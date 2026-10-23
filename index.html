@@ -170,6 +170,9 @@ footer span:last-child{margin-left:auto}
 #findbar button:hover{background:var(--accent-soft)}
 #findbar label{display:flex;gap:4px;align-items:center;color:var(--muted)}
 #fstat{color:var(--muted);min-width:90px}
+#ffsum{color:var(--muted);font-size:12px}
+#fmtDlg{width:min(460px,94vw)}#fmtDlg h3{margin:0 0 10px}#fmtDlg input[type=text],#fmtDlg select{height:30px;border:1px solid var(--line);border-radius:4px;padding:0 8px;background:var(--paper);color:var(--paper-ink);font:inherit;width:100%}
+#fmtDlg button{height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 12px;cursor:pointer;font:inherit}#fmtDlg button:hover{background:var(--accent-soft)}
 #page code{background:#eef0f3;border-radius:3px;padding:1px 4px;font-family:Consolas,"Courier New",monospace;font-size:.95em}
 #page .pb{border-top:2px dashed #b9c3cf;margin:1.2em 0;page-break-after:always;break-after:page}
 @media print{#page,#sheet{zoom:1 !important} #page .pb{border:0;margin:0} #findbar{display:none}}
@@ -911,11 +914,33 @@ main{cursor:default}
   <label><input type="checkbox" id="fcase"> Diferenciar maiúsculas</label>
   <label><input type="checkbox" id="fword"> Palavra inteira</label>
   <label><input type="checkbox" id="fhl" checked> Realçar tudo</label>
+  <label title="Usar curingas: ? * &lt; &gt; [a-z] [!a-z] (…) {n,m} @ e \1 na substituição"><input type="checkbox" id="fwild"> Curingas</label>
+  <button id="fspec" type="button" title="Inserir código especial (^p parágrafo, ^t tabulação, ^l quebra de linha…)">Especial ▾</button>
+  <button id="ffmtF" type="button" title="Localizar por formatação">Formato…</button>
+  <button id="ffmtR" type="button" title="Aplicar formatação ao substituir">Formato da substituição…</button>
+  <span id="ffsum"></span>
   <button id="fprev" title="Anterior">↑</button><button id="fnext" title="Próximo">↓</button>
   <button id="frepl">Substituir</button><button id="freplAll">Substituir tudo</button>
   <span id="fstat"></span>
   <button id="fclose" aria-label="Fechar">✕</button>
 </div>
+
+<dialog id="fmtDlg">
+  <h3 id="fmtTitle">Formato</h3>
+  <div class="fdGrid">
+    <label>Fonte<input type="text" id="fmFont" placeholder="(qualquer)"></label>
+    <label>Tamanho (pt)<input type="text" id="fmSize" inputmode="decimal" placeholder="(qualquer)"></label>
+    <label>Negrito<select id="fmB"><option value="">—</option><option value="1">Sim</option><option value="0">Não</option></select></label>
+    <label>Itálico<select id="fmI"><option value="">—</option><option value="1">Sim</option><option value="0">Não</option></select></label>
+    <label>Sublinhado<select id="fmU"><option value="">—</option><option value="1">Sim</option><option value="0">Não</option></select></label>
+    <label>Tachado<select id="fmS"><option value="">—</option><option value="1">Sim</option><option value="0">Não</option></select></label>
+    <label>Cor do texto<span style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="fmCOn"><input type="color" id="fmColor" value="#000000"></span></label>
+    <label>Realce<select id="fmH"><option value="">—</option><option value="1">Com realce</option><option value="0">Sem realce</option></select></label>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+    <button type="button" id="fmClear">Limpar</button><button type="button" id="fmCancel">Cancelar</button><button type="button" id="fmOk">OK</button>
+  </div>
+</dialog>
 
 <div id="hfbar" hidden>
   <strong>Cabeçalho e Rodapé</strong>
@@ -2264,14 +2289,99 @@ main{cursor:default}
     if(t && t.length < 80 && !/\n/.test(t)) fi.value = t;
     fi.focus(); fi.select();
   }
-  function matches(){
-    const q = fi.value; if(!q) return [];
-    const esc = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const re = $('fword').checked ? new RegExp('(?<![\\p{L}\\p{N}_])' + esc + '(?![\\p{L}\\p{N}_])', fcase.checked ? 'gu' : 'giu') : new RegExp(esc, fcase.checked ? 'g' : 'gi');
-    const out = [], w = document.createTreeWalker(page, NodeFilter.SHOW_TEXT); let n;
+  // ---- Localizar e Substituir avançado: curingas, códigos especiais (^p ^t ^l …) e formatação ----
+  const FBLK = 'p,h1,h2,h3,h4,h5,h6,li,td,th,div,blockquote,pre,figcaption';
+  const WORDC = '\\p{L}\\p{N}_';
+  let fmtF = null, fmtR = null;   // {font,size,b,i,u,s,color,hl}
+  const rxEsc = c=>/[.*+?^${}()|[\]\\\/]/.test(c) ? '\\' + c : c;
+  const CODE = {p:'\\n', l:'\\n', t:'\\t', '?':'[^\\n]', '#':'\\d', '$':'\\p{L}', w:'[ \\t\\u00A0]+', s:'\\u00A0', '^':'\\^'};
+  function toRe(q, wild){
+    let o = '';
+    for(let i = 0; i < q.length; i++){
+      const c = q[i];
+      if(c === '^' && i + 1 < q.length && CODE[q[i + 1]]){ o += CODE[q[++i]]; continue; }
+      if(!wild){ o += rxEsc(c); continue; }
+      if(c === '\\' && i + 1 < q.length){ o += rxEsc(q[++i]); continue; }
+      if(c === '?') o += '[^\\n]';
+      else if(c === '*') o += '[^\\n]*?';
+      else if(c === '<') o += '(?<![' + WORDC + '])(?=[' + WORDC + '])';
+      else if(c === '>') o += '(?<=[' + WORDC + '])(?![' + WORDC + '])';
+      else if(c === '@') o += '+';
+      else if(c === '['){ const j = q.indexOf(']', i + 2); if(j < 0) throw new Error('classe'); let cl = q.slice(i + 1, j); if(cl[0] === '!') cl = '^' + cl.slice(1); o += '[' + cl.replace(/[\\\[]/g, '\\$&') + ']'; i = j; }
+      else if(c === '{'){ const j = q.indexOf('}', i); if(j < 0) throw new Error('chave'); o += q.slice(i, j + 1); i = j; }
+      else if(c === '(' || c === ')') o += c;
+      else o += rxEsc(c);
+    }
+    return o;
+  }
+  function flatDoc(){
+    const segs = []; let txt = '', prev = null;
+    const w = document.createTreeWalker(page, NodeFilter.SHOW_TEXT); let n;
     while((n = w.nextNode())){
-      let m; re.lastIndex = 0;
-      while((m = re.exec(n.data))) out.push([n, m.index, m.index + m[0].length]);
+      const pe = n.parentElement; if(!pe || pe.closest('.pb')) continue;
+      if(!n.data.trim() && (pe === page || pe.matches('ul,ol,table,tbody,thead,tfoot,tr'))) continue;
+      if(!n.data) continue;
+      const blk = pe.closest(FBLK) || page;
+      if(prev && blk !== prev) txt += '\n';
+      segs.push({n, s:txt.length}); txt += n.data; prev = blk;
+    }
+    return {segs, txt};
+  }
+  function loc(segs, i, end){
+    if(end){
+      for(const k of segs){ const l = k.n.data.length; if(i > k.s && i <= k.s + l) return [k.n, i - k.s]; }
+      for(const k of segs) if(k.s >= i) return [k.n, 0];
+    }else{
+      for(const k of segs){ const l = k.n.data.length; if(i >= k.s && i < k.s + l) return [k.n, i - k.s]; }
+      for(let j = segs.length - 1; j >= 0; j--) if(segs[j].s + segs[j].n.data.length <= i) return [segs[j].n, segs[j].n.data.length];
+    }
+    return null;
+  }
+  function fmtOk(node, f){
+    const el = node.nodeType === 3 ? node.parentElement : node; if(!el) return false;
+    const cs = getComputedStyle(el);
+    if(f.font && !cs.fontFamily.toLowerCase().includes(f.font.toLowerCase())) return false;
+    if(f.size && Math.abs(parseFloat(cs.fontSize) * 0.75 - f.size) > 0.26) return false;
+    if(f.b != null && (parseInt(cs.fontWeight) >= 600) !== f.b) return false;
+    if(f.i != null && /italic|oblique/.test(cs.fontStyle) !== f.i) return false;
+    if(f.u != null || f.s != null || f.hl != null){
+      let u = false, st = false, hl = false;
+      for(let e = el; e && e !== page.parentElement; e = e.parentElement){
+        const c = getComputedStyle(e), td = c.textDecorationLine || '';
+        if(td.includes('underline')) u = true;
+        if(td.includes('line-through')) st = true;
+        const bg = c.backgroundColor; if(bg && bg !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(bg) && e !== page) hl = true;
+        if(e === page) break;
+      }
+      if(f.u != null && u !== f.u) return false;
+      if(f.s != null && st !== f.s) return false;
+      if(f.hl != null && hl !== f.hl) return false;
+    }
+    if(f.color){ const t = document.createElement('i'); t.style.color = f.color; document.body.appendChild(t); const want = getComputedStyle(t).color; t.remove(); if(cs.color !== want) return false; }
+    return true;
+  }
+  function matches(){
+    const q = fi.value; if(!q && !fmtF) return [];
+    const wild = $('fwild').checked, out = [], {segs, txt} = flatDoc();
+    if(!q){   // só formatação: cada trecho de texto com o formato
+      segs.forEach(k=>{ if(k.n.data.trim() && fmtOk(k.n, fmtF)){ const r = document.createRange(); r.setStart(k.n, 0); r.setEnd(k.n, k.n.data.length); out.push({r, m:[k.n.data]}); } });
+      return out;
+    }
+    let src;
+    try{
+      src = toRe(q, wild);
+      if(!wild && $('fword').checked) src = '(?<![' + WORDC + '])' + src + '(?![' + WORDC + '])';
+      var re = new RegExp(src, 'gu' + (fcase.checked ? '' : 'i'));
+    }catch(e){ $('fstat').textContent = 'Padrão inválido'; return []; }
+    let m;
+    while((m = re.exec(txt))){
+      if(!m[0].length){ re.lastIndex++; continue; }
+      const a = loc(segs, m.index, false), b = loc(segs, m.index + m[0].length, true);
+      if(!a || !b) continue;
+      if(fmtF && !(fmtOk(a[0], fmtF) && fmtOk(b[0], fmtF))) continue;
+      const r = document.createRange(); r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]);
+      if(r.collapsed) continue;
+      out.push({r, m});
     }
     return out;
   }
@@ -2280,20 +2390,99 @@ main{cursor:default}
     try{
       if(!window.CSS || !CSS.highlights) return;
       if(!ms.length || !$('fhl').checked){ CSS.highlights.delete('vfind'); return; }
-      const rs = ms.map(m=>{ const r = document.createRange(); r.setStart(m[0], m[1]); r.setEnd(m[0], m[2]); return r; });
-      CSS.highlights.set('vfind', new Highlight(...rs));
+      CSS.highlights.set('vfind', new Highlight(...ms.map(m=>m.r.cloneRange())));
     }catch(e){}
   }
   function step(dir){
     const ms = matches();
-    if(!ms.length){ $('fstat').textContent = 'Nenhum resultado'; hlAll([]); return; }
+    if(!ms.length){ if($('fstat').textContent !== 'Padrão inválido') $('fstat').textContent = 'Nenhum resultado'; hlAll([]); return; }
     fIdx = (fIdx + dir + ms.length) % ms.length;
     $('fstat').textContent = (fIdx + 1) + ' de ' + ms.length;
     hlAll(ms);
-    const m = ms[fIdx], r = document.createRange();
-    r.setStart(m[0], m[1]); r.setEnd(m[0], m[2]);
-    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-    m[0].parentElement.scrollIntoView({block:'center'});
+    const r = ms[fIdx].r, s = getSelection(); s.removeAllRanges(); s.addRange(r.cloneRange());
+    const el = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer;
+    if(el) el.scrollIntoView({block:'center'});
+  }
+  // expande ^& ^p ^t ^l ^s ^^ e \1..\9 (curingas) na substituição
+  function expand(str, m, wild){
+    let o = '';
+    for(let i = 0; i < str.length; i++){
+      const c = str[i];
+      if(c === '^' && i + 1 < str.length){
+        const d = str[i + 1];
+        if(d === '&'){ o += m[0]; i++; continue; }
+        if(d === 'p' || d === 'l'){ o += '\n'; i++; continue; }
+        if(d === 't'){ o += '\t'; i++; continue; }
+        if(d === 's'){ o += ' '; i++; continue; }
+        if(d === '^'){ o += '^'; i++; continue; }
+      }
+      if(wild && c === '\\' && /[1-9]/.test(str[i + 1] || '')){ o += m[+str[i + 1]] || ''; i++; continue; }
+      o += c;
+    }
+    return o;
+  }
+  function styleSpan(sp, f){
+    if(f.font) sp.style.fontFamily = f.font;
+    if(f.size) sp.style.fontSize = f.size + 'pt';
+    if(f.b != null) sp.style.fontWeight = f.b ? 'bold' : 'normal';
+    if(f.i != null) sp.style.fontStyle = f.i ? 'italic' : 'normal';
+    const td = []; if(f.u) td.push('underline'); if(f.s) td.push('line-through');
+    if(f.u != null || f.s != null) sp.style.textDecoration = td.join(' ') || 'none';
+    if(f.color) sp.style.color = f.color;
+    if(f.hl != null) sp.style.backgroundColor = f.hl ? '#ffff00' : 'transparent';
+  }
+  function fmtRange(r, f){   // aplica formato a cada trecho de texto dentro do intervalo
+    const w = document.createTreeWalker(r.commonAncestorContainer.nodeType === 3 ? r.commonAncestorContainer.parentNode : r.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+    const list = []; let n; while((n = w.nextNode())) if(r.intersectsNode(n) && n.data) list.push(n);
+    list.forEach(t=>{
+      let a = 0, b = t.data.length;
+      if(t === r.endContainer) b = r.endOffset;
+      if(t === r.startContainer) a = r.startOffset;
+      if(b <= a) return;
+      if(b < t.data.length) t.splitText(b);
+      let mid = a > 0 ? t.splitText(a) : t;
+      const sp = document.createElement('span'); mid.replaceWith(sp); sp.appendChild(mid); styleSpan(sp, f);
+    });
+  }
+  function blockOf(n){ const e = n.nodeType === 3 ? n.parentElement : n; return e && e.closest(FBLK) || null; }
+  function firstText(el){ const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); return w.nextNode(); }
+  function replaceOne(mt){
+    const wild = $('fwild').checked, rv = ri.value, r = mt.r;
+    if(rv === '' && fmtR){ fmtRange(r, fmtR); return; }
+    const txt = expand(rv, mt.m, wild);
+    const sb = blockOf(r.startContainer), eb = blockOf(r.endContainer);
+    const sc = r.startContainer, so = r.startOffset;
+    r.deleteContents();
+    if(sb && eb && sb !== eb && page.contains(eb) && !sb.contains(eb) && !eb.contains(sb)){
+      while(eb.firstChild) sb.appendChild(eb.firstChild); eb.remove();
+    }
+    if(sc.nodeType === 3 && sc.isConnected){ r.setStart(sc, Math.min(so, sc.data.length)); r.collapse(true); }
+    if(!txt) return;
+    const parts = txt.split('\n');
+    const made = [sb].filter(Boolean);
+    parts.forEach((part, j)=>{
+      if(j > 0){
+        const last = r.startContainer, blk = blockOf(last);
+        if(blk && page.contains(blk)){
+          const r2 = document.createRange(); r2.setStart(r.startContainer, r.startOffset);
+          r2.setEndAfter(blk.lastChild || blk);
+          const frag = r2.extractContents(), nb = blk.cloneNode(false); nb.removeAttribute('id');
+          nb.appendChild(frag); if(!nb.textContent && !nb.querySelector('img,br,table')) nb.innerHTML = '<br>';
+          blk.after(nb);
+          made.push(nb);
+          const ft = firstText(nb);
+          if(ft) r.setStart(ft, 0); else r.setStart(nb, 0);
+          r.collapse(true);
+        }else{ const br = document.createElement('br'); r.insertNode(br); r.setStartAfter(br); r.collapse(true); }
+      }
+      if(part){
+        const t = document.createTextNode(part);
+        if(fmtR){ const sp = document.createElement('span'); sp.appendChild(t); styleSpan(sp, fmtR); r.insertNode(sp); r.setStartAfter(sp); }
+        else{ r.insertNode(t); r.setStartAfter(t); }
+        r.collapse(true);
+      }
+    });
+    made.forEach(b=>{ if(b.isConnected && !b.textContent && !b.querySelector('img,br,table')) b.innerHTML = '<br>'; });
   }
   $('btnFind').addEventListener('click', e=>{
     if(e.target.closest('.car')){ e.stopPropagation(); findMenu(); return; }
@@ -2447,13 +2636,75 @@ main{cursor:default}
   $('frepl').addEventListener('click', ()=>{
     const ms = matches(); if(!ms.length) return;
     if(fIdx < 0 || fIdx >= ms.length) fIdx = 0;
-    const m = ms[fIdx]; m[0].replaceData(m[1], m[2]-m[1], ri.value);
+    replaceOne(ms[fIdx]);
     changed(); fIdx--; step(1);
   });
   $('freplAll').addEventListener('click', ()=>{
     const ms = matches();
-    for(let i = ms.length - 1; i >= 0; i--) ms[i][0].replaceData(ms[i][1], ms[i][2]-ms[i][1], ri.value);
+    for(let i = ms.length - 1; i >= 0; i--) replaceOne(ms[i]);
     $('fstat').textContent = ms.length + ' substituído(s)'; changed(); fIdx = -1; try{ CSS.highlights.delete('vfind'); }catch(e){}
+  });
+  $('fwild').addEventListener('change', ()=>{ fIdx = -1; step(1); });
+  // códigos especiais
+  let lastField = fi; fi.addEventListener('focus', ()=>lastField = fi); ri.addEventListener('focus', ()=>lastField = ri);
+  $('fspec').addEventListener('click', e=>{
+    e.stopPropagation();
+    const old = $('fmenu'); if(old){ old.remove(); return; }
+    const r = $('fspec').getBoundingClientRect(), m = document.createElement('div');
+    m.id = 'fmenu'; m.style.left = r.left + 'px'; m.style.top = r.bottom + 2 + 'px';
+    const inRepl = lastField === ri;
+    const L = inRepl
+      ? [['Marca de parágrafo','^p'],['Tabulação','^t'],['Quebra de linha','^l'],['Espaço não separável','^s'],['Texto localizado','^&'],['Acento circunflexo','^^']]
+      : [['Marca de parágrafo','^p'],['Tabulação','^t'],['Quebra de linha','^l'],['Qualquer caractere','^?'],['Qualquer dígito','^#'],['Qualquer letra','^$'],['Espaço em branco','^w'],['Espaço não separável','^s'],['Acento circunflexo','^^']];
+    L.forEach(([t,c])=>{
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = t + '   ' + c;
+      b.addEventListener('mousedown', ev=>ev.preventDefault());
+      b.addEventListener('click', ()=>{
+        m.remove(); const f = lastField, a = f.selectionStart ?? f.value.length, z = f.selectionEnd ?? a;
+        f.value = f.value.slice(0, a) + c + f.value.slice(z); f.focus(); f.setSelectionRange(a + c.length, a + c.length);
+        if(f === fi){ fIdx = -1; step(1); }
+      });
+      m.appendChild(b);
+    });
+    document.body.appendChild(m);
+    setTimeout(()=>document.addEventListener('click', function g(){ m.remove(); document.removeEventListener('click', g); }), 0);
+  });
+  // formato a localizar / a aplicar
+  const fmDlg = $('fmtDlg'); let fmTarget = 'F';
+  const SEL = {b:'fmB', i:'fmI', u:'fmU', s:'fmS', hl:'fmH'};
+  function fmtSummary(f){
+    if(!f) return '';
+    const p = [];
+    if(f.font) p.push(f.font); if(f.size) p.push(f.size + ' pt');
+    [['b','negrito'],['i','itálico'],['u','sublinhado'],['s','tachado'],['hl','realce']].forEach(([k,n])=>{ if(f[k] != null) p.push((f[k] ? '' : 'sem ') + n); });
+    if(f.color) p.push('cor ' + f.color);
+    return p.join(', ');
+  }
+  function updSum(){
+    const a = fmtSummary(fmtF), b = fmtSummary(fmtR);
+    $('ffsum').textContent = [a && 'Localizar: ' + a, b && 'Substituir: ' + b].filter(Boolean).join(' · ');
+    $('ffmtF').style.fontWeight = fmtF ? '700' : ''; $('ffmtR').style.fontWeight = fmtR ? '700' : '';
+  }
+  function openFmt(t){
+    fmTarget = t; const f = (t === 'F' ? fmtF : fmtR) || {};
+    $('fmtTitle').textContent = t === 'F' ? 'Localizar formato' : 'Formato da substituição';
+    $('fmFont').value = f.font || ''; $('fmSize').value = f.size || '';
+    for(const k in SEL) $(SEL[k]).value = f[k] == null ? '' : (f[k] ? '1' : '0');
+    $('fmCOn').checked = !!f.color; if(f.color) $('fmColor').value = f.color;
+    fmDlg.showModal();
+  }
+  $('ffmtF').addEventListener('click', ()=>openFmt('F'));
+  $('ffmtR').addEventListener('click', ()=>openFmt('R'));
+  $('fmCancel').addEventListener('click', ()=>fmDlg.close());
+  $('fmClear').addEventListener('click', ()=>{ if(fmTarget === 'F') fmtF = null; else fmtR = null; updSum(); fmDlg.close(); fIdx = -1; step(1); });
+  $('fmOk').addEventListener('click', ()=>{
+    const f = {}, font = $('fmFont').value.trim(), size = parseFloat(($('fmSize').value || '').replace(',', '.'));
+    if(font) f.font = font; if(size > 0) f.size = size;
+    for(const k in SEL){ const v = $(SEL[k]).value; if(v !== '') f[k] = v === '1'; }
+    if($('fmCOn').checked) f.color = $('fmColor').value;
+    const v = Object.keys(f).length ? f : null;
+    if(fmTarget === 'F') fmtF = v; else fmtR = v;
+    updSum(); fmDlg.close(); fIdx = -1; step(1);
   });
 
   // Atalhos
