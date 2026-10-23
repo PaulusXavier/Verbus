@@ -95,6 +95,7 @@ main{flex:1;overflow:auto;padding:24px 36px 48px}
 #page{background:var(--paper);color:var(--paper-ink);width:100%;max-width:none;min-height:var(--ph,29.7cm);
   margin:0;padding:var(--mt,2.5cm) var(--mr,3cm) var(--mb,2.5cm) var(--ml,3cm);box-shadow:0 0 0 1px var(--pgedge,#c6c6c6);outline:none;
   font:11pt/1.08 Calibri,"Carlito","Segoe UI",sans-serif;word-wrap:break-word;overflow-wrap:anywhere}
+#page{tab-size:var(--tabdef,1.25cm);-moz-tab-size:var(--tabdef,1.25cm)} #page .tb{white-space:pre}
 #page:empty:before{content:"";color:#9aa3ad}
 #page h1{font-size:24pt;margin:.5em 0 .3em}
 #page h2{font-size:18pt;margin:.5em 0 .3em}
@@ -118,6 +119,8 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="dark"]{--bg:#14171b;--bar:#20252b;--ink:#e6e9ed;--muted:#98a3b0;--line:#38414b;--accent:#7aa8f5;--accent-soft:#27364f;--pgedge:#0b0d10}
 :root[data-theme="light"]{--bg:#e6e6e6;--bar:#f7f8fa;--ink:#1f2933;--muted:#5f6b7a;--line:#c9d0d8;--accent:#1d5fd1;--accent-soft:#dce8fb;--pgedge:#c6c6c6}
 ::highlight(vfind){background:#ffe36e;color:#000}
+::highlight(vsim){background:#9ec5fa;color:#000}
+@media print{::highlight(vsim){background:transparent;color:inherit}}
 @media print{::highlight(vfind){background:transparent;color:inherit}}
 @media print{html,body,main,#work,#sheet{background:#fff !important}#clipDlg,#fmenu,#cpal,#minibar,#gotoDlg{display:none !important}#page{caret-color:transparent}}
 #page .ctx + .ctx{margin-top:0 !important}
@@ -253,6 +256,19 @@ main{padding-top:0}
 #vruler{position:absolute;left:-24px;top:0;bottom:0;width:12px;user-select:none;-webkit-user-select:none;touch-action:none}
 #vruler[hidden]{display:none}
 .mgv{position:absolute;left:0;right:0;height:8px;margin-top:-4px;cursor:row-resize;z-index:2}
+/* Tabulações personalizadas: marcadores na régua e largura calculada de cada tabulação */
+#page .tb.tbc{display:inline-block;white-space:pre;overflow:visible}
+#page .tb.tl-d{background:radial-gradient(circle,currentColor .7px,transparent .95px) 0 78%/4px 4px repeat-x}
+#page .tb.tl-h{background:linear-gradient(90deg,currentColor 55%,transparent 55%) 0 80%/5px 1px repeat-x}
+#page .tb.tl-u{background:linear-gradient(currentColor,currentColor) 0 82%/100% 1px no-repeat}
+#tabSel{position:absolute;left:1px;top:3px;width:19px;height:16px;padding:0;border:1px solid var(--line);background:var(--paper);color:var(--paper-ink);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6}
+#tabSel:hover{border-color:var(--accent)}
+#tabSel svg,.ts svg{width:9px;height:9px;display:block;stroke:currentColor;fill:none;stroke-width:1.6;pointer-events:none}
+.ts{position:absolute;top:1px;width:11px;height:10px;margin-left:-5.5px;display:flex;align-items:center;justify-content:center;color:#222;cursor:ew-resize;z-index:2}
+.ts:hover,.ts.drag{color:var(--accent)} .ts.rm-off{opacity:.3}
+@media (prefers-color-scheme: dark){.ts{color:#222}}
+@media (max-width:700px){#tabSel{display:none}}
+@media print{#tabSel,.ts{display:none !important}}
 #rulerGuide{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--accent);display:none;pointer-events:none;z-index:4}
 @media (max-width:700px){#rulerWrap,#vruler,#rulerGuide{display:none !important}}
 @media print{#rulerWrap,#vruler,#rulerGuide{display:none !important}#sheet,#sheet.abnt{width:auto;max-width:none;margin:0}}
@@ -615,6 +631,7 @@ main{cursor:default}
     <button id="btnQSave" title="Salvar (Ctrl+S)" aria-label="Salvar"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2.5h9l2 2v9h-11z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M5 2.5v3.6h5V2.5M5 13.5V9h6v4.5" fill="none" stroke="#fff" stroke-width="1.4"/></svg></button>
     <button data-cmd="undo" title="Desfazer (Ctrl+Z)" aria-label="Desfazer"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6.5h6.2a3.8 3.8 0 010 7.6H5.5M3 6.5l3-3M3 6.5l3 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button data-cmd="redo" title="Refazer (Ctrl+Y)" aria-label="Refazer"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M15 6.5H8.8a3.8 3.8 0 000 7.6h3.7M15 6.5l-3-3M15 6.5l-3 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(-1 0)"/></svg></button>
+    <button id="btnRepeat" title="Repetir (F4): repete a última ação" aria-label="Repetir"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 11-1.6-3.7M13 2.5v3h-3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button id="btnQMore" title="Personalizar a barra de acesso rápido (em breve)" aria-label="Personalizar a barra de acesso rápido" disabled><svg class="ic" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3h10" stroke="#fff" stroke-width="1.3"/><path d="M4 7h8l-4 4.5z" fill="#fff"/></svg></button>
   </div>
   <div id="ttl"><input id="title" value="Documento sem título" aria-label="Nome do documento" spellcheck="false"><span class="app"> - Verbus</span></div>
@@ -752,7 +769,7 @@ main{cursor:default}
       <button id="btnRepl" class="rb sm" title="Substituir (Ctrl+H)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><text x="0.5" y="7.2" font-size="7.5" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#555">ab</text><text x="6" y="14.2" font-size="7.5" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">ac</text><path d="M2.4 9v2.8h2.2" stroke="#7a4fb0" fill="none"/></svg><span>Substituir</span></button>
       <span class="dd sm selw"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.8l7.6 7H8l2.4 4.8-1.9.9L6.1 9.6 4 11.8z" fill="#fff" stroke="#555"/></svg><span class="tx">Selecionar</span><i class="car"></i><select id="selAll" title="Selecionar">
       <option value="" selected disabled hidden>Selecionar</option>
-      <option value="all">Selecionar tudo (Ctrl+A)</option><option value="par">Selecionar o parágrafo atual</option><option value="obj">Selecionar objetos (imagens e tabelas)</option>
+      <option value="all">Selecionar tudo (Ctrl+A)</option><option value="par">Selecionar o parágrafo atual</option><option value="sim">Selecionar texto com formatação semelhante</option><option value="obj">Selecionar objetos (imagens e tabelas)</option>
     </select></span>
     </div><div class="gl">Edição</div></div>
     <div class="group voz" role="group" aria-label="Voz"><div class="gb">
@@ -1099,7 +1116,20 @@ main{cursor:default}
     <label><input type="checkbox" id="pdCtx"> Não adicionar espaço entre parágrafos do mesmo estilo</label>
   </div>
   <p id="pdMsg" role="alert" style="margin:8px 0 0;color:#c0392b;min-height:1.3em"></p>
-  <div class="dlgrow"><button id="pdOk">OK</button><button id="pdCancel">Cancelar</button></div>
+  <div class="dlgrow"><button id="pdTabs" type="button" title="Definir paradas de tabulação e preenchimento">Tabulações…</button><button id="pdOk">OK</button><button id="pdCancel">Cancelar</button></div>
+</dialog>
+<dialog id="tabDlg">
+  <h3>Tabulações</h3>
+  <div class="fdGrid">
+    <label class="full">Tabulação padrão (cm), vale para o documento todo<input type="text" id="tdDef" inputmode="decimal" autocomplete="off" placeholder="1,25"></label>
+    <label class="full">Posição da parada de tabulação (cm)<input type="text" id="tdPos" inputmode="decimal" autocomplete="off" placeholder="ex.: 6,5"></label>
+    <label class="full">Paradas definidas<select id="tdList" size="6" style="height:auto;padding:4px"></select></label>
+    <label>Alinhamento<select id="tdAlign"><option value="l">Esquerda</option><option value="c">Centralizada</option><option value="r">Direita</option><option value="d">Decimal</option></select></label>
+    <label>Preenchimento<select id="tdLead"><option value="">Nenhum</option><option value="d">Pontos (......)</option><option value="h">Tracejado (------)</option><option value="u">Sublinhado (______)</option></select></label>
+  </div>
+  <p style="margin:8px 0 0;color:var(--muted);font-size:12px">Depois da última parada definida valem as paradas padrão. As paradas definidas valem para os parágrafos selecionados; a tabulação padrão vale para o documento todo.</p>
+  <p id="tdMsg" role="alert" style="margin:6px 0 0;color:#c0392b;min-height:1.3em"></p>
+  <div class="dlgrow"><button id="tdSet">Definir</button><button id="tdClear">Limpar</button><button id="tdClearAll">Limpar tudo</button><button id="tdOk">OK</button><button id="tdCancel">Cancelar</button></div>
 </dialog>
 <dialog id="nfDlg">
   <h3>Definir Novo Formato de Número</h3>
@@ -1462,6 +1492,8 @@ main{cursor:default}
       if(m && m[k] != null && !mob) page.style.setProperty('--m' + k, m[k] + 'px');
       else page.style.removeProperty('--m' + k);
     });
+    if(d && d.tabdef) page.style.setProperty('--tabdef', d.tabdef + 'cm'); else page.style.removeProperty('--tabdef');   // tabulação padrão do documento
+    if(window.__tabsSoon) window.__tabsSoon();
     const e = effMar(), st = document.getElementById('pgStyle'), sh = document.getElementById('sheet'), pg = pgOf();
     if(sh){
       sh.style.setProperty('--pw', pg.w + 'cm'); sh.style.setProperty('--ph', pg.h + 'cm');
@@ -1566,6 +1598,13 @@ main{cursor:default}
   // HTML do corpo para exportar: imagens flutuantes viram posição absoluta de verdade e todas ganham largura/altura em px
   function bodyHtml(forDoc){
     const live = [...page.querySelectorAll('img')], c = page.cloneNode(true), cl = [...c.querySelectorAll('img')];
+    c.querySelectorAll('[data-tabs]').forEach(b=>{
+      const ts = (b.dataset.tabs || '').split(',').map(q=>{ const a = q.split(':'); return {x:parseFloat(a[0]), t:a[1], l:a[2]}; }).filter(o=>isFinite(o.x));
+      if(!ts.length) return;
+      const v = 'tab-stops:' + ts.map(o=>({c:'center ', r:'right ', d:'decimal '}[o.t] || '') + ({d:'dotted ', h:'dashed ', u:'lined '}[o.l] || '') + (Math.round(o.x * 28.35 * 10) / 10) + 'pt').join(' '), st = b.getAttribute('style') || '';
+      b.setAttribute('style', st + (st && !/;\s*$/.test(st) ? ';' : '') + v);
+    });
+    c.querySelectorAll('.tb').forEach(t=>{ t.setAttribute('style', 'mso-tab-count:1'); t.textContent = '    '; });   // tabulação: o Word lê mso-tab-count como uma parada de tabulação
     cl.forEach((im, i)=>{
       const lv = live[i]; if(!lv) return;
       const w = lv.offsetWidth, h = lv.offsetHeight;
@@ -1727,7 +1766,7 @@ main{cursor:default}
       : '@page Section1{size:' + sz + ';margin:' + mg + extra + ext + '}div.Section1{page:Section1}body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.08}' + (window.__styCss ? window.__styCss() : '');
     return '<!DOCTYPE html><html lang="pt-BR" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"><title>' +
       title.value.replace(/</g,'&lt;') + '</title><style>' + base +
-      'table{border-collapse:collapse}td{border:1px solid #888;padding:6px 8px}img{max-width:100%}</style></head><body>' +
+      'body{tab-interval:' + (Math.round(((store.docs[store.current] || {}).tabdef || 1.25) * 28.35 * 10) / 10) + 'pt}table{border-collapse:collapse}td{border:1px solid #888;padding:6px 8px}img{max-width:100%}</style></head><body>' +
       '<div class="Section1">' + bodyHtml(forDoc) + '</div>' +
       (hasHF ? '<div style=\'mso-element:header\' id="h1">' + hfImgsDoc() + hfLines('h', 'MsoHeader') + '</div><div style=\'mso-element:footer\' id="f1">' + hfLines('f', 'MsoFooter') + '</div>' +
         (dif ? '<div style=\'mso-element:header\' id="fh1"><p class="MsoHeader"></p></div><div style=\'mso-element:footer\' id="ff1"><p class="MsoFooter"></p></div>' : '') : '') +
@@ -2831,6 +2870,7 @@ main{cursor:default}
     store.current = id; const d = store.docs[id];
     title.value = d.title || 'Documento sem título'; page.innerHTML = d.html || '';
     applyMar(); persist(); updateCount(); renderSide();
+    if(window.__tabsSoon) window.__tabsSoon();
   }
   function newDoc(){
     save(); const id = uid();
@@ -3286,6 +3326,29 @@ main{cursor:default}
     const li = selEl().closest('li'); if(!li || !page.contains(li)) return;
     e.preventDefault(); exec(e.shiftKey ? 'outdent' : 'indent');
   });
+  function cellMove(td, back){
+    const table = td.closest('table'); if(!table) return;
+    const cells = ()=>[...table.querySelectorAll('td, th')].filter(c=>c.closest('table') === table);
+    let all = cells(), i = all.indexOf(td) + (back ? -1 : 1);
+    if(i < 0) return;
+    if(i >= all.length){   // última célula: Tab cria uma nova linha (como no Word)
+      const last = all[all.length - 1].parentNode, n = last.cloneNode(true);
+      n.querySelectorAll('td, th').forEach(x=>{ x.innerHTML = '<br>'; });
+      last.parentNode.insertBefore(n, last.nextSibling); changed(); all = cells();
+    }
+    const c = all[i], r = document.createRange(), sl = getSelection();
+    r.selectNodeContents(c); if(!c.textContent.trim() && !c.querySelector('img')) r.collapse(true);
+    sl.removeAllRanges(); sl.addRange(r);
+  }
+  // Tabulação (passo 1): Tab fora de listas e tabelas insere um caractere de tabulação; paradas padrão a cada 1,25 cm (como no Word)
+  page.addEventListener('keydown', e=>{
+    if(e.key !== 'Tab' || e.ctrlKey || e.altKey || e.metaKey) return;
+    const el = selEl(); if(!el || !page.contains(el) || el.closest('li')) return;
+    const cell = el.closest('td, th');
+    if(cell){ e.preventDefault(); cellMove(cell, e.shiftKey); return; }   // na tabela: Tab vai para a próxima célula, Shift+Tab para a anterior
+    e.preventDefault(); if(e.shiftKey) return;
+    exec('insertHTML', '<span class="tb">&#9;</span>');
+  });
 
   let sortAsc = true;
   $('btnSort').addEventListener('click', ()=>{
@@ -3664,7 +3727,7 @@ main{cursor:default}
     const mg = {L:$('mgL'), R:$('mgR'), T:$('mgT'), B:$('mgB')};
     const CM = CMPX, Q = CM / 4, BLK = 'p,h1,h2,h3,h4,h5,h6,li,div,blockquote,pre';
     const MARGIN = '#c6c6c6', INK = '#404040', TICK = '#5a5a5a', RH = 12;   // cores e altura da faixa iguais às do Word
-    let key = '', vkey = '', W = 0, H = 0, pad = {t:0, r:0, b:0, l:0}, s = 1, drag = null;
+    let key = '', vkey = '', W = 0, H = 0, pad = {t:0, r:0, b:0, l:0}, s = 1, drag = null, tType = 'l', tdrag = null;
 
     function zoomNow(){ return parseFloat(sheet.style.zoom) || 1; }
     function blocks(){
@@ -3738,6 +3801,7 @@ main{cursor:default}
       mk.first.style.left = st.f + 'px'; mk.left.style.left = st.l + 'px'; mk.both.style.left = st.l + 'px'; mk.right.style.left = st.r + 'px';
       mg.L.style.left = pad.l + 'px'; mg.R.style.left = (W - pad.r) + 'px';
       mg.T.style.top = pad.t + 'px'; mg.B.style.top = (H - pad.b) + 'px';
+      if(!tdrag) renderTabs();
     }
     function update(){
       if(wrap.hidden) return;
@@ -3832,6 +3896,179 @@ main{cursor:default}
       const g = e.target.closest('.mgv'); if(g){ resetMar(g.dataset.m.toLowerCase()); update(); }
     });
 
+
+    // --- tabulações personalizadas (paradas na régua) ---
+    const TT = ['l','c','r','d'], TN = {l:'Esquerda', c:'Centralizada', r:'Direita', d:'Decimal'};
+    const TSVG = {l:'<path d="M2 1V7.5H7.5"/>', c:'<path d="M4.5 1V7.5M1.5 7.5H7.5"/>', r:'<path d="M7 1V7.5H1.5"/>', d:'<path d="M3.2 1V7.5M.8 7.5H5.6"/><circle cx="7.4" cy="6.9" r=".7" fill="currentColor" stroke="none"/>'};
+    const tsvg = t=>'<svg viewBox="0 0 9 9" aria-hidden="true">' + TSVG[t] + '</svg>';
+    const defTab = ()=>((store.docs[store.current] || {}).tabdef || 1.25) * CM;
+    const tabSel = document.createElement('button'); tabSel.type = 'button'; tabSel.id = 'tabSel'; wrap.appendChild(tabSel);
+    function tabSelDraw(){ tabSel.innerHTML = tsvg(tType); tabSel.title = 'Tipo de tabulação: ' + TN[tType] + ' (clique para trocar; depois clique na régua para criar a parada)'; tabSel.setAttribute('aria-label', tabSel.title); }
+    tabSel.addEventListener('mousedown', e=>e.preventDefault());
+    tabSel.addEventListener('click', ()=>{ tType = TT[(TT.indexOf(tType) + 1) % TT.length]; tabSelDraw(); });
+    tabSelDraw();
+    const rcm = v=>Math.round(v * 100) / 100;
+    function getTabs(b){
+      return (b.dataset.tabs || '').split(',').map(q=>{ const a = q.split(':'); return {x:parseFloat(a[0]), t:TT.includes(a[1]) ? a[1] : 'l', l:'dhu'.includes(a[2] || 'n') && a[2] ? a[2] : ''}; }).filter(o=>isFinite(o.x)).sort((a, b)=>a.x - b.x);
+    }
+    function setTabs(b, arr){
+      if(arr.length) b.dataset.tabs = arr.map(o=>rcm(o.x) + ':' + o.t + (o.l ? ':' + o.l : '')).join(',');
+      else b.removeAttribute('data-tabs');
+      tabLayout(b);
+    }
+    // largura do texto de um trecho (até o primeiro separador decimal, se dec)
+    function runWidth(rg, dec){
+      if(dec){
+        const txt = rg.toString(), m = /,/.exec(txt) || /\./.exec(txt);   // em português o separador decimal é a vírgula
+        if(m){
+          const w = document.createTreeWalker(rg.commonAncestorContainer.nodeType === 3 ? rg.commonAncestorContainer.parentNode : rg.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+          let n = w.nextNode(), left = m.index, started = false;
+          while(n){
+            if(n === rg.startContainer || rg.intersectsNode(n)){
+              let from = n === rg.startContainer ? rg.startOffset : 0, to = n === rg.endContainer ? rg.endOffset : n.data.length;
+              const len = to - from; started = true;
+              if(left <= len){ const r2 = rg.cloneRange(); r2.setEnd(n, from + left); return r2.getBoundingClientRect().width; }
+              left -= len;
+            }
+            n = w.nextNode();
+          }
+        }
+      }
+      return rg.getBoundingClientRect().width;
+    }
+    function tabLayout(b){
+      const tabs = getTabs(b), spans = [...b.querySelectorAll('.tb')];
+      if(!spans.length) return;
+      if(!tabs.length){ spans.forEach(t=>{ t.classList.remove('tbc', 'tl-d', 'tl-h', 'tl-u'); t.style.removeProperty('width'); if(!t.getAttribute('style')) t.removeAttribute('style'); }); return; }
+      const pr = page.getBoundingClientRect(), sc = page.offsetWidth ? pr.width / page.offsetWidth : 1, padL = parseFloat(getComputedStyle(page).paddingLeft) || 0;
+      const stops = tabs.map(o=>({x:o.x * CM, t:o.t, l:o.l}));
+      spans.forEach(t=>{ t.classList.add('tbc'); t.classList.remove('tl-d', 'tl-h', 'tl-u'); t.style.width = '0px'; });
+      spans.forEach((t, i)=>{
+        const x = (t.getBoundingClientRect().left - pr.left) / sc - padL;
+        const rg = document.createRange(); rg.setStartAfter(t);
+        if(spans[i + 1]) rg.setEndBefore(spans[i + 1]); else rg.setEnd(b, b.childNodes.length);
+        const tw = (t.nextSibling || spans[i + 1]) ? runWidth(rg, false) / sc : 0;
+        let w = null, used = null;
+        for(const st of stops){
+          if(st.x <= x + 1) continue;
+          let c = st.x - x;
+          if(st.t === 'c') c -= tw / 2; else if(st.t === 'r') c -= tw; else if(st.t === 'd') c -= runWidth(rg, true) / sc;
+          if(c >= 0){ w = c; used = st; break; }
+        }
+        if(w == null){   // depois da última parada personalizada valem as paradas padrão (1,25 cm)
+          const D = defTab(), g = (Math.floor((Math.max(x, stops[stops.length - 1].x) + 1) / D) + 1) * D; w = g - x;
+        }
+        t.style.width = rcm(w) + 'px';
+        if(used && used.l) t.classList.add('tl-' + used.l);
+      });
+    }
+    let tabRaf = 0;
+    function tabsAll(){
+      tabRaf = 0;
+      const set = new Set();
+      page.querySelectorAll('[data-tabs]').forEach(b=>set.add(b));
+      page.querySelectorAll('.tb.tbc').forEach(t=>{ const b = t.closest(BLK); if(b) set.add(b); });
+      set.forEach(tabLayout);
+    }
+    window.__tabsSoon = ()=>{ if(!tabRaf) tabRaf = requestAnimationFrame(tabsAll); };
+    function renderTabs(){
+      ruler.querySelectorAll('.ts').forEach(n=>n.remove());
+      const st = state(); if(!st.b) return;
+      getTabs(st.b).forEach(o=>{
+        const i = document.createElement('i'); i.className = 'ts'; i.dataset.x = o.x; i.style.left = (pad.l + o.x * CM) + 'px';
+        i.innerHTML = tsvg(o.t); i.title = 'Parada de tabulação ' + TN[o.t].toLowerCase() + ': arraste para mover; arraste para fora da régua para remover; clique duas vezes para abrir a caixa Tabulações';
+        ruler.appendChild(i);
+      });
+    }
+    ruler.addEventListener('pointerdown', e=>{
+      if(e.target.closest('.rm') || e.target.closest('.mg')) return;
+      const x = xOf(e);
+      let el = e.target.closest('.ts'), bs;
+      if(!el && (x < pad.l || x > W - pad.r)) return;
+      e.preventDefault();
+      bs = blocks();
+      if(!bs.length){ page.focus(); document.execCommand('formatBlock', false, 'p'); bs = blocks(); }
+      if(!bs.length) return;
+      let cm;
+      if(el){ cm = parseFloat(el.dataset.x); }
+      else{
+        cm = rcm((e.altKey ? x - pad.l : Math.round((x - pad.l) / Q) * Q) / CM);
+        bs.forEach(b=>{ const t = getTabs(b).filter(o=>Math.abs(o.x - cm) > .01); t.push({x:cm, t:tType}); setTabs(b, t); });
+        renderTabs(); el = [...ruler.querySelectorAll('.ts')].find(n=>Math.abs(parseFloat(n.dataset.x) - cm) < .011);
+      }
+      if(!el) return;
+      tdrag = {bs, cm, el}; el.classList.add('drag'); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    ruler.addEventListener('pointermove', e=>{
+      if(!tdrag) return;
+      const d = tdrag, rr = ruler.getBoundingClientRect(), out = Math.abs(e.clientY - (rr.top + rr.height / 2)) > 26;
+      d.el.classList.toggle('rm-off', out); d.out = out;
+      if(out) return;
+      const x = xOf(e), max = (W - pad.l - pad.r) / CM;
+      const cm = Math.max(0, Math.min(max, rcm((e.altKey ? x - pad.l : Math.round((x - pad.l) / Q) * Q) / CM)));
+      if(Math.abs(cm - d.cm) < .001) return;
+      d.bs.forEach(b=>{ const t = getTabs(b), k = t.find(o=>Math.abs(o.x - d.cm) < .011); if(k){ k.x = cm; setTabs(b, t.filter(o=>o === k || Math.abs(o.x - cm) > .01)); } });
+      d.cm = cm; d.el.dataset.x = cm; d.el.style.left = (pad.l + cm * CM) + 'px';
+    });
+    function tend(){
+      if(!tdrag) return;
+      const d = tdrag; tdrag = null;
+      if(d.out) d.bs.forEach(b=>setTabs(b, getTabs(b).filter(o=>Math.abs(o.x - d.cm) > .011)));
+      save(); update();
+    }
+    ruler.addEventListener('pointerup', tend); ruler.addEventListener('pointercancel', tend);
+    ruler.addEventListener('dblclick', e=>{ if(e.target.closest('.ts')) openTabDlg(); });
+    // ---- caixa Tabulações… ----
+    const td = $('tabDlg'), tdList = $('tdList'), pcm = v=>String(rcm(v)).replace('.', ',');
+    let tdWork = [];
+    function tdFill(sel){
+      tdList.innerHTML = '';
+      tdWork.forEach((o, i)=>{ const op = document.createElement('option'); op.value = i; op.textContent = pcm(o.x) + ' cm — ' + TN[o.t] + (o.l ? ' — ' + {d:'pontos', h:'tracejado', u:'sublinhado'}[o.l] : ''); tdList.appendChild(op); });
+      if(sel != null && tdWork[sel]){ tdList.value = String(sel); }
+    }
+    function tdPick(){
+      const o = tdWork[+tdList.value]; if(!o) return;
+      $('tdPos').value = pcm(o.x); $('tdAlign').value = o.t; $('tdLead').value = o.l || '';
+    }
+    tdList.addEventListener('change', tdPick);
+    function openTabDlg(){
+      restore();
+      let bs = blocks(); if(!bs.length){ page.focus(); try{ document.execCommand('formatBlock', false, 'p'); }catch(_){} bs = blocks(); }
+      if(!bs.length){ alert('Clique dentro de um parágrafo e abra a caixa Tabulações de novo.'); return; }
+      tdWork = getTabs(bs[0]); tdFill(tdWork.length ? 0 : null); $('tdMsg').textContent = '';
+      if(tdWork.length) tdPick(); else{ $('tdPos').value = ''; $('tdAlign').value = 'l'; $('tdLead').value = ''; }
+      $('tdDef').value = pcm((store.docs[store.current] || {}).tabdef || 1.25);
+      td.showModal(); $('tdPos').focus();
+    }
+    window.__tabDlg = openTabDlg;
+    $('tdSet').addEventListener('click', ()=>{
+      const v = parseFloat(String($('tdPos').value).replace(',', '.')), max = (W - pad.l - pad.r) / CM;
+      if(!(v >= 0 && v <= (max || 40))){ $('tdMsg').textContent = 'Informe a posição em cm, de 0 até ' + pcm(max || 40) + '.'; return; }
+      $('tdMsg').textContent = '';
+      const x = rcm(v); tdWork = tdWork.filter(o=>Math.abs(o.x - x) > .005); tdWork.push({x, t:$('tdAlign').value, l:$('tdLead').value}); tdWork.sort((a, b)=>a.x - b.x);
+      tdFill(tdWork.findIndex(o=>Math.abs(o.x - x) < .006)); $('tdPos').select();
+    });
+    $('tdClear').addEventListener('click', ()=>{
+      const i = +tdList.value; if(!tdWork[i]) return; tdWork.splice(i, 1); tdFill(tdWork.length ? Math.min(i, tdWork.length - 1) : null); tdPick();
+    });
+    $('tdClearAll').addEventListener('click', ()=>{ tdWork = []; tdFill(null); $('tdPos').value = ''; });
+    $('tdCancel').addEventListener('click', ()=>td.close());
+    $('tdPos').addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); $('tdSet').click(); } });
+    $('tdOk').addEventListener('click', ()=>{
+      const pend = String($('tdPos').value).trim(); if(pend && !tdWork.some(o=>pcm(o.x) === pend)) $('tdSet').click();   // posição digitada e ainda não definida
+      if($('tdMsg').textContent) return;
+      const dv = parseFloat(String($('tdDef').value).replace(',', '.'));
+      if(!(dv >= 0.1 && dv <= 10)){ $('tdMsg').textContent = 'A tabulação padrão vai de 0,1 a 10 cm.'; return; }
+      const dd = store.docs[store.current]; if(dd){ if(Math.abs(dv - 1.25) < .001) delete dd.tabdef; else dd.tabdef = rcm(dv); }
+      td.close(); restore();
+      applyMar();
+      blocks().forEach(b=>setTabs(b, tdWork.map(o=>({...o}))));
+      save(); persist(); update();
+    });
+    page.addEventListener('input', window.__tabsSoon);
+    $('zoom').addEventListener('change', window.__tabsSoon);
+    if(window.ResizeObserver) new ResizeObserver(window.__tabsSoon).observe(page);
+    window.__tabsSoon();
     document.addEventListener('selectionchange', ()=>{ if(!drag) update(); });
     page.addEventListener('input', ()=>{ if(!drag) update(); });
     $('zoom').addEventListener('change', update);
@@ -4261,6 +4498,7 @@ main{cursor:default}
       const v = e.target.value; e.target.selectedIndex = 0;
       page.focus();
       if(v === 'all') document.execCommand('selectAll');
+      else if(v === 'sim'){ if(window.__selSimilar) window.__selSimilar(); }
       else if(v === 'obj'){
         const objs = [...page.querySelectorAll('img,table')].filter(o=>!o.closest('.hf'));
         if(!objs.length){ alert('Não há imagens nem tabelas no documento.'); return; }
@@ -4908,6 +5146,7 @@ main{cursor:default}
       pd.showModal();
     }
     $('pdCancel').addEventListener('click', ()=>pd.close());
+    $('pdTabs').addEventListener('click', ()=>{ pd.close(); if(window.__tabDlg) window.__tabDlg(); });
     $('pdOk').addEventListener('click', ()=>{
       const L = num($('pdL'), 0), R = num($('pdR'), 0), by = num($('pdBy'), 0), B = num($('pdB'), 0), A = num($('pdA'), 0), lh = num($('pdLh'), 0);
       const mode = $('pdLhMode').value, pts = mode === 'min' || mode === 'exact';
@@ -5042,6 +5281,140 @@ main{cursor:default}
       b.addEventListener('mousedown', e=>e.preventDefault());
       b.addEventListener('click', e=>{ e.stopPropagation(); $('galMore').click(); });
     });
+  })();
+
+
+  // ================= Repetir (F4) e Selecionar texto com formatação semelhante =================
+  (function(){
+    const NOREP = new Set(['btnCut','btnCopy','btnPaste','pasteSp','btnPainter','btnMarks','btnFind','btnRepl','selAll','btnCollapse','btnDictHome','btnEditorHome','btnSort','btnChgSty','galUp','galDn','galMore','gsCreate','gsClear2']);
+    const BLKQ = 'p,h1,h2,h3,h4,h5,h6,li,div,blockquote,pre,td,th';
+    let last = null, replaying = false, multi = null, internal = false;
+    const inRibbon = t=>!!(t.closest && t.closest('#tp-inicio, #minibar') && !t.closest('.gdl') && !t.dataset.dlg && !NOREP.has(t.id));
+    const rec = a=>{ if(!replaying) last = a; };
+
+    // ---- grava a última ação da faixa de opções ----
+    document.addEventListener('click', e=>{
+      const b = e.target.closest && e.target.closest('button'); if(!b || !inRibbon(b)) return;
+      rec({k:'ctl', el:b, evt:'click'}); afterCtl();
+    }, true);
+    document.addEventListener('change', e=>{
+      const t = e.target; if(!(t instanceof HTMLSelectElement || t instanceof HTMLInputElement) || !inRibbon(t)) return;
+      if(t.value === '' || String(t.value).startsWith('__')) return;
+      rec({k:'ctl', el:t, evt:'change', value:t.value}); afterCtl();
+    }, true);
+    document.addEventListener('input', e=>{
+      const t = e.target; if(t.matches && t.matches('#fore, #back, #shade')){ rec({k:'ctl', el:t, evt:'input', value:t.value}); afterCtl(); }
+    }, true);
+    // ---- grava o último trecho digitado ----
+    page.addEventListener('beforeinput', e=>{
+      if(replaying) return;
+      if(e.inputType === 'insertText' && e.data){
+        if(last && last.k === 'type' && last.live) last.text += e.data; else last = {k:'type', text:e.data, live:true};
+      }else if(!/^format|Composition/.test(e.inputType) && last && last.k === 'type') last.live = false;   // Enter, apagar etc. encerram o trecho
+    });
+    page.addEventListener('keydown', e=>{
+      if(!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
+      const m = {b:'bold', i:'italic', u:'underline', l:'justifyLeft', e:'justifyCenter', r:'justifyRight', j:'justifyFull'}[e.key.toLowerCase()];
+      if(m) rec({k:'cmd', cmd:m});
+    });
+
+    function setSel(r){ internal = true; const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); savedRange = r.cloneRange(); internal = false; }
+    function replayOne(a){
+      if(a.k === 'type'){ page.focus(); document.execCommand('insertText', false, a.text); changed(); }
+      else if(a.k === 'cmd'){ exec(a.cmd); }
+      else if(a.k === 'ctl'){
+        if(!a.el.isConnected) return;
+        if(a.evt === 'click') a.el.click(); else{ a.el.value = a.value; a.el.dispatchEvent(new Event(a.evt, {bubbles:true})); }
+      }
+    }
+    // Os trechos são guardados como posições no texto da página (formatar não muda o texto), então continuam certos depois de cada ação
+    function tIndex(){
+      const tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT), nodes = [], starts = []; let t = 0, n;
+      while((n = tw.nextNode())){ nodes.push(n); starts.push(t); t += n.data.length; }
+      return {nodes, starts, total:t};
+    }
+    function offOf(ix, node, off){ const i = ix.nodes.indexOf(node); return i < 0 ? 0 : ix.starts[i] + off; }
+    function rangeOf(ix, s, e){
+      const r = document.createRange(), find = (pos, isEnd)=>{
+        for(let i = 0; i < ix.nodes.length; i++){ const a = ix.starts[i], b = a + ix.nodes[i].data.length; if(isEnd ? (pos > a && pos <= b) : (pos >= a && pos < b)) return [ix.nodes[i], pos - a]; }
+        const l = ix.nodes.length - 1; return l >= 0 ? [ix.nodes[l], ix.nodes[l].data.length] : null;
+      };
+      const a = find(s, false), b = find(e, true); if(!a || !b) return null;
+      r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]); return r;
+    }
+    function runAll(a, offs){
+      replaying = true;
+      try{
+        if(!offs){ replayOne(a); return; }
+        offs.forEach(o=>{ const r = rangeOf(tIndex(), o.s, o.e); if(!r || r.collapsed) return; setSel(r); replayOne(a); });
+      }finally{ replaying = false; }
+    }
+    function selFirst(){ if(!multi || !multi.offs.length) return; const r = rangeOf(tIndex(), multi.offs[0].s, multi.offs[0].e); if(r) setSel(r); }
+    // com vários trechos selecionados, a ação da faixa vale para todos (o primeiro já foi tratado pelo próprio botão)
+    function afterCtl(){
+      if(!multi || replaying) return;
+      const a = last, rest = multi.offs.slice(1);
+      selFirst();   // o próprio botão age no primeiro trecho
+      setTimeout(()=>{ runAll(a, rest); selFirst(); hl(); }, 0);
+    }
+    function doRepeat(){
+      if(!last) return;
+      const sl = getSelection(); if(sl.rangeCount && page.contains(sl.anchorNode)) savedRange = sl.getRangeAt(0).cloneRange();   // o selectionchange é assíncrono: sincroniza antes de repetir
+      if(multi){ runAll(last, multi.offs.slice()); selFirst(); hl(); } else runAll(last, null);
+    }
+    document.addEventListener('keydown', e=>{
+      if(e.key !== 'F4' || e.altKey || e.ctrlKey || e.metaKey || document.querySelector('dialog[open]')) return;
+      e.preventDefault(); doRepeat();
+    });
+    $('btnRepeat').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnRepeat').addEventListener('click', doRepeat);
+
+    // ---- Selecionar texto com formatação semelhante ----
+    const info = document.createElement('span'); info.className = 'sb'; info.id = 'simInfo'; info.hidden = true; $('count').after(info);
+    function hl(){
+      try{
+        if(!multi){ CSS.highlights.delete('vsim'); info.hidden = true; return; }
+        const ix = tIndex(), rs = multi.offs.map(o=>rangeOf(ix, o.s, o.e)).filter(r=>r && !r.collapsed);
+        if(!rs.length){ multi = null; CSS.highlights.delete('vsim'); info.hidden = true; return; }
+        CSS.highlights.set('vsim', new Highlight(...rs));
+        info.textContent = rs.length + ' trecho(s) com a mesma formatação'; info.hidden = false;
+      }catch(_){}
+    }
+    function clearMulti(){ multi = null; hl(); }
+    function charSig(n){
+      const el = n.parentElement, cs = getComputedStyle(el); let bg = '';
+      for(let x = el; x && x !== page; x = x.parentElement){ const c = getComputedStyle(x).backgroundColor; if(c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent'){ bg = c; break; } if(x.matches(BLKQ)) break; }
+      return [cs.fontFamily, cs.fontSize, cs.fontWeight, cs.fontStyle, cs.color, cs.textDecorationLine, cs.textDecorationStyle, cs.verticalAlign, cs.textTransform, cs.fontVariantCaps, cs.letterSpacing, bg].join('|');
+    }
+    function firstText(n){ if(n.nodeType === 3) return n; return document.createTreeWalker(n, NodeFilter.SHOW_TEXT).nextNode(); }
+    function anchorText(){
+      const sl = getSelection(), r = sl.rangeCount && page.contains(sl.anchorNode) ? sl.getRangeAt(0) : savedRange; if(!r) return null;
+      const n = r.startContainer; if(n.nodeType === 3) return n;
+      const c = n.childNodes[r.startOffset], t = c && firstText(c); if(t) return t;
+      const pc = n.childNodes[r.startOffset - 1];
+      if(pc){ const w = document.createTreeWalker(pc, NodeFilter.SHOW_TEXT); let x, l = null; while((x = w.nextNode())) l = x; if(l) return l; }
+      return firstText(n);
+    }
+    window.__selSimilar = function(){
+      const a = anchorText();
+      if(!a || !page.contains(a) || !a.data.trim()){ alert('Clique no texto cuja formatação você quer procurar e escolha de novo.'); return; }
+      const want = charSig(a), ix = tIndex(), groups = []; let cur = null;
+      ix.nodes.forEach(n=>{
+        if(n.parentElement.closest('.hf, [data-hid]') || !n.data.trim()) return;
+        const blk = n.parentElement.closest(BLKQ);
+        if(charSig(n) === want){
+          if(cur && cur.blk === blk) cur.last = n; else{ if(cur) groups.push(cur); cur = {first:n, last:n, blk}; }
+        }else if(cur){ groups.push(cur); cur = null; }
+      });
+      if(cur) groups.push(cur);
+      const offs = groups.map(g=>({s:offOf(ix, g.first, 0), e:offOf(ix, g.last, g.last.data.length)}));
+      if(!offs.length) return;
+      multi = {offs}; selFirst(); page.focus(); hl();
+    };
+    // qualquer clique, tecla ou digitação no texto desfaz a seleção múltipla
+    page.addEventListener('mousedown', ()=>{ if(multi && !replaying) clearMulti(); });
+    page.addEventListener('keydown', e=>{ if(multi && !replaying && !/^(Shift|Control|Alt|Meta|F4)$/.test(e.key)) clearMulti(); });
+    page.addEventListener('input', e=>{ if(multi && !replaying && /^(insertText|insertParagraph|insertFromPaste|delete)/.test(e.inputType || '')) clearMulti(); });
   })();
 
   load().then(updateCount, updateCount);
