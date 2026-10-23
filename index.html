@@ -69,6 +69,7 @@ header button:hover{background:rgba(255,255,255,.3)}
   height:30px;min-width:30px;border:1px solid transparent;background:transparent;color:var(--ink);
   border-radius:4px;cursor:pointer;font:inherit;padding:0 6px}
 #toolbar button:hover,#toolbar select:hover{background:var(--accent-soft)}
+#toolbar .dd select,#toolbar .dd input[type=color]{min-width:0}
 body.painting #page{cursor:copy}
 #page sup.fn{color:#1d5fd1;cursor:pointer;user-select:none}
 #page .fnote .fnn{color:#1d5fd1;cursor:pointer;user-select:none;margin-right:4px}
@@ -331,15 +332,34 @@ body.hfedit #page{opacity:.4}
 body.hfedit #sheet::before,body.hfedit #sheet::after{content:"";position:absolute;left:0;right:0;z-index:3;pointer-events:none;border-top:1px dashed #6b7480}
 body.hfedit #sheet::before{top:var(--ht)}
 body.hfedit #sheet::after{bottom:var(--hb)}
-#hfbar{background:var(--bar);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px}
+#hfbar{background:var(--bar);border-bottom:1px solid var(--line);display:flex;flex-wrap:nowrap;align-items:stretch;gap:1px;padding:4px 4px 0;min-height:84px;overflow-x:auto;scrollbar-width:thin;color:var(--ink)}
 #hfbar[hidden]{display:none}
-#hfbar button{height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 10px;cursor:pointer;font:inherit}
-#hfbar button:hover{background:var(--accent-soft)}
+#hfbar .hg{display:flex;flex-direction:column;flex:none;border-right:1px solid var(--line);padding:0 5px 0 3px}
+#hfbar .hgb{flex:1;display:flex;align-items:center;gap:2px}
+#hfbar .hgl{text-align:center;font-size:11.5px;color:var(--muted);padding:2px 0 3px;white-space:nowrap}
+#hfbar .stk{display:flex;flex-direction:column;justify-content:center;gap:2px}
+#hfbar .rw{display:flex;align-items:center;gap:3px}
+#hfbar button{height:26px;min-width:26px;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:3px;padding:0 6px;cursor:pointer;font:inherit;font-size:12.5px;display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+#hfbar button.big{flex-direction:column;height:62px;min-width:50px;padding:3px 4px;gap:2px;line-height:1.1;text-align:center;font-size:12px}
+#hfbar button:hover{background:var(--accent-soft);border-color:var(--line)}
 #hfbar button.on{background:var(--accent-soft);border-color:var(--accent)}
-#hfbar label{display:flex;gap:4px;align-items:center;color:var(--ink)}
-#hfbar strong{margin-right:4px}
-#hfbar .sp{margin-left:auto}
-#hfbar select{height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 6px;font:inherit;max-width:150px}
+#hfbar button:disabled{opacity:.45;cursor:default}
+#hfbar label{display:flex;gap:6px;align-items:center;color:var(--ink);font-size:12px;white-space:nowrap}
+#hfbar input[type=number]{height:24px;width:50px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:3px;padding:0 4px;font:inherit;font-size:12.5px}
+#hfbar select{height:24px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:3px;padding:0 4px;font:inherit;font-size:12.5px;max-width:100px}
+#hfbar .car{font-size:9px}
+#hfbar .fclose{color:#b3261e}
+#hfmenu{position:fixed;z-index:80;background:var(--bar);color:var(--ink);border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:3px;min-width:230px;max-height:70vh;overflow:auto}
+#hfmenu button{display:block;width:100%;height:auto;text-align:left;border:0;border-radius:0;padding:6px 10px;font-size:13px;white-space:nowrap}
+#hfmenu button:hover{background:var(--accent-soft)}
+#hfmenu h5{margin:4px 0 2px;padding:3px 10px;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line)}
+#hfmenu hr{border:0;border-top:1px solid var(--line);margin:3px 0}
+#tab-hf{display:none}
+body.hfedit #tab-hf{display:block}
+body.hfedit #toolbar{display:none}
+body.hfedit #tabs .tab.on{background:transparent;color:#fff;font-weight:400}
+#tabs #tab-hf{background:var(--bar);color:var(--accent);font-weight:600}
+body.hfedit.hfnotext #page{visibility:hidden}
 @media (max-width:700px){.hf,#hfbar{display:none !important}}
 @media print{.hf,#hfbar{display:none !important}#sheet::before,#sheet::after{display:none !important}body.hfedit #page{opacity:1}}
 /* ===== Menu Arquivo (estilo clássico) ===== */
@@ -684,7 +704,7 @@ main{cursor:default}
 </header>
 <div id="tabs">
   <button id="btnFile" class="tabfile" title="Menu Arquivo: informações, novo, abrir, salvar, imprimir… (Ctrl+O abre a lista)" aria-haspopup="dialog">Arquivo</button>
-  <div role="tablist" aria-label="Guias da faixa de opções"><button role="tab" id="tab-inicio" class="tab on" data-tab="inicio" aria-controls="tp-inicio" aria-selected="true">Página Inicial</button><button role="tab" id="tab-inserir" class="tab" data-tab="inserir" aria-controls="tp-inserir" aria-selected="false" tabindex="-1">Inserir</button><button role="tab" id="tab-design" class="tab" data-tab="design" aria-controls="tp-design" aria-selected="false" tabindex="-1">Design</button><button role="tab" id="tab-layout" class="tab" data-tab="layout" aria-controls="tp-layout" aria-selected="false" tabindex="-1">Layout</button><button role="tab" id="tab-referencias" class="tab" data-tab="referencias" aria-controls="tp-referencias" aria-selected="false" tabindex="-1">Referências</button><button role="tab" id="tab-correspondencias" class="tab" data-tab="correspondencias" aria-controls="tp-correspondencias" aria-selected="false" tabindex="-1">Correspondências</button><button role="tab" id="tab-revisao" class="tab" data-tab="revisao" aria-controls="tp-revisao" aria-selected="false" tabindex="-1">Revisão</button><button role="tab" id="tab-exibir" class="tab" data-tab="exibir" aria-controls="tp-exibir" aria-selected="false" tabindex="-1">Exibir</button><button role="tab" id="tab-desenvolvedor" class="tab" data-tab="desenvolvedor" aria-controls="tp-desenvolvedor" aria-selected="false" tabindex="-1">Desenvolvedor</button></div>
+  <div role="tablist" aria-label="Guias da faixa de opções"><button role="tab" id="tab-inicio" class="tab on" data-tab="inicio" aria-controls="tp-inicio" aria-selected="true">Página Inicial</button><button role="tab" id="tab-inserir" class="tab" data-tab="inserir" aria-controls="tp-inserir" aria-selected="false" tabindex="-1">Inserir</button><button role="tab" id="tab-design" class="tab" data-tab="design" aria-controls="tp-design" aria-selected="false" tabindex="-1">Design</button><button role="tab" id="tab-layout" class="tab" data-tab="layout" aria-controls="tp-layout" aria-selected="false" tabindex="-1">Layout</button><button role="tab" id="tab-referencias" class="tab" data-tab="referencias" aria-controls="tp-referencias" aria-selected="false" tabindex="-1">Referências</button><button role="tab" id="tab-correspondencias" class="tab" data-tab="correspondencias" aria-controls="tp-correspondencias" aria-selected="false" tabindex="-1">Correspondências</button><button role="tab" id="tab-revisao" class="tab" data-tab="revisao" aria-controls="tp-revisao" aria-selected="false" tabindex="-1">Revisão</button><button role="tab" id="tab-exibir" class="tab" data-tab="exibir" aria-controls="tp-exibir" aria-selected="false" tabindex="-1">Exibir</button><button role="tab" id="tab-desenvolvedor" class="tab" data-tab="desenvolvedor" aria-controls="tp-desenvolvedor" aria-selected="false" tabindex="-1">Desenvolvedor</button></div><button type="button" id="tab-hf" class="tabctx" aria-label="Cabeçalho e Rodapé (guia contextual)">Cabeçalho e Rodapé</button>
   <div class="tellw"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8a4.2 4.2 0 00-2.4 7.7c.5.4.7.8.7 1.4h3.4c0-.6.2-1 .7-1.4A4.2 4.2 0 008 1.8z" fill="none" stroke="#a5b9d2" stroke-width="1.1"/><path d="M6.3 12.6h3.4M6.8 14.2h2.4" stroke="#a5b9d2" stroke-width="1.1"/></svg><input type="search" id="tell" list="tellList" placeholder="Buscar um comando…" aria-label="Buscar um comando" autocomplete="off"></div>
   <datalist id="tellList"></datalist>
   <button id="btnShare" title="Compartilhar (e-mail, aparelho, copiar texto)"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5.3" r="3" fill="none" stroke="#fff" stroke-width="1.2"/><path d="M2.5 14.2c0-3 2.4-4.8 5.5-4.8" fill="none" stroke="#fff" stroke-width="1.2"/><path d="M12 9.8v5M9.5 12.3h5" stroke="#fff" stroke-width="1.2"/></svg><span>Compartilhar</span></button>
@@ -1007,25 +1027,36 @@ main{cursor:default}
   </div>
 </dialog>
 
-<div id="hfbar" hidden>
-  <strong>Cabeçalho e Rodapé</strong>
-  <button id="hfPage" title="Inserir número da página">Nº da página</button>
-  <button id="hfPages" title="Inserir total de páginas">Total de páginas</button>
-  <button id="hfDate" title="Inserir a data de hoje">Data</button>
-  <button data-ha="left" title="Alinhar à esquerda" aria-label="Alinhar à esquerda"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M2 7.5H10"/><path d="M2 11.5H16"/><path d="M2 15.5H10"/></svg></button>
-  <button data-ha="center" title="Centralizar" aria-label="Centralizar"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M5 7.5H13"/><path d="M2 11.5H16"/><path d="M5 15.5H13"/></svg></button>
-  <button data-ha="right" title="Alinhar à direita" aria-label="Alinhar à direita"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M8 7.5H16"/><path d="M2 11.5H16"/><path d="M8 15.5H16"/></svg></button>
-  <select id="hfFont" title="Fonte do cabeçalho/rodapé em edição" aria-label="Fonte"><option>Calibri</option><option>Calibri Light</option><option>Cambria</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option><option>Courier New</option><option>Consolas</option></select>
-  <input type="number" id="hfSize" min="6" max="48" step="0.5" value="10" title="Tamanho da fonte (pt)" aria-label="Tamanho da fonte" style="width:64px;height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 6px;font:inherit">
-  <button id="hfB" title="Negrito (Ctrl+B)" aria-label="Negrito"><b>N</b></button>
-  <button id="hfI" title="Itálico (Ctrl+I)" aria-label="Itálico"><i>I</i></button>
-  <button id="hfU" title="Sublinhado (Ctrl+U)" aria-label="Sublinhado"><u>S</u></button>
-  <input type="color" id="hfColor" value="#000000" title="Cor da fonte" aria-label="Cor da fonte" style="width:34px;height:30px;border:1px solid var(--line);background:transparent;border-radius:4px;padding:2px;cursor:pointer">
-  <button id="hfImg" title="Inserir imagem neste cabeçalho/rodapé (logo, timbre, marca-d'água). Também dá para colar uma imagem (Ctrl+V) com o cabeçalho aberto">🖼 Imagem</button>
-  <span id="hfHint" hidden style="font-size:12px;color:var(--muted);max-width:260px;line-height:1.2">Com número de página, a impressão direta (Ctrl+P) usa a fonte da caixa inteira; Imprimir pelo menu Arquivo mantém tudo.</span>
-  <button id="hfGo">Ir para o Rodapé</button>
-  <label><input type="checkbox" id="hfDif"> Primeira página diferente</label>
-  <button id="hfClose" class="sp">Fechar cabeçalho e rodapé</button>
+<div id="hfbar" hidden role="toolbar" aria-label="Cabeçalho e Rodapé">
+  <div class="hg"><div class="hgb">
+    <button type="button" id="hfMenuH" class="big" aria-haspopup="menu" title="Cabeçalho: modelos prontos"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><path d="M6 2.5h12l5 5v18H6z" fill="#fff" stroke="#777"/><path d="M18 2.5v5h5" stroke="#777"/><rect x="9" y="6" width="9" height="3" fill="#f0a830"/><path d="M9 14h11M9 18h11M9 22h8" stroke="#bbb"/></svg><span>Cabeçalho <i class="car">▼</i></span></button>
+    <button type="button" id="hfMenuF" class="big" aria-haspopup="menu" title="Rodapé: modelos prontos"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><path d="M6 2.5h12l5 5v18H6z" fill="#fff" stroke="#777"/><path d="M18 2.5v5h5" stroke="#777"/><path d="M9 8h11M9 12h11M9 16h8" stroke="#bbb"/><rect x="9" y="20" width="9" height="3" fill="#f0a830"/></svg><span>Rodapé <i class="car">▼</i></span></button>
+    <button type="button" id="hfMenuN" class="big" aria-haspopup="menu" title="Número de Página"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><path d="M6 2.5h12l5 5v18H6z" fill="#fff" stroke="#777"/><path d="M18 2.5v5h5" stroke="#777"/><text x="9" y="19" font-size="11" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">#</text></svg><span>Número de<br>Página <i class="car">▼</i></span></button>
+  </div><div class="hgl">Cabeçalho e Rodapé</div></div>
+  <div class="hg"><div class="hgb">
+    <button type="button" id="hfDate" class="big" aria-haspopup="menu" title="Inserir data ou hora"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="4" y="5" width="20" height="19" rx="2" fill="#fff" stroke="#777"/><path d="M4 11h20" stroke="#777"/><rect x="4" y="5" width="20" height="6" fill="#2b79c9"/><circle cx="19" cy="19" r="5" fill="#fff" stroke="#555"/><path d="M19 16v3.5h2.5" stroke="#555"/></svg><span>Data e<br>Hora</span></button>
+    <button type="button" id="hfMenuI" class="big" aria-haspopup="menu" title="Informações do Documento"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="4" y="6" width="20" height="16" rx="2" fill="#fff" stroke="#777"/><path d="M8 11h12M8 15h12M8 19h7" stroke="#2b79c9"/></svg><span>Informações do<br>Documento <i class="car">▼</i></span></button>
+    <button type="button" id="hfImg" class="big" title="Inserir imagem neste cabeçalho/rodapé (logo, timbre, marca-d'água). Também dá para colar uma imagem (Ctrl+V) com o cabeçalho aberto"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="3.5" y="5.5" width="21" height="17" fill="#fff" stroke="#777"/><circle cx="10" cy="11.5" r="2.3" fill="#f0c04a"/><path d="M4 21l6-6 4 4 4-5 6 7z" fill="#4caf63"/></svg><span>Imagens</span></button>
+  </div><div class="hgl">Inserir</div></div>
+  <div class="hg"><div class="hgb">
+    <button type="button" id="hfGoH" class="big" title="Ir para o Cabeçalho"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="6" y="3" width="16" height="22" fill="#fff" stroke="#777"/><rect x="8" y="5" width="12" height="4" fill="#f0a830"/><path d="M8 13h12M8 17h12M8 21h9" stroke="#bbb"/></svg><span>Ir para<br>Cabeçalho</span></button>
+    <button type="button" id="hfGoF" class="big" title="Ir para o Rodapé"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="6" y="3" width="16" height="22" fill="#fff" stroke="#777"/><path d="M8 6h12M8 10h12M8 14h9" stroke="#bbb"/><rect x="8" y="19" width="12" height="4" fill="#f0a830"/></svg><span>Ir para<br>Rodapé</span></button>
+  </div><div class="hgl">Navegação</div></div>
+  <div class="hg"><div class="hgb"><div class="stk">
+    <label><input type="checkbox" id="hfDif"> Diferente na 1ª Página</label>
+    <label><input type="checkbox" id="hfShow" checked> Mostrar Texto do Documento</label>
+  </div></div><div class="hgl">Opções</div></div>
+  <div class="hg"><div class="hgb"><div class="stk">
+    <label>Cabeçalho de Cima: <input type="number" id="hfDt" min="0" max="10" step="0.05" aria-label="Distância do cabeçalho à borda superior (cm)"> cm</label>
+    <label>Rodapé de Baixo: <input type="number" id="hfDb" min="0" max="10" step="0.05" aria-label="Distância do rodapé à borda inferior (cm)"> cm</label>
+  </div></div><div class="hgl">Posição</div></div>
+  <div class="hg"><div class="hgb"><div class="stk">
+    <div class="rw"><select id="hfFont" title="Fonte do cabeçalho/rodapé em edição" aria-label="Fonte"><option>Calibri</option><option>Calibri Light</option><option>Cambria</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option><option>Courier New</option><option>Consolas</option></select><input type="number" id="hfSize" min="6" max="48" step="0.5" value="10" title="Tamanho da fonte (pt)" aria-label="Tamanho da fonte"><span id="hfHint" hidden title="Com número de página, a impressão direta (Ctrl+P) usa a fonte da caixa inteira; Imprimir pelo menu Arquivo mantém tudo." style="font-size:14px;color:var(--muted);cursor:help">ⓘ</span></div>
+    <div class="rw"><button id="hfB" title="Negrito (Ctrl+B)" aria-label="Negrito"><b>N</b></button><button id="hfI" title="Itálico (Ctrl+I)" aria-label="Itálico"><i>I</i></button><button id="hfU" title="Sublinhado (Ctrl+U)" aria-label="Sublinhado"><u>S</u></button><input type="color" id="hfColor" value="#000000" title="Cor da fonte" aria-label="Cor da fonte" style="width:34px;height:24px;border:1px solid var(--line);background:transparent;border-radius:3px;padding:2px;cursor:pointer"><button data-ha="left" title="Alinhar à esquerda" aria-label="Alinhar à esquerda"><svg viewBox="0 0 18 18" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M2 7.5H10"/><path d="M2 11.5H16"/><path d="M2 15.5H10"/></svg></button><button data-ha="center" title="Centralizar" aria-label="Centralizar"><svg viewBox="0 0 18 18" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M5 7.5H13"/><path d="M2 11.5H16"/><path d="M5 15.5H13"/></svg></button><button data-ha="right" title="Alinhar à direita" aria-label="Alinhar à direita"><svg viewBox="0 0 18 18" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M8 7.5H16"/><path d="M2 11.5H16"/><path d="M8 15.5H16"/></svg></button></div>
+  </div></div><div class="hgl">Formatação</div></div>
+  <div class="hg" style="border-right:0"><div class="hgb">
+    <button type="button" id="hfClose" class="big fclose" title="Fechar cabeçalho e rodapé (Esc)"><svg class="ic" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" fill="none"><rect x="4" y="4" width="20" height="20" fill="#fff" stroke="#d33"/><path d="M8 8l12 12M20 8L8 20" stroke="#d33" stroke-width="2"/></svg><span>Fechar Cabeçalho<br>e Rodapé</span></button>
+  </div><div class="hgl">Fechar</div></div>
 </div>
 
 <div id="imgbar" hidden>
@@ -1554,7 +1585,7 @@ main{cursor:default}
       sh.style.setProperty('--pw', pg.w + 'cm'); sh.style.setProperty('--ph', pg.h + 'cm');
       sh.style.setProperty('--hl', e.l + 'px'); sh.style.setProperty('--hr', e.r + 'px');
       sh.style.setProperty('--ht', e.t + 'px'); sh.style.setProperty('--hb', e.b + 'px');
-      sh.style.setProperty('--hty', Math.min(1.25 * CMPX, e.t * 0.4) + 'px'); sh.style.setProperty('--hby', Math.min(1.25 * CMPX, e.b * 0.4) + 'px');
+      sh.style.setProperty('--hty', hfDist(true, e) + 'px'); sh.style.setProperty('--hby', hfDist(false, e) + 'px');
     }
     if(st){
       const px = v=>(Math.round(v*100)/100) + 'px', hh = hfData(), any = hfHas('h') || hfHas('f');
@@ -1575,6 +1606,11 @@ main{cursor:default}
     const d = store.docs[store.current];
     if(!d) return {h:'', f:'', ha:'left', fa:'left', dif:false};
     return d.hf || (d.hf = {h:'', f:'', ha:'left', fa:'left', dif:false});
+  }
+  // distância do cabeçalho (h) / rodapé (f) à borda do papel: a que o usuário definiu (cm) ou a automática
+  function hfDist(top, e){
+    const v = hfData()[top ? 'dt' : 'db'];
+    return v >= 0 ? v * CMPX : Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
   }
   // estilo da fonte de cada caixa (h = cabeçalho, f = rodapé): vale na tela, na impressão/PDF, no .doc e no .docx
   function hfStyle(k){
@@ -1637,7 +1673,7 @@ main{cursor:default}
   function hfSvgText(k, pg, e){
     if(!(hfHas(k) && hfRich(k) && !hfHasFld(k))) return '';
     const hh = hfData(), a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left', top = k === 'h';
-    const PH = pg.h * CMPX, cw = pg.w * CMPX - e.l - e.r, dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4), n = v=>Math.round(v * 100) / 100;
+    const PH = pg.h * CMPX, cw = pg.w * CMPX - e.l - e.r, dist = hfDist(top, e), n = v=>Math.round(v * 100) / 100;
     const x = a === 'center' ? e.l + cw / 2 : a === 'right' ? e.l + cw : e.l, anchor = a === 'center' ? 'middle' : a === 'right' ? 'end' : 'start';
     const xe = t=>t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const lines = hfLineRuns(k).map(l=>{ const rr = l.map(r=>({t:r.t || '', q:hfResolve(k, r.s)})); const m = Math.max(hfStyle(k).fs, ...rr.map(r=>r.q.fs)); return {rr, m, lh:m * 96 / 72 * 1.3}; });
@@ -1670,7 +1706,7 @@ main{cursor:default}
     const hh = hfData(), a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left';
     const q = t=>'"' + t.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\s+/g, ' ') + '"';
     const content = hfTokens(hh[k]).map(t=>typeof t === 'string' ? (t ? q(t) : '') : t.br ? '"\\A "' : (t.f === 'pages' ? 'counter(pages)' : 'counter(page)')).filter(Boolean).join(' ');
-    const top = k === 'h', dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
+    const top = k === 'h', dist = hfDist(top, e);
     const sy = hfStyle(k), fam = '"' + sy.ff + '",Carlito,"Liberation Serif",serif';
     return '@' + (top ? 'top' : 'bottom') + '-' + a + '{content:' + content + ';white-space:pre;font:' + (sy.i ? 'italic ' : '') + (sy.b ? 'bold ' : '') + sy.fs + 'pt ' + fam + ';color:' + (sy.c || '#000') + ';text-decoration:' + (sy.u ? 'underline' : 'none') + ';text-align:' + a +
       ';vertical-align:' + (top ? 'top' : 'bottom') + ';padding-' + (top ? 'top' : 'bottom') + ':' + Math.round(dist * 100) / 100 + 'px}';
@@ -2002,12 +2038,30 @@ main{cursor:default}
   // Maiúsculas / minúsculas
   $('case').addEventListener('change', e=>{
     const m = e.target.value; e.target.value = '';
-    restore(); const t = getSelection().toString(); if(!t) return;
-    const o = m==='sent' ? t.toLowerCase().replace(/(^\s*|[.!?]\s+)(\p{L})/gu,(a,b,c)=>b + c.toUpperCase())
-      : m==='tog' ? [...t].map(ch=>ch === ch.toUpperCase() ? ch.toLowerCase() : ch.toUpperCase()).join('')
-      : m==='up' ? t.toUpperCase() : m==='low' ? t.toLowerCase()
-      : t.toLowerCase().replace(/(^|\s)(\S)/g,(a,b,c)=>b + c.toUpperCase());
-    exec('insertText', o);
+    restore(); const s = getSelection(); if(!s.rangeCount || s.isCollapsed) return;
+    const r = s.getRangeAt(0), nodes = [];
+    const w = document.createTreeWalker(r.commonAncestorContainer.nodeType === 3 ? r.commonAncestorContainer.parentNode : r.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+    for(let n = w.nextNode(); n; n = w.nextNode()) if(r.intersectsNode(n)) nodes.push(n);
+    // mexe só no texto dos nós (mantém negrito, links, cores e parágrafos)
+    let prev = '', lastBlk = null;
+    const conv = t=>{
+      if(m === 'up') return t.toUpperCase();
+      if(m === 'low') return t.toLowerCase();
+      if(m === 'tog') return [...t].map(ch=>ch === ch.toUpperCase() ? ch.toLowerCase() : ch.toUpperCase()).join('');
+      if(m === 'sent') return (prev + t.toLowerCase()).replace(/(^\s*|[.!?]\s+)(\p{L})/gu,(a,b,c)=>b + c.toUpperCase()).slice(prev.length);
+      return (prev + t.toLowerCase()).replace(/(^|\s)(\S)/g,(a,b,c)=>b + c.toUpperCase()).slice(prev.length);
+    };
+    nodes.forEach(n=>{
+      const a = n === r.startContainer ? r.startOffset : 0, z = n === r.endContainer ? r.endOffset : n.data.length;
+      if(z <= a) return;
+      const blk = n.parentNode.closest('p,li,h1,h2,h3,h4,td,th,blockquote,div');
+      if(blk !== lastBlk){ prev = ''; lastBlk = blk; }
+      else if(a > 0) prev = n.data.slice(Math.max(0, a - 2), a);
+      const o = conv(n.data.slice(a, z));
+      n.data = n.data.slice(0, a) + o + n.data.slice(z);
+      prev = o.slice(-2);
+    });
+    changed(); refresh();
   });
 
   // Símbolos, data, quebra de página, código
@@ -4280,14 +4334,14 @@ main{cursor:default}
     const els = {h:$('hdr'), f:$('ftr')}, bs = {h:els.h.querySelector('.hfb'), f:els.f.querySelector('.hfb')};
     let active = 'h', timer;
     const editing = ()=>body.classList.contains('hfedit');
-    function goBtn(){ $('hfGo').textContent = active === 'h' ? 'Ir para o Rodapé' : 'Ir para o Cabeçalho'; }
+    function goBtn(){ $('hfGoH').classList.toggle('on', active === 'h'); $('hfGoF').classList.toggle('on', active === 'f'); }
     function open(k){
       if(!editing()){
         body.classList.add('hfedit'); page.contentEditable = 'false'; bar.hidden = false;
         ['h','f'].forEach(x=>{ bs[x].contentEditable = 'true'; bs[x].innerHTML = hfData()[x]; bs[x].dataset.v = hfData()[x]; });
         hfRender();
       }
-      active = k; goBtn(); const b = bs[k]; b.focus(); syncFont();
+      active = k; goBtn(); const b = bs[k]; b.focus(); syncFont(); syncPos();
       const r = document.createRange(); r.selectNodeContents(b); r.collapse(false);
       const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r);
       b.scrollIntoView({block:'nearest'});
@@ -4295,7 +4349,7 @@ main{cursor:default}
     function close(){
       if(!editing()) return;
       clearTimeout(timer); store_();
-      body.classList.remove('hfedit'); bar.hidden = true; page.contentEditable = 'true';
+      closeMenu(); body.classList.remove('hfedit'); bar.hidden = true; page.contentEditable = 'true';
       ['h','f'].forEach(x=>{ bs[x].contentEditable = 'false'; });
       applyMar(); page.focus();
     }
@@ -4330,9 +4384,99 @@ main{cursor:default}
     function ins(html){ bs[active].focus(); document.execCommand('insertHTML', false, html); later(); }
     const fld = f=>'<span class="fld" data-f="' + f + '" contenteditable="false">' + (f === 'pages' ? pageCount() : active === 'h' ? 1 : pageCount()) + '</span>&#8203;';
     bar.querySelectorAll('button').forEach(b=>b.addEventListener('mousedown', e=>e.preventDefault()));
-    $('hfPage').addEventListener('click', ()=>ins(fld('page')));
-    $('hfPages').addEventListener('click', ()=>ins(fld('pages')));
-    $('hfDate').addEventListener('click', ()=>ins(new Date().toLocaleDateString('pt-BR')));
+    // ---- menus da guia (modelos de cabeçalho/rodapé, número de página, data, informações) ----
+    const fldK = (f, k)=>'<span class="fld" data-f="' + f + '" contenteditable="false">' + (f === 'pages' ? pageCount() : k === 'h' ? 1 : pageCount()) + '</span>&#8203;';
+    const docTitle = ()=>esc(($('title').value || '').trim() || 'Documento sem título');
+    // troca o conteúdo de uma caixa (k) inteira e o alinhamento dela
+    function setBox(k, html, al){
+      open(k); bs[k].innerHTML = html; hfData()[k + 'a'] = al || 'left'; bs[k].style.textAlign = al || 'left';
+      store_(); syncFont(); syncPos();
+      const r = document.createRange(); r.selectNodeContents(bs[k]); r.collapse(false); const g = getSelection(); g.removeAllRanges(); g.addRange(r);
+    }
+    // acrescenta um campo (número de página) ao fim da caixa, no alinhamento escolhido
+    function addTo(k, html, al){
+      const had = bs[k].textContent.replace(/\u200b/g, '').trim();
+      setBox(k, had ? bs[k].innerHTML + '<br>' + html : html, al);
+    }
+    const dataExt = ()=>new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+    function closeMenu(){ const m = $('hfmenu'); if(m){ m.remove(); } }
+    function showMenu(anchor, items){
+      const old = $('hfmenu'); if(old){ const same = old.dataset.for === anchor.id; old.remove(); if(same) return; }
+      const m = document.createElement('div'); m.id = 'hfmenu'; m.dataset.for = anchor.id; m.setAttribute('role', 'menu');
+      items.forEach(it=>{
+        if(it === '-'){ m.appendChild(document.createElement('hr')); return; }
+        if(it.h){ const h = document.createElement('h5'); h.textContent = it.h; m.appendChild(h); return; }
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it.t;
+        b.addEventListener('mousedown', e=>e.preventDefault());
+        b.addEventListener('click', ()=>{ closeMenu(); it.fn(); });
+        m.appendChild(b);
+      });
+      const r = anchor.getBoundingClientRect(); m.style.left = Math.max(4, Math.min(r.left, innerWidth - 250)) + 'px'; m.style.top = r.bottom + 2 + 'px';
+      bar.appendChild(m);
+      setTimeout(()=>document.addEventListener('mousedown', function f(e){ if(!e.target.closest('#hfmenu')){ closeMenu(); document.removeEventListener('mousedown', f); } }), 0);
+    }
+    const pgXY = k=>'Página ' + fldK('page', k) + ' de ' + fldK('pages', k);
+    $('hfMenuH').addEventListener('click', e=>showMenu(e.currentTarget, [
+      {h:'Cabeçalho'},
+      {t:'Em Branco', fn:()=>setBox('h', '', 'left')},
+      {t:'Título do documento (centralizado)', fn:()=>setBox('h', docTitle(), 'center')},
+      {t:'Título do documento (à esquerda)', fn:()=>setBox('h', docTitle(), 'left')},
+      {t:'Título e data (à direita)', fn:()=>setBox('h', docTitle() + '<br>' + dataExt(), 'right')},
+      {t:'Página X de Y (à direita)', fn:()=>setBox('h', pgXY('h'), 'right')},
+      '-', {t:'Remover Cabeçalho', fn:()=>setBox('h', '', 'left')}
+    ]));
+    $('hfMenuF').addEventListener('click', e=>showMenu(e.currentTarget, [
+      {h:'Rodapé'},
+      {t:'Em Branco', fn:()=>setBox('f', '', 'left')},
+      {t:'Página X de Y (centralizado)', fn:()=>setBox('f', pgXY('f'), 'center')},
+      {t:'Página X (à direita)', fn:()=>setBox('f', 'Página ' + fldK('page', 'f'), 'right')},
+      {t:'Título do documento (à esquerda)', fn:()=>setBox('f', docTitle(), 'left')},
+      {t:'Título e Página X de Y (à direita)', fn:()=>setBox('f', docTitle() + '<br>' + pgXY('f'), 'right')},
+      '-', {t:'Remover Rodapé', fn:()=>setBox('f', '', 'left')}
+    ]));
+    const num = (k, al)=>()=>addTo(k, fldK('page', k), al);
+    $('hfMenuN').addEventListener('click', e=>showMenu(e.currentTarget, [
+      {h:'Início da Página'},
+      {t:'Número simples, à esquerda', fn:num('h', 'left')}, {t:'Número simples, centralizado', fn:num('h', 'center')}, {t:'Número simples, à direita', fn:num('h', 'right')},
+      {h:'Fim da Página'},
+      {t:'Número simples, à esquerda', fn:num('f', 'left')}, {t:'Número simples, centralizado', fn:num('f', 'center')}, {t:'Número simples, à direita', fn:num('f', 'right')},
+      {t:'Página X de Y, centralizado', fn:()=>addTo('f', pgXY('f'), 'center')}, {t:'Página X de Y, à direita', fn:()=>addTo('f', pgXY('f'), 'right')},
+      {h:'Posição Atual'},
+      {t:'Inserir número de página no cursor', fn:()=>ins(fld('page'))},
+      '-',
+      {t:'Remover Números de Página', fn:()=>{
+        ['h', 'f'].forEach(k=>{
+          bs[k].innerHTML = bs[k].innerHTML.replace(/P[áa]gina\s*<span[^>]*data-f="page"[^>]*>.*?<\/span>(?:&#8203;|\u200b)?(?:\s*de\s*<span[^>]*data-f="pages"[^>]*>.*?<\/span>(?:&#8203;|\u200b)?)?/g, '');
+          bs[k].querySelectorAll('.fld').forEach(x=>x.remove());
+        });
+        later(); store_();
+      }}
+    ]));
+    $('hfMenuI').addEventListener('click', e=>showMenu(e.currentTarget, [
+      {t:'Título do documento', fn:()=>ins(docTitle())},
+      {t:'Número da página', fn:()=>ins(fld('page'))},
+      {t:'Total de páginas', fn:()=>ins(fld('pages'))},
+      {t:'Página X de Y', fn:()=>ins(pgXY(active))}
+    ]));
+    $('hfDate').addEventListener('click', e=>showMenu(e.currentTarget, [
+      {t:new Date().toLocaleDateString('pt-BR') + '  (dd/mm/aaaa)', fn:()=>ins(new Date().toLocaleDateString('pt-BR'))},
+      {t:dataExt(), fn:()=>ins(dataExt())},
+      {t:new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) + '  (hora)', fn:()=>ins(new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}))},
+      {t:'Data e hora', fn:()=>ins(new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}))}
+    ]));
+    // posição: distância do cabeçalho/rodapé à borda do papel (cm)
+    function syncPos(){
+      const e = effMar(), r = v=>Math.round(v / CMPX * 100) / 100;
+      $('hfDt').value = r(hfDist(true, e)); $('hfDb').value = r(hfDist(false, e));
+    }
+    [['hfDt', 'dt'], ['hfDb', 'db']].forEach(([id, k])=>$(id).addEventListener('change', ev=>{
+      const v = parseFloat(String(ev.target.value).replace(',', '.'));
+      if(v >= 0 && v <= 10) hfData()[k] = v; else delete hfData()[k];
+      persist(); applyMar(); syncPos();
+    }));
+    $('hfShow').addEventListener('change', ev=>body.classList.toggle('hfnotext', !ev.target.checked));
+    $('tab-hf').addEventListener('click', ()=>{ bs[active].focus(); });
+    document.querySelectorAll('#tabs [role=tab]').forEach(t=>t.addEventListener('click', ()=>{ if(editing()) close(); }));
     bar.querySelectorAll('[data-ha]').forEach(b=>b.addEventListener('click', ()=>{
       hfData()[active + 'a'] = b.dataset.ha; bs[active].style.textAlign = b.dataset.ha; bs[active].focus(); later();
     }));
@@ -4387,7 +4531,8 @@ main{cursor:default}
       if(inside(g)){ saved = g.isCollapsed ? null : g.getRangeAt(0).cloneRange(); }
       if(!ctl()) syncFont();
     });
-    $('hfGo').addEventListener('click', ()=>open(active === 'h' ? 'f' : 'h'));
+    $('hfGoH').addEventListener('click', ()=>open('h'));
+    $('hfGoF').addEventListener('click', ()=>open('f'));
     $('hfDif').addEventListener('change', e=>{ hfData().dif = e.target.checked; persist(); applyMar(); });
     $('hfClose').addEventListener('click', close);
     $('btnHF').addEventListener('click', ()=>editing() ? close() : open('h'));
@@ -4807,7 +4952,7 @@ main{cursor:default}
             box.textContent = ''; box.style.display = 'none';
             if(first || !hfHas(k)) return;
             const a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left', top = k === 'h';
-            const dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
+            const dist = hfDist(top, e);
             hfLineRuns(k).forEach(line=>{
               const d = document.createElement('div'); d.style.cssText = 'white-space:pre-wrap;line-height:1.3;min-height:1.3em';
               line.forEach(r=>{ const sp = document.createElement('span'); sp.style.cssText = hfRunCss(hfResolve(k, r.s)); sp.textContent = r.f ? String(r.f === 'pages' ? N : idx + 1) : r.t.replace(/\s+/g, ' '); d.append(sp); });
@@ -5243,10 +5388,10 @@ main{cursor:default}
       if(opts.full){ it.x = 0; it.y = 0; it.w = PW; it.h = PH; it.bg = true; }
       else if(where === 'f'){
         const need = Math.min(PH * 0.4, 1.0 * CMPX + nh + 0.4 * CMPX); if(e.b < need) setMar('b', need);
-        e = effMar(); it.y = PH - Math.min(1.25 * CMPX, e.b * 0.4) - nh;
+        e = effMar(); it.y = PH - hfDist(false, e) - nh;
       }else{
         const by = 1.0 * CMPX, need = Math.min(PH * 0.4, by + nh + 0.4 * CMPX); if(e.t < need) setMar('t', need);
-        e = effMar(); it.y = Math.min(1.25 * CMPX, e.t * 0.4);
+        e = effMar(); it.y = hfDist(true, e);
       }
       hfImgs().push(it); persist(); applyMar(); select({k:'h', it});
     }
