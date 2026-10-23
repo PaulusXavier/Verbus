@@ -403,7 +403,32 @@ header .actions{display:none}
   #bsNav .sep{width:1px;height:24px;margin:0 6px}
   #bsMain{padding:20px 16px 48px}
 }
-@media print{#bs{display:none !important}}
+.prWrap{display:flex;gap:28px;align-items:flex-start;max-width:1100px}
+.prSet{width:320px;flex:none}
+.prSet h2{margin:22px 0 8px}
+.prSet h2:first-of-type{margin-top:18px}
+.prBtn{display:flex;flex-direction:column;align-items:center;gap:4px;width:104px;padding:14px 8px;border:2px solid var(--accent);border-radius:4px;background:var(--accent-soft);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.prBtn:hover{background:var(--accent);color:#fff}
+.prBtn .ic{font-size:34px;line-height:1}
+.prRow{display:flex;flex-direction:column;gap:4px;margin:8px 0}
+.prRow label{font-size:12px;color:var(--muted)}
+.prRow select{width:100%;height:34px}
+.prLink{background:none;border:0;padding:0;margin:10px 0 0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
+.prInfo{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
+.prPrev{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:16px 12px}
+.prBox{position:relative;flex:none;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.prPaper{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;overflow:hidden}
+.prPaper iframe{position:absolute;border:0;background:transparent;display:block}
+.prLy{position:absolute;inset:0;pointer-events:none}
+.prHf{position:absolute;display:none;white-space:pre-wrap;color:#000;line-height:1.2;pointer-events:none}
+.prNav{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.prNav button{width:32px;height:30px;border:1px solid var(--line);background:var(--bar);color:var(--ink);border-radius:4px;font:inherit;cursor:pointer}
+.prNav button:hover:not(:disabled){background:var(--accent-soft)}
+.prNav button:disabled{opacity:.4;cursor:default}
+.prNav input{width:48px;height:30px;text-align:center;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit}
+@media (max-width:900px){ .prWrap{flex-direction:column;align-items:stretch} .prSet{width:100%} }
+#prNup{position:fixed;left:-99999px;top:0;width:auto}
+@media print{#bs{display:none !important} body.nup > *:not(#prNup){display:none !important} body.nup #prNup{position:static;display:block} body.nup{background:#fff !important}}
 .pgGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px}
 .pgGrid label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:13px}
 dialog input[type=number]{height:30px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit;padding:0 8px;width:100%}
@@ -4260,9 +4285,232 @@ main{cursor:default}
           f('🌐', 'Página da Web (.html)', 'Para abrir no navegador', 'btnHtml'), f('📃', 'Texto simples (.txt)', 'Só o texto, sem formatação', 'btnTxt')];
       },
       imprimir(){
-        const ab = page.classList.contains('abnt');
-        return [act('🖨', 'Imprimir / salvar em PDF', 'Na janela que abrir, escolha "Salvar como PDF" para gerar o arquivo', ()=>closeThen(()=>setTimeout(()=>window.print(), 150))),
-          el('p', {className:'bsNote', textContent:'Papel ' + PG_SIZES[pgOf().size][2] + (pgOf().land ? ' (paisagem)' : '') + ' · ' + (ab ? 'padrão ABNT' : 'margens padrão') + ' · cerca de ' + pagesEst() + ' página(s).'})];
+        const wrap = el('div', {className:'prWrap'}), set = el('div', {className:'prSet'}), prev = el('div', {className:'prPrev'});
+        const doPrint = ()=>closeThen(()=>setTimeout(()=>window.print(), 150));
+        const btn = el('button', {type:'button', className:'prBtn'}, el('span', {className:'ic', textContent:'🖨'}), el('span', {textContent:'Imprimir'}));
+        const SIDEMSG = {um:'', frente:'Imprime só as folhas 1, 3, 5… Depois recoloque o papel impresso na bandeja, com a face certa para cima, e imprima a 2ª passada.', verso:'Imprime as folhas 2, 4, 6… em ordem inversa, para cair atrás das folhas já impressas na 1ª passada. Confira a posição do papel na sua impressora.'};
+        async function printCustom(){
+          const total = sheetCount(), list = [];
+          for(let i = 0; i < total; i++) list.push(i);
+          let use = list;
+          if(side === 'frente') use = list.filter(i=>i % 2 === 0);
+          if(side === 'verso') use = list.filter(i=>i % 2 === 1).reverse();
+          if(!use.length){ sideInfo.textContent = 'Com só ' + total + ' folha, não há folhas pares para a 2ª passada.'; return; }
+          const pgc = pgOf(), host = el('div', {id:'prNup'}), built = use.map(si=>buildSheet(si));
+          built.forEach((b, k)=>{
+            const x = b.el; x.style.cssText += ';position:relative;transform:none;left:auto;top:auto;width:' + Math.floor(geo.W) + 'px;height:' + (Math.floor(geo.H) - 1) + 'px;overflow:hidden;break-after:' + (k < built.length - 1 ? 'page' : 'auto') + ';box-shadow:none';
+            host.append(x);
+          });
+          // durante esta impressão o @page do documento (com número de página/cabeçalho do navegador) é trocado por uma página sem margens; o cabeçalho/rodapé já está desenhado em cada página reduzida
+          const pst = $('pgStyle'), oldCss = pst.textContent;
+          close(false); pst.textContent = '@page{size:' + pgc.w + 'cm ' + pgc.h + 'cm;margin:0}'; document.body.append(host); document.body.classList.add('nup');
+          const clean = ()=>{ host.remove(); pst.textContent = oldCss; document.body.classList.remove('nup'); };
+          await Promise.all(built.map(b=>b.ready));
+          addEventListener('afterprint', clean, {once:true});
+          window.print();
+        }
+        btn.onclick = ()=>{ if(nup === 1 && side === 'um') doPrint(); else printCustom(); };
+        const row = (label, sel)=>{ const id = 'pr' + label.replace(/\W/g, ''); sel.id = id; return el('div', {className:'prRow'}, el('label', {htmlFor:id, textContent:label}), sel); };
+        const sel = opts=>{ const s = el('select'); opts.forEach(o=>s.append(el('option', {value:o[0], textContent:o[1]}))); return s; };
+        const selOri = sel([['p', 'Orientação Vertical (retrato)'], ['l', 'Orientação Horizontal (paisagem)']]);
+        const selSize = sel(Object.keys(PG_SIZES).map(k=>[k, PG_SIZES[k][2] + ' — ' + String(PG_SIZES[k][0]).replace('.', ',') + ' x ' + String(PG_SIZES[k][1]).replace('.', ',') + ' cm']));
+        const selMar = sel([['padrao', 'Margens Normais (padrão)'], ['estreita', 'Margens Estreitas'], ['moderada', 'Margens Moderadas'], ['larga', 'Margens Largas'], ['abnt', 'Margens ABNT (3 / 2 / 2 / 3 cm)'], ['custom', 'Margens Personalizadas']]);
+        const selNup = sel([[1, '1 Página Por Folha'], [2, '2 Páginas Por Folha'], [4, '4 Páginas Por Folha'], [6, '6 Páginas Por Folha'], [8, '8 Páginas Por Folha'], [16, '16 Páginas Por Folha']]);
+        const selSide = sel([['um', 'Imprimir Apenas um Lado'], ['frente', 'Dois lados manual — 1ª passada (folhas ímpares)'], ['verso', 'Dois lados manual — 2ª passada (folhas pares)']]);
+        const sideInfo = el('p', {className:'prInfo'});
+        const link = el('button', {type:'button', className:'prLink', textContent:'Configurar Página…'});
+        const info = el('p', {className:'prInfo'});
+        set.append(btn,
+          el('h2', {textContent:'Impressora'}),
+          el('p', {className:'prInfo', textContent:'Cópias, intervalo de páginas e impressora são escolhidos na janela do navegador, que abre ao clicar em Imprimir. Para gerar um arquivo, escolha \"Salvar como PDF\" nela.'}),
+          el('h2', {textContent:'Definições'}),
+          row('Lados', selSide), sideInfo, row('Orientação', selOri), row('Tamanho do papel', selSize), row('Margens', selMar), row('Páginas por folha', selNup), link, info);
+
+        // ---- pré-visualização ----
+        const nav = el('div', {className:'prNav'});
+        const bPrev = el('button', {type:'button', textContent:'◀', title:'Página anterior'}), bNext = el('button', {type:'button', textContent:'▶', title:'Próxima página'});
+        const inp = el('input', {type:'text', inputMode:'numeric', value:'1'}); inp.setAttribute('aria-label', 'Página');
+        const tot = el('span', {textContent:'de 1'});
+        nav.append(bPrev, inp, tot, bNext);
+        const box = el('div', {className:'prBox'}), paper = el('div', {className:'prPaper'}), ifr = el('iframe');
+        ifr.setAttribute('sandbox', 'allow-same-origin'); ifr.setAttribute('title', 'Pré-visualização da página'); ifr.tabIndex = -1;
+        const lyBack = el('div', {className:'prLy'}), lyFront = el('div', {className:'prLy'}), hdr = el('div', {className:'prHf'}), ftr = el('div', {className:'prHf'});
+        paper.append(lyBack, ifr, lyFront, hdr, ftr); box.append(paper); prev.append(box, nav);
+        wrap.append(set, prev);
+
+        let plan = [0], pageNo = 0, cols = 1, shiftX = 0, geo = null, token = 0, nup = 1, side = 'um', lastHtml = '', curSheet = null, sheetSig = '';
+        const NUP = {1:[1,1], 2:[2,1], 4:[2,2], 6:[2,3], 8:[2,4], 16:[4,4]};
+        const alive = ()=>wrap.isConnected;
+        function fit(){
+          if(!geo) return;
+          const availW = Math.max(160, prev.clientWidth - 24), availH = Math.max(240, innerHeight - 250);
+          const k = Math.min(1, availW / geo.W, availH / geo.H);
+          box.style.width = Math.round(geo.W * k) + 'px'; box.style.height = Math.round(geo.H * k) + 'px';
+          [paper, curSheet].forEach(x=>{ if(x){ x.style.width = geo.W + 'px'; x.style.height = geo.H + 'px'; x.style.transform = 'scale(' + k + ')'; } });
+        }
+        // uma "folha" cópia da página (iframe próprio) para folhas com várias páginas e para a impressão
+        function buildPaper(idx){
+          const pgc = pgOf(), e = effMar(), cw = Math.max(CMPX, pgc.w * CMPX - e.l - e.r);
+          const pp = el('div', {className:'prPaper'}), lB = el('div', {className:'prLy'}), lF = el('div', {className:'prLy'}), h = el('div', {className:'prHf'}), f = el('div', {className:'prHf'}), fr = el('iframe');
+          fr.setAttribute('sandbox', 'allow-same-origin'); fr.tabIndex = -1;
+          fr.style.left = e.l + 'px'; fr.style.top = e.t + 'px'; fr.style.width = cw + 'px'; fr.style.height = geo.use + 'px';
+          pp.style.width = geo.W + 'px'; pp.style.height = geo.H + 'px';
+          pp.append(lB, fr, lF, h, f); decor(idx, lB, lF, h, f);
+          const place = ()=>{
+            const d = fr.contentDocument, pg = d && d.getElementById('page'); if(!pg) return;
+            if(cols > 1){ pg.style.transform = 'translateX(' + (-idx * shiftX) + 'px)'; fr.style.height = geo.use + 'px'; }
+            else{
+              const from = plan[idx], to = idx + 1 < plan.length ? plan[idx + 1] : from + geo.use;
+              pg.style.transform = 'translateY(' + (-from) + 'px)'; fr.style.height = Math.max(1, Math.min(geo.use, to - from)) + 'px';
+            }
+          };
+          const ready = new Promise(res=>{
+            fr.onload = ()=>{
+              place();
+              let d = null; try{ d = fr.contentDocument; }catch(err){}
+              Promise.race([d && d.fonts ? d.fonts.ready : Promise.resolve(), new Promise(r=>setTimeout(r, 1500))]).then(()=>{ place(); setTimeout(res, 150); });
+            };
+          });
+          fr.srcdoc = lastHtml;
+          return {el:pp, ready};
+        }
+        function buildSheet(si){
+          const sh = el('div', {className:'prPaper nupSheet'}), W = geo.W, H = geo.H, g = NUP[nup] || [1,1], readies = [];
+          sh.style.width = W + 'px'; sh.style.height = H + 'px';
+          const pad = nup > 1 ? 0.6 * CMPX : 0, cellW = (W - 2 * pad) / g[0], cellH = (H - 2 * pad) / g[1], sc = nup > 1 ? Math.min(cellW / W, cellH / H) * 0.97 : 1;
+          for(let k = 0; k < nup; k++){
+            const idx = si * nup + k; if(idx >= plan.length) break;
+            const bp = buildPaper(idx), col = k % g[0], row = Math.floor(k / g[0]);
+            // caixa já do tamanho reduzido (com corte), para a impressão não estender a página original além da folha
+            const cellBox = el('div');
+            cellBox.style.cssText = 'position:absolute;overflow:hidden;background:#fff;left:' + (pad + col * cellW + (cellW - W * sc) / 2) + 'px;top:' + (pad + row * cellH + (cellH - H * sc) / 2) + 'px;width:' + (W * sc) + 'px;height:' + (H * sc) + 'px' + (nup > 1 ? ';outline:1px solid #9a9a9a' : '');
+            bp.el.style.left = '0px'; bp.el.style.top = 'auto'; bp.el.style.bottom = '0px'; bp.el.style.transformOrigin = '0 100%'; bp.el.style.transform = 'scale(' + sc + ')';   // ancorada embaixo: a caixa original não passa do fim da folha e a impressão não a corta
+            cellBox.append(bp.el); sh.append(cellBox); readies.push(bp.ready);
+          }
+          return {el:sh, ready:Promise.all(readies)};
+        }
+        const sheetCount = ()=>Math.max(1, Math.ceil(plan.length / nup));
+        function decor(idx, lyBack, lyFront, hdr, ftr){
+          const pgc = pgOf(), e = effMar(), hh = hfData(), first = idx === 0 && !!hh.dif, abnt = page.classList.contains('abnt');
+          const cw = Math.max(CMPX, pgc.w * CMPX - e.l - e.r), N = plan.length;
+          lyBack.replaceChildren(); lyFront.replaceChildren();
+          if(!first) hfImgList().forEach(it=>{
+            const im = el('img', {src:it.src, alt:''});
+            im.style.cssText = 'position:absolute;left:' + it.x + 'px;top:' + it.y + 'px;width:' + it.w + 'px;height:' + it.h + 'px;opacity:' + (1 - (it.op || 0) / 100);
+            (it.z === 'front' ? lyFront : lyBack).append(im);
+          });
+          const fam = abnt ? '"Times New Roman",serif' : 'Calibri,Carlito,sans-serif';
+          const fill = (box, k)=>{
+            box.textContent = ''; box.style.display = 'none';
+            if(first || !hfHas(k)) return;
+            const a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left', top = k === 'h';
+            const dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
+            box.textContent = hfTokens(hh[k]).map(t=>typeof t === 'string' ? t.replace(/\s+/g, ' ') : t.br ? '\n' : String(t.f === 'pages' ? N : idx + 1)).join('');
+            box.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:' + a + ';font:10pt ' + fam + ';' + (top ? 'top:' + dist + 'px' : 'bottom:' + dist + 'px');
+          };
+          fill(hdr, 'h'); fill(ftr, 'f');
+          if(abnt && !hfHas('h') && !hfHas('f') && idx >= 0){   // número automático do padrão ABNT, no canto superior direito
+            hdr.textContent = String(idx + 1);
+            hdr.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:right;font:12pt "Times New Roman",serif;top:' + Math.max(0, e.t / 2 - 9) + 'px';
+          }
+        }
+        function showPage(n){
+          const U = nup > 1 ? sheetCount() : plan.length;
+          pageNo = Math.max(0, Math.min(U - 1, n));
+          inp.value = String(pageNo + 1); tot.textContent = 'de ' + U; inp.setAttribute('aria-label', nup > 1 ? 'Folha' : 'Página');
+          bPrev.disabled = pageNo === 0; bNext.disabled = pageNo >= U - 1;
+          if(!geo) return;
+          if(nup > 1){
+            const sig = [JSON.stringify(plan), pageNo, nup, lastHtml.length].join('|');
+            if(curSheet && sig === sheetSig) return;
+            sheetSig = sig; paper.style.display = 'none'; if(curSheet) curSheet.remove();
+            curSheet = buildSheet(pageNo).el; box.append(curSheet); fit(); return;
+          }
+          if(curSheet){ curSheet.remove(); curSheet = null; sheetSig = ''; }
+          paper.style.display = '';
+          decor(pageNo, lyBack, lyFront, hdr, ftr);
+          const d = ifr.contentDocument, pg = d && d.getElementById('page'); if(!pg) return;
+          if(cols > 1){ pg.style.transform = 'translateX(' + (-pageNo * shiftX) + 'px)'; ifr.style.height = geo.use + 'px'; }
+          else{
+            const from = plan[pageNo], to = pageNo + 1 < plan.length ? plan[pageNo + 1] : from + geo.use;
+            pg.style.transform = 'translateY(' + (-from) + 'px)'; ifr.style.height = Math.max(1, Math.min(geo.use, to - from)) + 'px';
+          }
+        }
+        function render(){
+          const my = ++token, pgc = pgOf(), e = effMar();
+          const W = pgc.w * CMPX, H = pgc.h * CMPX, cw = Math.max(CMPX, W - e.l - e.r), use = Math.max(CMPX, H - e.t - e.b);
+          geo = {W, H, use}; cols = pgc.cols;
+          paper.style.width = W + 'px'; paper.style.height = H + 'px';
+          ifr.style.left = e.l + 'px'; ifr.style.top = e.t + 'px'; ifr.style.width = cw + 'px'; ifr.style.height = use + 'px';
+          fit();
+          const gap = 1.25 * CMPX;
+          const styles = [...document.querySelectorAll('style')].map(x=>x.outerHTML).join('');
+          const over = '<style>html,body{margin:0;padding:0;background:transparent !important;height:auto !important;overflow:hidden;display:block}' +
+            '#page{zoom:1 !important;position:static !important;width:' + cw + 'px !important;max-width:none !important;min-height:0 !important;padding:0 !important;margin:0 !important;box-shadow:none !important;background:transparent !important;color:#111;caret-color:transparent;isolation:auto}' +
+            '#page [data-hid]{display:none !important}#page .pb{border:0 !important;margin:0 !important}' +
+            (cols > 1 ? '#page{column-count:' + cols + ' !important;column-gap:' + gap + 'px !important;column-fill:auto !important;height:' + use + 'px !important}' : '') + '</style>';
+          const html = '<!DOCTYPE html><html lang="pt-BR" data-theme="light"><head><meta charset="utf-8">' + styles + over + '</head><body><div id="page" class="' + page.className.replace(/"/g, '') + '" style="' + (page.getAttribute('style') || '').replace(/"/g, '&quot;') + '">' + page.innerHTML + '</div></body></html>';
+          lastHtml = html;
+          const calc = ()=>{
+            if(my !== token || !alive()) return;
+            try{
+              const d = ifr.contentDocument, pg = d.getElementById('page');
+              if(cols > 1){
+                const colW = (cw - (cols - 1) * gap) / cols, sw = d.documentElement.scrollWidth;
+                const C = Math.max(1, Math.round((sw + gap) / (colW + gap)));
+                shiftX = cw + gap; plan = Array.from({length:Math.max(1, Math.ceil(C / cols))}, (_, i)=>i);
+              }else{
+                pg.style.transform = ''; const base = 0, starts = [0]; let ps = 0, brk = false;   // medido a partir do topo do documento (a margem do 1º elemento escapa de #page)
+                const next = y=>{ starts.push(y); ps = y; };
+                [...pg.children].forEach(k=>{
+                  if(k.classList.contains('pb')){ brk = true; return; }
+                  const r = k.getBoundingClientRect(), top = r.top - base, bot = r.bottom - base;
+                  if(brk){ brk = false; if(top > ps + 1) next(top); }
+                  if(bot - ps > use + 1){
+                    if(top > ps + 1 && bot - top <= use) next(top);
+                    else while(bot - ps > use + 1) next(ps + use);
+                  }
+                });
+                plan = starts;
+              }
+            }catch(err){ plan = [0]; }
+            showPage(Math.min(pageNo, plan.length - 1));
+          };
+          ifr.onload = ()=>{
+            calc();
+            // fontes e imagens podem mudar a altura depois do carregamento: recalcula as quebras quando terminarem
+            try{
+              const d = ifr.contentDocument;
+              if(d.fonts && d.fonts.ready) d.fonts.ready.then(calc);
+              [...d.images].forEach(im=>{ if(!im.complete) im.addEventListener('load', calc, {once:true}); });
+            }catch(err){}
+            setTimeout(calc, 350);
+          };
+          ifr.srcdoc = html;
+        }
+        const refresh = ()=>{
+          pgSync();
+          selOri.value = $('pgOri').value; selSize.value = $('pgSize').value; selMar.value = $('pgMar').value;
+          const pgc = pgOf(), e = effMar();
+          info.textContent = PG_SIZES[pgc.size][2] + (pgc.land ? ' · paisagem' : ' · retrato') + ' · margens (sup., inf., esq., dir.): ' + [e.t, e.b, e.l, e.r].map(cm).join(' · ') + '. A pré-visualização é aproximada: as quebras de página podem diferir um pouco do PDF.';
+          render();
+        };
+        selOri.onchange = ()=>{ pgSet({land: selOri.value === 'l'}); refresh(); };
+        selSize.onchange = ()=>{ pgSet({size: selSize.value}); refresh(); };
+        selMar.onchange = ()=>{
+          if(selMar.value === 'custom'){ pgSync(); selMar.value = $('pgMar').value; pgDlgOpen(); $('pgDlg').addEventListener('close', ()=>{ if(alive()) refresh(); }, {once:true}); return; }
+          marSet(selMar.value); refresh();
+        };
+        link.onclick = ()=>{ pgDlgOpen(); $('pgDlg').addEventListener('close', ()=>{ if(alive()) refresh(); }, {once:true}); };
+        selNup.onchange = ()=>{ nup = parseInt(selNup.value, 10); showPage(0); };
+        selSide.onchange = ()=>{ side = selSide.value; sideInfo.textContent = SIDEMSG[side]; };
+        bPrev.onclick = ()=>showPage(pageNo - 1); bNext.onclick = ()=>showPage(pageNo + 1);
+        inp.onchange = ()=>{ const n = parseInt(inp.value, 10); showPage(isNaN(n) ? pageNo : n - 1); };
+        inp.onkeydown = e=>{ if(e.key === 'Enter'){ e.preventDefault(); inp.onchange(); } };
+        addEventListener('resize', ()=>{ if(alive()) fit(); });
+        pageNo = 0; refresh();
+        requestAnimationFrame(fit);
+        return [wrap];
       },
       compartilhar(){
         const out = [];
@@ -4357,6 +4605,7 @@ main{cursor:default}
         const k = e.key.toLowerCase();
         if(k === 'o' && !e.shiftKey){ e.preventDefault(); openBs('abrir'); }
         else if(k === 's' && e.shiftKey){ e.preventDefault(); openBs('salvarcomo'); }
+        else if(k === 'p' && !e.shiftKey){ e.preventDefault(); openBs('imprimir'); }
       }
     });
   })();
