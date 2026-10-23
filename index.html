@@ -305,6 +305,14 @@ body.hfedit #page{pointer-events:none}
 #imgbar .ab{display:flex;gap:2px}
 @media (max-width:700px){#imgbar{display:none !important}}
 @media print{#tabs,#toolbar,#findbar,#hfBack,#hfFront,#imgOv,#imgbar{display:none !important} #sheet{background:none} #page{--ox:var(--hl);--oy:var(--ht)}}
+#pstBtn{position:fixed;z-index:60;display:flex;align-items:center;gap:2px;height:26px;padding:0 6px;border:1px solid var(--line);border-radius:4px;background:var(--bar);color:var(--ink);cursor:pointer;font:13px/1 inherit;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+#pstBtn[hidden],#pstMenu[hidden]{display:none}
+#pstMenu{position:fixed;z-index:61;min-width:240px;background:var(--bar);color:var(--ink);border:1px solid var(--line);border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.25);padding:4px 0}
+#pstMenu button{display:block;width:100%;text-align:left;background:transparent;border:0;color:inherit;font:inherit;padding:7px 12px;cursor:pointer}
+#pstMenu button:hover{background:var(--accent-soft)}
+#pstMenu button.on::before{content:"✓ ";color:var(--accent)}
+#pstMenu button:not(.on)::before{content:"\00a0\00a0\00a0"}
+@media print{#pstBtn,#pstMenu{display:none !important}}
 /* Cabeçalho e rodapé (estilo clássico) */
 #sheet{--hl:3cm;--hr:3cm;--ht:2.5cm;--hb:2.5cm;--hty:1cm;--hby:1cm}
 .hf{position:absolute;left:var(--hl);right:var(--hr);z-index:3;pointer-events:none;color:#8a8f96;
@@ -331,6 +339,7 @@ body.hfedit #sheet::after{bottom:var(--hb)}
 #hfbar label{display:flex;gap:4px;align-items:center;color:var(--ink)}
 #hfbar strong{margin-right:4px}
 #hfbar .sp{margin-left:auto}
+#hfbar select{height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 6px;font:inherit;max-width:150px}
 @media (max-width:700px){.hf,#hfbar{display:none !important}}
 @media print{.hf,#hfbar{display:none !important}#sheet::before,#sheet::after{display:none !important}body.hfedit #page{opacity:1}}
 /* ===== Menu Arquivo (estilo clássico) ===== */
@@ -541,7 +550,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:1px dotted
 #toolbar .group.edt{padding:0 6px}
 /* fonte / tamanho */
 #toolbar #font,#toolbar #size{-webkit-appearance:none;appearance:none;height:22px;margin:0;padding:0 14px 0 4px;border:1px solid var(--ctlb);border-radius:0;background:var(--ctl) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0h7L3.5 4z' fill='%23888'/%3E%3C/svg%3E") no-repeat right 4px center;color:var(--rink);font:12px/20px Calibri,"Carlito","Segoe UI",sans-serif;text-overflow:clip}
-#toolbar #font{width:84px}
+#toolbar #font{width:112px}
 #toolbar #size{width:61px;margin-right:6px;border-left:0;background-image:none;padding:0 4px;font:inherit;color:inherit}
 #toolbar #font:hover,#toolbar #size:hover{border-color:#8f8f8f}
 #toolbar .group.fnt{padding:0 6px 0 4px}
@@ -824,6 +833,20 @@ main{cursor:default}
     </div><div class="gl">Links</div></div>
     <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb">
       <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
+      <select id="pgNum" title="Número de Página: escolha onde colocar (usa o formato escolhido ao lado)">
+        <option value="" selected disabled hidden>Número de Página</option>
+        <optgroup label="Início da página (cabeçalho)"><option value="h:left">Esquerda</option><option value="h:center">Centralizado</option><option value="h:right">Direita</option></optgroup>
+        <optgroup label="Final da página (rodapé)"><option value="f:left">Esquerda</option><option value="f:center">Centralizado</option><option value="f:right">Direita</option></optgroup>
+        <option value="cur">Posição Atual (no cabeçalho/rodapé aberto)</option>
+        <option value="rm">Remover Números de Página</option>
+      </select>
+      <select id="pgNumFmt" title="Formato do número de página">
+        <option value="n">1, 2, 3</option><option value="p">Página 1</option><option value="pd">Página 1 de 5</option><option value="s">1 / 5</option><option value="t">– 1 –</option>
+      </select>
+      <select id="hfRm" title="Remover cabeçalho ou rodapé (texto e imagens da margem)">
+        <option value="" selected disabled hidden>Remover</option>
+        <option value="h">Remover Cabeçalho</option><option value="f">Remover Rodapé</option><option value="hf">Remover Cabeçalho e Rodapé</option>
+      </select>
     </div><div class="gl">Cabeçalho e Rodapé</div></div>
     <div class="group" role="group" aria-label="Texto"><div class="gb">
       <button id="btnDate" title="Inserir data de hoje">Data</button>
@@ -992,7 +1015,14 @@ main{cursor:default}
   <button data-ha="left" title="Alinhar à esquerda" aria-label="Alinhar à esquerda"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M2 7.5H10"/><path d="M2 11.5H16"/><path d="M2 15.5H10"/></svg></button>
   <button data-ha="center" title="Centralizar" aria-label="Centralizar"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M5 7.5H13"/><path d="M2 11.5H16"/><path d="M5 15.5H13"/></svg></button>
   <button data-ha="right" title="Alinhar à direita" aria-label="Alinhar à direita"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3.5H16"/><path d="M8 7.5H16"/><path d="M2 11.5H16"/><path d="M8 15.5H16"/></svg></button>
-  <button id="hfImg" title="Inserir imagem neste cabeçalho/rodapé (logo, timbre, marca-d'água)">🖼 Imagem</button>
+  <select id="hfFont" title="Fonte do cabeçalho/rodapé em edição" aria-label="Fonte"><option>Calibri</option><option>Calibri Light</option><option>Cambria</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option><option>Courier New</option><option>Consolas</option></select>
+  <input type="number" id="hfSize" min="6" max="48" step="0.5" value="10" title="Tamanho da fonte (pt)" aria-label="Tamanho da fonte" style="width:64px;height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 6px;font:inherit">
+  <button id="hfB" title="Negrito (Ctrl+B)" aria-label="Negrito"><b>N</b></button>
+  <button id="hfI" title="Itálico (Ctrl+I)" aria-label="Itálico"><i>I</i></button>
+  <button id="hfU" title="Sublinhado (Ctrl+U)" aria-label="Sublinhado"><u>S</u></button>
+  <input type="color" id="hfColor" value="#000000" title="Cor da fonte" aria-label="Cor da fonte" style="width:34px;height:30px;border:1px solid var(--line);background:transparent;border-radius:4px;padding:2px;cursor:pointer">
+  <button id="hfImg" title="Inserir imagem neste cabeçalho/rodapé (logo, timbre, marca-d'água). Também dá para colar uma imagem (Ctrl+V) com o cabeçalho aberto">🖼 Imagem</button>
+  <span id="hfHint" hidden style="font-size:12px;color:var(--muted);max-width:260px;line-height:1.2">Com número de página, a impressão direta (Ctrl+P) usa a fonte da caixa inteira; Imprimir pelo menu Arquivo mantém tudo.</span>
   <button id="hfGo">Ir para o Rodapé</button>
   <label><input type="checkbox" id="hfDif"> Primeira página diferente</label>
   <button id="hfClose" class="sp">Fechar cabeçalho e rodapé</button>
@@ -1531,7 +1561,7 @@ main{cursor:default}
       let css = '@page{size:' + pg.w + 'cm ' + pg.h + 'cm;margin:' + [e.t, e.r, e.b, e.l].map(px).join(' ') + ';';
       if(any || !page.classList.contains('abnt')) css += '@top-right{content:none}';   // o número automático no canto é só do padrão ABNT; com cabeçalho/rodapé próprio ele também sai
       css += hfBoxCss('h', e) + hfBoxCss('f', e) + hfPrintCss(pg, !!hh.dif) + '}';
-      const anyImg = hfImgList().length > 0;
+      const anyImg = hfImgList().length > 0 || hfSvgTextOn();
       if((any || anyImg) && hh.dif) css += '@page:first{' + ['top-left','top-center','top-right','bottom-left','bottom-center','bottom-right'].concat(anyImg ? ['top-left-corner'] : []).map(p=>'@' + p + '{content:none}').join('') + '}';
       st.textContent = css;
     }
@@ -1546,11 +1576,84 @@ main{cursor:default}
     if(!d) return {h:'', f:'', ha:'left', fa:'left', dif:false};
     return d.hf || (d.hf = {h:'', f:'', ha:'left', fa:'left', dif:false});
   }
+  // estilo da fonte de cada caixa (h = cabeçalho, f = rodapé): vale na tela, na impressão/PDF, no .doc e no .docx
+  function hfStyle(k){
+    const hh = hfData(), st = (hh.st && hh.st[k]) || {}, ab = page.classList.contains('abnt');
+    return {ff: st.ff || (ab ? 'Times New Roman' : 'Calibri'), fs: st.fs > 0 ? st.fs : 10, b: !!st.b, i: !!st.i, u: !!st.u, c: /^#[0-9a-f]{6}$/i.test(st.c || '') ? st.c : ''};
+  }
+  function hfStyleSet(k, ch){
+    const hh = hfData(); hh.st = hh.st || {}; hh.st[k] = Object.assign({}, hh.st[k], ch);
+  }
+
+  // ---- formatação por trecho: lê o HTML do cabeçalho/rodapé como trechos {t|f, s:estilo} ----
+  const hfCx = document.createElement('canvas').getContext('2d');
+  function hfHex(c){ try{ hfCx.fillStyle = '#000000'; hfCx.fillStyle = c; return /^#[0-9a-f]{6}$/i.test(hfCx.fillStyle) ? hfCx.fillStyle : ''; }catch(e){ return ''; } }
+  function hfRuns(html){
+    const root = document.createElement('div'); root.innerHTML = html || ''; const out = [];
+    const pt = v=>{ const m = /^([\d.]+)(pt|px)$/.exec((v || '').trim()); return m ? (m[2] === 'px' ? +m[1] * 0.75 : +m[1]) : 0; };
+    const own = (c, s0)=>{
+      const n = Object.assign({}, s0), t = c.tagName, st = c.style;
+      if(t === 'B' || t === 'STRONG') n.b = true; if(t === 'I' || t === 'EM') n.i = true; if(t === 'U') n.u = true;
+      if(t === 'FONT'){ if(c.getAttribute('face')) n.ff = c.getAttribute('face'); const cc = c.getAttribute('color'); if(cc && hfHex(cc)) n.c = hfHex(cc); }
+      if(st){
+        if(st.fontFamily) n.ff = st.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+        const f = pt(st.fontSize); if(f > 0) n.fs = Math.round(f * 2) / 2;
+        if(st.color && hfHex(st.color)) n.c = hfHex(st.color);
+        if(st.fontWeight) n.b = st.fontWeight === 'bold' || parseInt(st.fontWeight, 10) >= 600;
+        if(st.fontStyle) n.i = st.fontStyle === 'italic';
+        const td = st.textDecorationLine || st.textDecoration || ''; if(td) n.u = td.indexOf('underline') >= 0;
+      }
+      return n;
+    };
+    (function walk(n, s0){
+      n.childNodes.forEach(c=>{
+        if(c.nodeType === 3) c.data.replace(/ /g, ' ').replace(/​/g, '').split('\n').forEach((ln, i)=>{ if(i) out.push({br:1}); if(ln) out.push({t:ln, s:s0}); });
+        else if(c.nodeType === 1){
+          if(c.classList.contains('fld')) out.push({f:c.dataset.f, s:s0});
+          else if(c.tagName === 'BR') out.push({br:1});
+          else{ if(/^(DIV|P|H[1-6])$/.test(c.tagName) && out.length) out.push({br:1}); walk(c, own(c, s0)); }
+        }
+      });
+    })(root, {});
+    return out;
+  }
+  function hfLineRuns(k, html){
+    const lines = [[]];
+    hfRuns(html == null ? hfData()[k] : html).forEach(r=>{ if(r.br) lines.push([]); else lines[lines.length - 1].push(r); });
+    return lines;
+  }
+  function hfResolve(k, s0){ return Object.assign({}, hfStyle(k), s0 || {}); }
+  function hfRich(k, html){
+    const b = hfStyle(k);
+    return hfRuns(html == null ? hfData()[k] : html).some(r=>!r.br && (r.f || (r.t && r.t.trim())) && Object.keys(r.s).some(x=>r.s[x] !== b[x]));
+  }
+  function hfHasFld(k, html){ return hfRuns(html == null ? hfData()[k] : html).some(r=>r.f); }
+  // CSS de um trecho (tela, pré-visualização e .doc)
+  function hfRunCss(q){
+    return 'font-family:"' + q.ff + '",Carlito,"Liberation Serif",sans-serif;font-size:' + q.fs + 'pt;font-weight:' + (q.b ? '700' : '400') + ';font-style:' + (q.i ? 'italic' : 'normal') + ';text-decoration:' + (q.u ? 'underline' : 'none') + ';color:' + (q.c || '#000000');
+  }
+  // impressão direta (Ctrl+P): trechos formatados viram texto numa imagem da margem (repete em todas as páginas)
+  const hfSvgTextOn = ()=>['h','f'].some(k=>hfHas(k) && hfRich(k) && !hfHasFld(k));
+  function hfSvgText(k, pg, e){
+    if(!(hfHas(k) && hfRich(k) && !hfHasFld(k))) return '';
+    const hh = hfData(), a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left', top = k === 'h';
+    const PH = pg.h * CMPX, cw = pg.w * CMPX - e.l - e.r, dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4), n = v=>Math.round(v * 100) / 100;
+    const x = a === 'center' ? e.l + cw / 2 : a === 'right' ? e.l + cw : e.l, anchor = a === 'center' ? 'middle' : a === 'right' ? 'end' : 'start';
+    const xe = t=>t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = hfLineRuns(k).map(l=>{ const rr = l.map(r=>({t:r.t || '', q:hfResolve(k, r.s)})); const m = Math.max(hfStyle(k).fs, ...rr.map(r=>r.q.fs)); return {rr, m, lh:m * 96 / 72 * 1.3}; });
+    const total = lines.reduce((s0, l)=>s0 + l.lh, 0); let y = top ? dist : PH - dist - total, out = '';
+    lines.forEach(l=>{
+      const base = y + l.lh / 2 + l.m * 96 / 72 * 0.33; y += l.lh;
+      if(!l.rr.length) return;
+      out += '<text x="' + n(x) + '" y="' + n(base) + '" text-anchor="' + anchor + '" xml:space="preserve">' + l.rr.map(r=>'<tspan font-family="\'' + r.q.ff + '\',Carlito,\'Liberation Serif\',sans-serif" font-size="' + n(r.q.fs * 96 / 72) + '" font-weight="' + (r.q.b ? 700 : 400) + '" font-style="' + (r.q.i ? 'italic' : 'normal') + '"' + (r.q.u ? ' text-decoration="underline"' : '') + ' fill="' + (r.q.c || '#000000') + '">' + xe(r.t) + '</tspan>').join('') + '</text>';
+    });
+    return out;
+  }
   function hfTokens(html){
     const root = document.createElement('div'); root.innerHTML = html || ''; const out = [];
     (function walk(n){
       n.childNodes.forEach(c=>{
-        if(c.nodeType === 3) out.push(c.data.replace(/\u00a0/g, ' ').replace(/\u200b/g, ''));
+        if(c.nodeType === 3) c.data.replace(/\u00a0/g, ' ').replace(/\u200b/g, '').split('\n').forEach((ln, i)=>{ if(i) out.push({br:1}); out.push(ln); });
         else if(c.nodeType === 1){
           if(c.classList.contains('fld')) out.push({f:c.dataset.f});
           else if(c.tagName === 'BR') out.push({br:1});
@@ -1563,12 +1666,13 @@ main{cursor:default}
   function hfHas(k){ return hfTokens(hfData()[k]).some(t=>typeof t === 'string' ? t.trim() : !t.br); }
   function hfBoxCss(k, e){
     if(!hfHas(k)) return '';
+    if(hfRich(k) && !hfHasFld(k)) return '';
     const hh = hfData(), a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left';
     const q = t=>'"' + t.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\s+/g, ' ') + '"';
     const content = hfTokens(hh[k]).map(t=>typeof t === 'string' ? (t ? q(t) : '') : t.br ? '"\\A "' : (t.f === 'pages' ? 'counter(pages)' : 'counter(page)')).filter(Boolean).join(' ');
     const top = k === 'h', dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
-    const fam = page.classList.contains('abnt') ? '"Times New Roman",serif' : 'Calibri,Carlito,sans-serif';
-    return '@' + (top ? 'top' : 'bottom') + '-' + a + '{content:' + content + ';white-space:pre;font:10pt ' + fam + ';color:#000;text-align:' + a +
+    const sy = hfStyle(k), fam = '"' + sy.ff + '",Carlito,"Liberation Serif",serif';
+    return '@' + (top ? 'top' : 'bottom') + '-' + a + '{content:' + content + ';white-space:pre;font:' + (sy.i ? 'italic ' : '') + (sy.b ? 'bold ' : '') + sy.fs + 'pt ' + fam + ';color:' + (sy.c || '#000') + ';text-decoration:' + (sy.u ? 'underline' : 'none') + ';text-align:' + a +
       ';vertical-align:' + (top ? 'top' : 'bottom') + ';padding-' + (top ? 'top' : 'bottom') + ':' + Math.round(dist * 100) / 100 + 'px}';
   }
   function pageCount(){
@@ -1582,6 +1686,10 @@ main{cursor:default}
       const b = el.querySelector('.hfb');
       if(!document.body.classList.contains('hfedit') && b.dataset.v !== hh[k]){ b.innerHTML = hh[k]; b.dataset.v = hh[k]; }
       b.style.textAlign = hh[k + 'a'] || 'left';
+      const sty = hfStyle(k);
+      b.style.fontFamily = '"' + sty.ff + '",Carlito,"Liberation Serif",sans-serif'; b.style.fontSize = sty.fs + 'pt';
+      b.style.fontWeight = sty.b ? '700' : ''; b.style.fontStyle = sty.i ? 'italic' : ''; b.style.textDecoration = sty.u ? 'underline' : '';
+      b.style.color = sty.c || '';
       b.querySelectorAll('.fld').forEach(sp=>{ sp.contentEditable = 'false'; sp.textContent = sp.dataset.f === 'pages' ? n : (k === 'h' ? 1 : n); });
     });
     const dif = document.getElementById('hfDif'); if(dif) dif.checked = !!hh.dif;
@@ -1609,13 +1717,13 @@ main{cursor:default}
   // camada de impressão: uma imagem do tamanho do papel, desenhada na caixa de margem (repete em todas as páginas, atrás do texto)
   let hfPK = '', hfPC = '';
   function hfPrintCss(pg, dif){
-    const L = hfImgList(); if(!L.length) return '';
-    const key = pg.w + 'x' + pg.h + '|' + dif + '|' + L.map(i=>[i.id, i.x, i.y, i.w, i.h, i.op || 0, i.z, i.src.length].join(',')).join(';');
+    const L = hfImgList(), e0 = effMar(), tx = hfSvgText('h', pg, e0) + hfSvgText('f', pg, e0); if(!L.length && !tx) return '';
+    const key = pg.w + 'x' + pg.h + '|' + dif + '|' + tx + '|' + L.map(i=>[i.id, i.x, i.y, i.w, i.h, i.op || 0, i.z, i.src.length].join(',')).join(';');
     if(key === hfPK) return hfPC;
     const W = Math.round(pg.w * CMPX * 100) / 100, H = Math.round(pg.h * CMPX * 100) / 100, n = v=>Math.round(v * 100) / 100;
     const img = i=>'<image x="' + n(i.x) + '" y="' + n(i.y) + '" width="' + n(i.w) + '" height="' + n(i.h) + '" preserveAspectRatio="none"' + (i.op ? ' opacity="' + (1 - i.op / 100) + '"' : '') + ' xlink:href="' + i.src + '"/>';
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' +
-      L.filter(i=>i.z !== 'front').map(img).join('') + L.filter(i=>i.z === 'front').map(img).join('') + '</svg>';
+      L.filter(i=>i.z !== 'front').map(img).join('') + tx + L.filter(i=>i.z === 'front').map(img).join('') + '</svg>';
     hfPK = key;
     hfPC = '@top-left-corner{content:url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '");padding:0;margin:0;border:0;vertical-align:top;text-align:left;font-size:0;line-height:0;overflow:visible}';
     return hfPC;
@@ -1773,12 +1881,14 @@ main{cursor:default}
   }
   function hfLines(k, cls){
     const hh = hfData(), lines = [[]];
-    hfTokens(hh[k]).forEach(t=>{
-      if(typeof t === 'string') lines[lines.length - 1].push(t.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
-      else if(t.br) lines.push([]);
-      else lines[lines.length - 1].push('<span style=\'mso-field-code:" ' + (t.f === 'pages' ? 'NUMPAGES' : 'PAGE') + ' "\'><span style="mso-no-proof:yes">1</span></span>');
+    hfRuns(hh[k]).forEach(t=>{
+      if(t.br){ lines.push([]); return; }
+      const css = hfRunCss(hfResolve(k, t.s)).replace(/"/g, '&quot;');
+      const inner = t.f ? '<span style=\'mso-field-code:" ' + (t.f === 'pages' ? 'NUMPAGES' : 'PAGE') + ' "\'><span style="mso-no-proof:yes">1</span></span>' : t.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      lines[lines.length - 1].push('<span style="' + css + '">' + inner + '</span>');
     });
-    return lines.map(l=>'<p class="' + cls + '" style="margin:0;text-align:' + (hh[k + 'a'] || 'left') + ';font-size:10pt;line-height:1.2">' + (l.join('') || '&nbsp;') + '</p>').join('');
+    const sy = hfStyle(k), css = 'margin:0;text-align:' + (hh[k + 'a'] || 'left') + ';font-family:"' + sy.ff + '";font-size:' + sy.fs + 'pt;line-height:1.2' + (sy.b ? ';font-weight:bold' : '') + (sy.i ? ';font-style:italic' : '') + (sy.u ? ';text-decoration:underline' : '') + (sy.c ? ';color:' + sy.c : '');
+    return lines.map(l=>'<p class="' + cls + '" style=\'' + css + '\'>' + (l.join('') || '&nbsp;') + '</p>').join('');
   }
   function wrap(forDoc){
     const ab = page.classList.contains('abnt'), m = effMar();
@@ -2837,7 +2947,7 @@ main{cursor:default}
     const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
     const xe = t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const font = ab ? 'Times New Roman' : 'Calibri';
-    const rpr = '<w:rPr><w:rFonts w:ascii="' + font + '" w:hAnsi="' + font + '" w:cs="' + font + '"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>';
+    const rprOf = (k, s0)=>{ const sy = hfResolve(k, s0), z = Math.round(sy.fs * 2); return '<w:rPr><w:rFonts w:ascii="' + sy.ff + '" w:hAnsi="' + sy.ff + '" w:cs="' + sy.ff + '"/>' + (sy.b ? '<w:b/>' : '') + (sy.i ? '<w:i/>' : '') + (sy.c ? '<w:color w:val="' + sy.c.slice(1).toUpperCase() + '"/>' : '') + '<w:sz w:val="' + z + '"/><w:szCs w:val="' + z + '"/>' + (sy.u ? '<w:u w:val="single"/>' : '') + '</w:rPr>'; };
     const imgRuns = [], imgRels = [], imgTypes = new Set();
     for(let i = 0; i < imgsL.length; i++){
       const b = await imgBytes(imgsL[i].src), nm = 'verba_img' + i + '.' + b.ext;
@@ -2848,10 +2958,11 @@ main{cursor:default}
     function part(k, root){
       const lines = [k === 'h' ? [imgRuns.join('')] : []];
       if(!lines[0].length) lines[0] = [];
-      hfTokens(hh[k]).forEach(t=>{
-        if(typeof t === 'string'){ if(t) lines[lines.length - 1].push('<w:r>' + rpr + '<w:t xml:space="preserve">' + xe(t) + '</w:t></w:r>'); }
-        else if(t.br) lines.push([]);
-        else lines[lines.length - 1].push('<w:fldSimple w:instr=" ' + (t.f === 'pages' ? 'NUMPAGES' : 'PAGE') + ' "><w:r>' + rpr + '<w:t>1</w:t></w:r></w:fldSimple>');
+      hfRuns(hh[k]).forEach(t=>{
+        if(t.br){ lines.push([]); return; }
+        const rpr = rprOf(k, t.s);
+        if(t.f) lines[lines.length - 1].push('<w:fldSimple w:instr=" ' + (t.f === 'pages' ? 'NUMPAGES' : 'PAGE') + ' "><w:r>' + rpr + '<w:t>1</w:t></w:r></w:fldSimple>');
+        else if(t.t) lines[lines.length - 1].push('<w:r>' + rpr + '<w:t xml:space="preserve">' + xe(t.t) + '</w:t></w:r>');
       });
       const jc = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left';
       return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:' + root + ' ' + NS + '>' +
@@ -3047,7 +3158,7 @@ main{cursor:default}
             const blob = await it.getType(img); restore(); window.__insImgFile(blob); return;
           }
           if(!plain && it.types.includes('text/html')){
-            const h = await (await it.getType('text/html')).text(); restore(); exec('insertHTML', cleanPasted(h)); return;
+            const h = await (await it.getType('text/html')).text(); restore(); exec('insertHTML', cleanPasted(h)); if(window.__pstShow) setTimeout(()=>window.__pstShow(h, null), 0); return;
           }
           if(it.types.includes('text/plain')){
             const t = await (await it.getType('text/plain')).text(); restore(); exec('insertText', t); return;
@@ -4176,7 +4287,7 @@ main{cursor:default}
         ['h','f'].forEach(x=>{ bs[x].contentEditable = 'true'; bs[x].innerHTML = hfData()[x]; bs[x].dataset.v = hfData()[x]; });
         hfRender();
       }
-      active = k; goBtn(); const b = bs[k]; b.focus();
+      active = k; goBtn(); const b = bs[k]; b.focus(); syncFont();
       const r = document.createRange(); r.selectNodeContents(b); r.collapse(false);
       const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r);
       b.scrollIntoView({block:'nearest'});
@@ -4200,8 +4311,21 @@ main{cursor:default}
     ['h','f'].forEach(k=>{
       bs[k].addEventListener('focus', ()=>{ active = k; goBtn(); });
       bs[k].addEventListener('input', later);
-      bs[k].addEventListener('paste', e=>{ e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain').replace(/\r?\n/g, ' ')); });
-      bs[k].addEventListener('keydown', e=>{ if(e.key === 'Escape'){ e.preventDefault(); close(); } });
+      bs[k].addEventListener('paste', e=>{
+        e.preventDefault();
+        const cd = e.clipboardData, imgs = [];
+        [...(cd.items || [])].forEach(it=>{ if(it.kind === 'file' && /^image\//.test(it.type)){ const f = it.getAsFile(); if(f) imgs.push(f); } });
+        const txt = (cd.getData('text/plain') || '').replace(/\r/g, '');
+        if(txt.trim() || !imgs.length){
+          txt.replace(/\n+$/, '').split('\n').forEach((ln, i)=>{ if(i) document.execCommand('insertLineBreak'); if(ln) document.execCommand('insertText', false, ln); });
+          later();
+        }
+        active = k; imgs.forEach(f=>{ if(window.__insImgFile) window.__insImgFile(f); });
+      });
+      bs[k].addEventListener('keydown', e=>{
+        if(e.key === 'Escape'){ e.preventDefault(); close(); return; }
+        if((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && /^[biu]$/i.test(e.key)){ e.preventDefault(); toggle(e.key.toLowerCase()); }
+      });
     });
     function ins(html){ bs[active].focus(); document.execCommand('insertHTML', false, html); later(); }
     const fld = f=>'<span class="fld" data-f="' + f + '" contenteditable="false">' + (f === 'pages' ? pageCount() : active === 'h' ? 1 : pageCount()) + '</span>&#8203;';
@@ -4212,6 +4336,57 @@ main{cursor:default}
     bar.querySelectorAll('[data-ha]').forEach(b=>b.addEventListener('click', ()=>{
       hfData()[active + 'a'] = b.dataset.ha; bs[active].style.textAlign = b.dataset.ha; bs[active].focus(); later();
     }));
+    let saved = null;                                        // último trecho selecionado dentro da caixa (a seleção some quando o foco vai para o campo de tamanho)
+    const inside = g=>g.rangeCount && bs[active].contains(g.anchorNode) && bs[active].contains(g.focusNode);
+    const ctl = ()=>['hfFont', 'hfSize', 'hfColor'].includes(document.activeElement && document.activeElement.id);
+    const inBox = viaCtl=>{
+      if(!editing()) return false; const g = getSelection();
+      if(inside(g) && !g.isCollapsed) return true;
+      return !!((viaCtl || ctl()) && saved && bs[active].contains(saved.commonAncestorContainer));
+    };
+    function volta(){ bs[active].focus(); if(saved && !(inside(getSelection()) && !getSelection().isCollapsed)){ const g = getSelection(); g.removeAllRanges(); g.addRange(saved); } }
+    function syncFont(){
+      let sy = hfStyle(active);
+      if(inBox()){
+        const g = getSelection(), el0 = g.anchorNode.nodeType === 1 ? g.anchorNode : g.anchorNode.parentElement, cs = getComputedStyle(el0);
+        const fam = (cs.fontFamily.split(',')[0] || '').replace(/["']/g, '').trim(), rgb = cs.color.match(/\d+/g) || [0, 0, 0];
+        const st = c=>{ try{ return document.queryCommandState(c); }catch(e){ return false; } };
+        sy = {ff:fam || sy.ff, fs:Math.round(parseFloat(cs.fontSize) * 0.75 * 2) / 2, b:st('bold'), i:st('italic'), u:st('underline'), c:'#' + rgb.slice(0, 3).map(n=>(+n).toString(16).padStart(2, '0')).join('')};
+      }
+      const f = $('hfFont');
+      if(![...f.options].some(o=>o.value === sy.ff)){ const o = document.createElement('option'); o.textContent = sy.ff; f.appendChild(o); }
+      f.value = sy.ff; $('hfSize').value = sy.fs; $('hfColor').value = sy.c || '#000000';
+      $('hfB').classList.toggle('on', sy.b); $('hfI').classList.toggle('on', sy.i); $('hfU').classList.toggle('on', sy.u);
+      const h = bs[active].innerHTML; $('hfHint').hidden = !(hfRich(active, h) && hfHasFld(active, h));
+    }
+    function setSt(ch){ hfStyleSet(active, ch); persist(); hfRender(); applyMar(); syncFont(); }
+    // com texto selecionado a formatação vale só para o trecho; sem seleção vale para a caixa inteira
+    function runCmd(c, v){ volta(); document.execCommand('styleWithCSS', false, true); document.execCommand(c, false, v || null); later(); syncFont(); }
+    function runSize(pt){
+      volta(); document.execCommand('styleWithCSS', false, false); document.execCommand('fontSize', false, '7');
+      const novos = [...bs[active].querySelectorAll('font[size="7"]')].map(f=>{
+        const sp = document.createElement('span'); sp.style.fontSize = pt + 'pt';
+        while(f.firstChild) sp.appendChild(f.firstChild); f.replaceWith(sp);
+        sp.querySelectorAll('[style]').forEach(x=>x.style.removeProperty('font-size')); return sp;
+      });
+      if(novos.length){ const r = document.createRange(); r.setStartBefore(novos[0]); r.setEndAfter(novos[novos.length - 1]); const g = getSelection(); g.removeAllRanges(); g.addRange(r); }
+      later(); syncFont();
+    }
+    function toggle(x){
+      if(inBox()){ runCmd({b:'bold', i:'italic', u:'underline'}[x]); return; }
+      const sy = hfStyle(active); setSt({[x]: !sy[x]}); bs[active].focus();
+    }
+    $('hfFont').addEventListener('change', e=>{ if(inBox(true)) runCmd('fontName', e.target.value); else{ setSt({ff:e.target.value}); bs[active].focus(); } });
+    $('hfSize').addEventListener('change', e=>{ const v = parseFloat(String(e.target.value).replace(',', '.')); if(!(v >= 6 && v <= 48)){ syncFont(); return; } if(inBox(true)) runSize(v); else setSt({fs:v}); });
+    $('hfColor').addEventListener('input', e=>{ if(!inBox(true)) setSt({c:e.target.value}); });
+    $('hfColor').addEventListener('change', e=>{ if(inBox(true)) runCmd('foreColor', e.target.value); });
+    ['B','I','U'].forEach(x=>$('hf' + x).addEventListener('click', ()=>toggle(x.toLowerCase())));
+    bs.h.addEventListener('focus', syncFont); bs.f.addEventListener('focus', syncFont);
+    document.addEventListener('selectionchange', ()=>{
+      if(!editing()) return; const g = getSelection();
+      if(inside(g)){ saved = g.isCollapsed ? null : g.getRangeAt(0).cloneRange(); }
+      if(!ctl()) syncFont();
+    });
     $('hfGo').addEventListener('click', ()=>open(active === 'h' ? 'f' : 'h'));
     $('hfDif').addEventListener('change', e=>{ hfData().dif = e.target.checked; persist(); applyMar(); });
     $('hfClose').addEventListener('click', close);
@@ -4225,8 +4400,166 @@ main{cursor:default}
       const cs = getComputedStyle(page), pt = parseFloat(cs.paddingTop) || 0, pb = parseFloat(cs.paddingBottom) || 0;
       if(y < pt) open('h'); else if(y > sheet.offsetHeight - pb) open('f');
     });
-    window.__hfClose = close;
+    window.__hfClose = close; window.__hfIns = ins;
     window.__hfActive = ()=>active; window.__hfOpen = open; window.__hfEditing = editing;
+  })();
+
+
+  // ---------- Lista de fontes (como no Word): cada nome na própria fonte, recentes no topo, mostra a fonte do cursor ----------
+  (function(){
+    const sel = document.getElementById('font'); if(!sel) return;
+    const BASE = ['Calibri','Calibri Light','Cambria','Arial','Times New Roman','Georgia','Verdana','Tahoma','Trebuchet MS','Palatino Linotype','Garamond','Courier New','Consolas'];
+    const MAIS = ['Arial Narrow','Arial Black','Book Antiqua','Bookman Old Style','Calibri Light','Cambria Math','Candara','Century Gothic','Century Schoolbook','Comic Sans MS','Constantia','Corbel','Franklin Gothic Medium','Impact','Lucida Console','Lucida Sans Unicode','Segoe UI','Segoe UI Light','Sylfaen','Times','Helvetica','Carlito','Liberation Serif','Liberation Sans','Noto Sans','Noto Serif','Roboto','Open Sans'];
+    const cv = document.createElement('canvas').getContext('2d'), T = 'mmmmmmmmmmlliWWW áçãõ 0123';
+    const w = f=>{ cv.font = '72px ' + f; return cv.measureText(T).width; };
+    const w1 = w('monospace'), w2 = w('serif'), w3 = w('sans-serif');
+    const instalada = n=>{ const q = '"' + n + '"'; return w(q + ',monospace') !== w1 || w(q + ',serif') !== w2 || w(q + ',sans-serif') !== w3; };
+    let todas = BASE.slice();
+    MAIS.forEach(n=>{ if(!todas.includes(n) && instalada(n)) todas.push(n); });
+    todas.sort((a, b)=>a.localeCompare(b, 'pt'));
+    let rec = []; try{ rec = JSON.parse(localStorage.getItem('verbus_fontes_recentes') || '[]').filter(x=>typeof x === 'string').slice(0, 5); }catch(e){}
+    const opt = n=>{ const o = document.createElement('option'); o.value = o.textContent = n; o.style.fontFamily = '"' + n + '",sans-serif'; o.style.fontSize = '15px'; return o; };
+    function montar(extra){
+      const atual = sel.value; sel.innerHTML = '';
+      const lista = todas.slice(); if(extra && !lista.some(x=>x.toLowerCase() === extra.toLowerCase())){ lista.push(extra); lista.sort((a, b)=>a.localeCompare(b, 'pt')); }
+      if(rec.length){ const g = document.createElement('optgroup'); g.label = 'Fontes recentes'; rec.forEach(n=>g.appendChild(opt(n))); sel.appendChild(g); }
+      const g2 = document.createElement('optgroup'); g2.label = 'Todas as fontes'; lista.forEach(n=>g2.appendChild(opt(n))); sel.appendChild(g2);
+      if(atual) sel.value = atual;
+    }
+    montar();
+    sel.addEventListener('change', ()=>{
+      const n = sel.value; if(!n) return;
+      rec = [n].concat(rec.filter(x=>x !== n)).slice(0, 5);
+      try{ localStorage.setItem('verbus_fontes_recentes', JSON.stringify(rec)); }catch(e){}
+      montar();
+    });
+    // a caixa mostra a fonte do texto onde está o cursor
+    let t;
+    document.addEventListener('selectionchange', ()=>{
+      clearTimeout(t); t = setTimeout(()=>{
+        if(document.activeElement === sel || document.body.classList.contains('hfedit')) return;
+        const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return;
+        let el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement; if(!el) return;
+        const fam = (getComputedStyle(el).fontFamily.split(',')[0] || '').replace(/["']/g, '').trim(); if(!fam) return;
+        const ach = [...sel.options].find(o=>o.value.toLowerCase() === fam.toLowerCase());
+        if(ach) sel.value = ach.value; else{ montar(fam); sel.value = fam; }
+      }, 60);
+    });
+  })();
+
+
+  // ---------- Número de Página e Remover Cabeçalho/Rodapé (guia Inserir) ----------
+  (function(){
+    const selN = document.getElementById('pgNum'), selF = document.getElementById('pgNumFmt'), selR = document.getElementById('hfRm'); if(!selN) return;
+    const fld = f=>'<span class="fld" data-f="' + f + '" contenteditable="false">1</span>&#8203;';
+    const FM = {n:()=>fld('page'), p:()=>'Página ' + fld('page'), pd:()=>'Página ' + fld('page') + ' de ' + fld('pages'), s:()=>fld('page') + ' / ' + fld('pages'), t:()=>'– ' + fld('page') + ' –'};
+    try{ const v = localStorage.getItem('verbus_pgnum_fmt'); if(v && FM[v]) selF.value = v; }catch(e){}
+    selF.addEventListener('change', ()=>{ try{ localStorage.setItem('verbus_pgnum_fmt', selF.value); }catch(e){} });
+    const fechar = ()=>{ try{ if(window.__hfEditing && window.__hfEditing() && window.__hfClose) window.__hfClose(); }catch(e){} };
+    const lerBranco = html=>!hfTokens(html).some(t=>typeof t === 'string' ? t.trim() : !t.br);
+    function tirarNum(hh, k){
+      const add = hh.pn && hh.pn[k];
+      if(add && hh[k] && hh[k].endsWith(add)){ hh[k] = hh[k].slice(0, -add.length).replace(/(<br>)+$/, ''); if(lerBranco(hh[k])) hh[k] = ''; }
+      else if(hh[k]){ const d = document.createElement('div'); d.innerHTML = hh[k]; d.querySelectorAll('.fld').forEach(x=>x.remove()); hh[k] = lerBranco(d.innerHTML) ? '' : d.innerHTML; }
+      if(hh.pn) delete hh.pn[k];
+    }
+    selN.addEventListener('change', ()=>{
+      const v = selN.value; selN.selectedIndex = 0; if(!v) return;
+      if(v === 'cur'){                       // número no ponto do cursor dentro do cabeçalho/rodapé (abre o rodapé se nada estiver aberto)
+        if(!(window.__hfEditing && window.__hfEditing()) && window.__hfOpen) window.__hfOpen('f');
+        if(window.__hfIns) window.__hfIns(FM[selF.value]());
+        return;
+      }
+      fechar(); const hh = hfData();
+      if(v === 'rm'){ tirarNum(hh, 'h'); tirarNum(hh, 'f'); persist(); applyMar(); return; }
+      const [k, al] = v.split(':'), frag = FM[selF.value]();
+      tirarNum(hh, 'h'); tirarNum(hh, 'f');            // um só número por documento, como no Word
+      hh.pn = hh.pn || {};
+      if(lerBranco(hh[k] || '')){ hh[k] = frag; hh[k + 'a'] = al; hh.pn[k] = frag; }
+      else{ hh[k] = hh[k] + '<br>' + frag; hh.pn[k] = '<br>' + frag; }
+      persist(); applyMar();
+    });
+    selR.addEventListener('change', ()=>{
+      const v = selR.value; selR.selectedIndex = 0; if(!v) return;
+      if(!confirm(v === 'hf' ? 'Remover o cabeçalho e o rodapé (texto e imagens)?' : 'Remover o ' + (v === 'h' ? 'cabeçalho' : 'rodapé') + ' (texto e imagens)?')) return;
+      fechar(); const hh = hfData(), pg = pgOf(), e = effMar(), PH = pg.h * CMPX;
+      v.split('').forEach(k=>{
+        hh[k] = ''; if(hh.pn) delete hh.pn[k];
+        hh.imgs = hfImgs().filter(i=>{ if(i.bg) return true; const c = i.y + i.h / 2; return k === 'h' ? c >= e.t : c <= PH - e.b; });
+      });
+      persist(); applyMar();
+    });
+  })();
+
+
+  // ---------- Opções de Colagem (botão que aparece depois de colar, como o Ctrl do Word) ----------
+  (function(){
+    const btn = document.createElement('button'), menu = document.createElement('div');
+    btn.id = 'pstBtn'; btn.type = 'button'; btn.hidden = true; btn.title = 'Opções de Colagem (Ctrl)'; btn.setAttribute('aria-haspopup', 'menu'); btn.innerHTML = '<span aria-hidden="true">📋</span><span aria-hidden="true" style="font-size:10px">▾</span><span style="position:absolute;width:1px;height:1px;overflow:hidden">Opções de Colagem</span>';
+    menu.id = 'pstMenu'; menu.hidden = true; menu.setAttribute('role', 'menu');
+    const MODES = [['keep', 'Manter formatação de origem'], ['merge', 'Mesclar formatação'], ['text', 'Manter somente texto']];
+    MODES.forEach(m=>{ const b = document.createElement('button'); b.type = 'button'; b.dataset.m = m[0]; b.setAttribute('role', 'menuitem'); b.textContent = m[1]; menu.appendChild(b); });
+    document.body.append(btn, menu);
+    let ctx = null, ctrlAlone = false, busy = false;
+    const hide = ()=>{ btn.hidden = true; menu.hidden = true; ctx = null; };
+    const merge = h=>{
+      const d = new DOMParser().parseFromString(h, 'text/html');
+      d.querySelectorAll('script,style,iframe,object,embed,meta,link').forEach(n=>n.remove());
+      d.querySelectorAll('*').forEach(n=>{ ['style', 'class', 'color', 'face', 'size', 'bgcolor', 'width', 'height', 'align'].forEach(a=>n.removeAttribute(a)); [...n.attributes].forEach(a=>{ if(/^on/i.test(a.name) || /^\s*javascript:/i.test(a.value)) n.removeAttribute(a.name); }); });
+      return d.body.innerHTML;
+    };
+    const plain = (h, t)=>{ if(t) return t; const d = new DOMParser().parseFromString(h, 'text/html'); return (d.body.innerText || d.body.textContent || '').trim(); };
+    function marcar(){ menu.querySelectorAll('button').forEach(b=>b.classList.toggle('on', ctx && b.dataset.m === ctx.mode)); }
+    function pos(){
+      const g = getSelection(); let r = null;
+      if(g.rangeCount){ const rr = g.getRangeAt(0).getClientRects(); r = rr.length ? rr[rr.length - 1] : g.getRangeAt(0).getBoundingClientRect(); }
+      if(!r || (!r.width && !r.height && !r.top)) r = page.getBoundingClientRect();
+      const x = Math.max(8, Math.min(innerWidth - 60, r.right || r.left)), y = Math.max(8, Math.min(innerHeight - 40, (r.bottom || r.top) + 6));
+      btn.style.left = x + 'px'; btn.style.top = y + 'px';
+    }
+    function mostra(h, t){
+      if(!h || !h.trim()) return;
+      ctx = {h, t, mode:'keep'}; pos(); btn.hidden = false; menu.hidden = true; marcar();
+    }
+    window.__pstShow = mostra;
+    page.addEventListener('paste', e=>{
+      const cd = e.clipboardData; if(!cd || [...cd.files].some(f=>f.type.startsWith('image/'))) return;
+      const h = cd.getData('text/html'), t = cd.getData('text/plain'); if(!h) return;
+      setTimeout(()=>mostra(h, t), 0);
+    });
+    function abrir(){
+      if(!ctx) return; marcar(); const b = btn.getBoundingClientRect();
+      menu.hidden = false; const mh = menu.offsetHeight, mw = menu.offsetWidth;
+      menu.style.left = Math.max(8, Math.min(innerWidth - mw - 8, b.left)) + 'px';
+      menu.style.top = (b.bottom + mh + 8 > innerHeight ? Math.max(8, b.top - mh - 4) : b.bottom + 4) + 'px';
+    }
+    btn.addEventListener('mousedown', e=>e.preventDefault());
+    menu.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('click', ()=>{ if(menu.hidden) abrir(); else menu.hidden = true; });
+    menu.addEventListener('click', e=>{
+      const b = e.target.closest('button'); if(!b || !ctx) return;
+      const m = b.dataset.m, c = ctx; menu.hidden = true;
+      if(m === c.mode) return;
+      busy = true; page.focus();
+      try{ document.execCommand('undo'); }catch(err){}                    // desfaz a colagem e cola de novo no modo escolhido
+      page.focus(); document.execCommand('styleWithCSS', false, false);
+      if(m === 'text') document.execCommand('insertText', false, plain(c.h, c.t));
+      else document.execCommand('insertHTML', false, m === 'merge' ? merge(c.h) : cleanPasted(c.h));
+      try{ refresh(); changed(); }catch(err){}
+      busy = false; ctx = c; ctx.mode = m; btn.hidden = false; pos(); marcar();
+    });
+    // qualquer outra ação no texto some com o botão
+    page.addEventListener('mousedown', ()=>{ if(!busy) hide(); }); page.addEventListener('input', e=>{ if(ctx && !busy && e.inputType !== 'insertFromPaste' && e.inputType !== 'insertText' && e.inputType !== 'insertHTML') hide(); });
+    document.addEventListener('keydown', e=>{
+      if(e.key === 'Control'){ ctrlAlone = true; return; }
+      ctrlAlone = false;
+      if(e.key === 'Shift' || e.key === 'Alt' || e.key === 'Meta' || !ctx) return;
+      if(e.key === 'Escape' && !menu.hidden){ menu.hidden = true; return; }
+      if(!(e.ctrlKey && /^[vz]$/i.test(e.key))) hide();
+    }, true);
+    document.addEventListener('keyup', e=>{ if(e.key === 'Control' && ctrlAlone && ctx && !btn.hidden){ if(menu.hidden) abrir(); else menu.hidden = true; } });
+    document.addEventListener('mousedown', e=>{ if(!menu.hidden && !e.target.closest('#pstMenu,#pstBtn')) menu.hidden = true; });
+    addEventListener('scroll', ()=>{ if(ctx) pos(); }, true);
   })();
 
   // ---------- Atualização automática (service worker) ----------
@@ -4470,14 +4803,18 @@ main{cursor:default}
             im.style.cssText = 'position:absolute;left:' + it.x + 'px;top:' + it.y + 'px;width:' + it.w + 'px;height:' + it.h + 'px;opacity:' + (1 - (it.op || 0) / 100);
             (it.z === 'front' ? lyFront : lyBack).append(im);
           });
-          const fam = abnt ? '"Times New Roman",serif' : 'Calibri,Carlito,sans-serif';
           const fill = (box, k)=>{
             box.textContent = ''; box.style.display = 'none';
             if(first || !hfHas(k)) return;
             const a = hh[k + 'a'] === 'center' ? 'center' : hh[k + 'a'] === 'right' ? 'right' : 'left', top = k === 'h';
             const dist = Math.min(1.25 * CMPX, (top ? e.t : e.b) * 0.4);
-            box.textContent = hfTokens(hh[k]).map(t=>typeof t === 'string' ? t.replace(/\s+/g, ' ') : t.br ? '\n' : String(t.f === 'pages' ? N : idx + 1)).join('');
-            box.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:' + a + ';font:10pt ' + fam + ';' + (top ? 'top:' + dist + 'px' : 'bottom:' + dist + 'px');
+            hfLineRuns(k).forEach(line=>{
+              const d = document.createElement('div'); d.style.cssText = 'white-space:pre-wrap;line-height:1.3;min-height:1.3em';
+              line.forEach(r=>{ const sp = document.createElement('span'); sp.style.cssText = hfRunCss(hfResolve(k, r.s)); sp.textContent = r.f ? String(r.f === 'pages' ? N : idx + 1) : r.t.replace(/\s+/g, ' '); d.append(sp); });
+              if(!line.length) d.textContent = '\u00a0';
+              box.append(d);
+            });
+            box.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:' + a + ';' + hfRunCss(hfStyle(k)) + ';' + (top ? 'top:' + dist + 'px' : 'bottom:' + dist + 'px');
           };
           fill(hdr, 'h'); fill(ftr, 'f');
           if(abnt && !hfHas('h') && !hfHas('f') && idx >= 0){   // número automático do padrão ABNT, no canto superior direito
@@ -4958,7 +5295,11 @@ main{cursor:default}
     function bPos(el, x, y){ if(x != null) el.style.setProperty('--x', Math.round(x) + 'px'); if(y != null) el.style.setProperty('--y', Math.round(y) + 'px'); }
 
     // ---- seleção, barra e moldura
-    function select(t){ T = t; update(); }
+    function select(t){
+      T = t;
+      if(t){ const a = document.activeElement; if(a && a !== document.body && !/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) a.blur(); }   // imagem selecionada: Delete/Backspace apaga, como no Word
+      update();
+    }
     function geom(){
       if(!T) return null;
       if(T.k === 'h') return {x:T.it.x, y:T.it.y, w:T.it.w, h:T.it.h};
@@ -4997,6 +5338,10 @@ main{cursor:default}
     sheet.addEventListener('mousedown', e=>{                       // com o cabeçalho aberto, clicar fora fecha
       if(editingHF() && !e.target.closest('.hf,.himg,#imgOv,#hfbar,#vruler') && window.__hfClose) window.__hfClose();
     });
+    document.addEventListener('pointerdown', e=>{                  // clicar na imagem (ou na moldura dela) tira o cursor do texto: Delete apaga a imagem
+      if(!T || !(e.target.closest && e.target.closest('#imgOv,.himg'))) return;
+      const a = document.activeElement; if(a && a !== document.body && !/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) a.blur();
+    }, true);
     document.addEventListener('keydown', e=>{
       if(e.key === 'Escape' && T && !editingHF()){ select(null); return; }
       if(!T || e.key !== 'Delete' && e.key !== 'Backspace') return;
@@ -5353,7 +5698,7 @@ main{cursor:default}
     function openFont(){
       $('fdMsg').textContent = '';
       const fsel = $('fdFont'); fsel.innerHTML = '';
-      [...$('font').options].forEach(o=>{ const n = document.createElement('option'); n.textContent = n.value = o.value; fsel.appendChild(n); });
+      const vistas = new Set(); [...$('font').options].forEach(o=>{ if(!o.value || vistas.has(o.value) || o.disabled) return; vistas.add(o.value); const n = document.createElement('option'); n.textContent = n.value = o.value; fsel.appendChild(n); });
       restore();
       const el = selEl(), cs = getComputedStyle(el);
       const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
