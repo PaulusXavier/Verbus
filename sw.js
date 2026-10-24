@@ -1,5 +1,5 @@
 // Verbus — service worker: sempre tenta a rede primeiro (versão nova), usa o cache só offline.
-const CACHE = 'verbus-v5';
+const CACHE = 'verbus-v9';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon-32.png'];
 
 self.addEventListener('install', e=>{
