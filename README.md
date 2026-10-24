@@ -58,6 +58,7 @@ Editor de texto de uso pessoal que roda no navegador (HTML, CSS e JavaScript pur
 ## Padrão ABNT
 - **Padrão de todo documento**: Times New Roman 12 pt, espaçamento entre linhas 1,5 (base da ABNT; vale também na impressão, no PDF e no .doc/.docx)
 - **Mouse como no Word**: botão direito abre o menu (recortar/copiar/colar, fonte, parágrafo, link e, em tabela, inserir, excluir célula/linha/coluna/tabela, selecionar, mesclar, bordas, sombreamento, alinhamento); clicar na margem à esquerda da tabela seleciona a linha e na borda de cima seleciona a coluna (arraste para várias); na margem da folha, clique seleciona a linha de texto e duplo clique o parágrafo; com células selecionadas, Delete limpa o conteúdo e Backspace exclui as linhas/colunas selecionadas
+- **Páginas separadas na tela**: cada folha aparece inteira, com margens, cabeçalho e rodapé próprios, e um espaço cinza entre elas marcado "Fim da página N · Início da página N+1"; a barra de status mostra a página do cursor. Só um bloco maior que a folha inteira (um parágrafo ou tabela enorme) volta a mostrar apenas a linha tracejada
 - Botão **ABNT**: A4, margens 3/2/2/3 cm, Times 12, espaçamento 1,5, recuo de 1,25 cm, texto justificado
 - Títulos numerados (1, 1.1, 1.1.1) e título sem número (RESUMO, REFERÊNCIAS)
 - Capa, folha de rosto, resumo, sumário e legendas de figura, tabela e quadro
