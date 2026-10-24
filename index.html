@@ -554,6 +554,26 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:1px dotted
 #toolbar .rb.sm{width:100%;justify-content:flex-start !important;text-align:left;height:22px;padding:0 4px;gap:5px}
 #toolbar .rb.dis{color:#989898}
 #toolbar .rb.dis .ic{opacity:.5}
+body.tsel #page ::selection{background:transparent}
+#toolbar .tso label{display:flex;align-items:center;gap:4px;height:20px;font:12px/1 var(--uifont);white-space:nowrap;cursor:pointer}
+#toolbar .tso input{margin:0}
+#toolbar .tso + .tso{margin-left:10px}
+#toolbar .tsgal{display:flex;gap:3px;max-width:430px;overflow-x:auto;padding:2px;scrollbar-width:thin}
+#toolbar .tsgal button{flex:none;width:54px;height:50px;padding:3px;border:2px solid transparent;background:var(--ctl);display:flex;align-items:center;justify-content:center}
+#toolbar .tsgal button:hover{border-color:#d6d6d6}
+#toolbar .tsgal button.on{border-color:#2b79c9}
+#toolbar .tsgal table{width:44px;border-collapse:collapse;table-layout:fixed;pointer-events:none}
+#toolbar .tsgal td{height:9px;padding:0}
+#tselOv{position:fixed;z-index:30;overflow:hidden;pointer-events:none}
+#tselOv i{position:absolute;box-sizing:border-box;background:rgba(43,121,201,.28);border:1px solid rgba(43,121,201,.55)}
+#tblPop{position:fixed;z-index:90;background:var(--ctl);color:var(--rink);border:1px solid var(--ctlb);box-shadow:0 3px 10px rgba(0,0,0,.3);padding:6px 8px 4px;font:12px/1.2 var(--uifont);user-select:none}
+#tblPop .tl{height:16px;margin-bottom:4px;font-weight:600}
+#tblPop .tg{display:grid;grid-template-columns:repeat(10,18px);gap:2px}
+#tblPop .tg i{display:block;width:18px;height:18px;box-sizing:border-box;border:1px solid var(--ctlb);background:var(--ctl);cursor:pointer}
+#tblPop .tg i.on{border-color:#2b79c9;background:rgba(43,121,201,.28)}
+#tblPop hr{border:0;border-top:1px solid var(--ctlb);margin:6px -8px 2px}
+#tblPop button{display:block;width:calc(100% + 16px);margin:0 -8px;height:26px;text-align:left;padding:0 10px;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
+#tblPop button:hover{background:var(--rhov)}
 #toolbar .rb.bigb{flex-direction:column;height:47px;width:44px;padding:0;gap:3px;justify-content:flex-start}
 #toolbar .rb.caronly{height:14px;width:44px;min-width:0;padding:0}
 #toolbar .pastecol{display:flex;flex-direction:column;align-items:center;width:46px;margin:0 2px 0 3px}
@@ -671,6 +691,7 @@ main::-webkit-scrollbar-corner{background:#dbdbdb}
 #toolbar .gallery.pop{background:#fff}
 #gallery .gact{display:none}
 #stmDlg,#stgDlg,#stiDlg,#staDlg{width:min(520px,94vw)}
+#tblDlg{width:min(380px,94vw)}
 #stMenu{position:fixed;z-index:90;background:var(--bar);color:var(--ink);border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:3px;min-width:260px}
 #stMenu button{display:block;width:100%;text-align:left;border:0;background:transparent;color:inherit;font:inherit;font-size:13px;padding:6px 10px;cursor:pointer}
 #stMenu button:hover{background:var(--accent-soft)}
@@ -886,7 +907,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <button id="btnPb" title="Quebra de página">Quebra</button>
     </div><div class="gl">Páginas</div></div>
     <div class="group" role="group" aria-label="Tabelas"><div class="gb">
-      <button id="btnTable" title="Inserir tabela">Tabela</button>
+      <button id="btnTable" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Inserir uma tabela"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="24" height="20" fill="#fff" stroke="#777"/><rect x="4" y="5" width="24" height="5" fill="#2b79c9" fill-opacity=".75" stroke="#777"/><path d="M12 5v20M20 5v20M4 15h24M4 20h24" stroke="#999" fill="none"/></svg><span>Tabela <i class="car"></i></span></button>
     </div><div class="gl">Tabelas</div></div>
     <div class="group" role="group" aria-label="Ilustrações"><div class="gb">
       <button id="btnImg" title="Inserir imagem no texto (ou no cabeçalho/rodapé, se ele estiver aberto). Depois escolha a disposição: alinhada, quadrado, acima e abaixo, atrás ou na frente do texto">🖼 Imagem</button>
@@ -900,6 +921,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <button id="btnLink" title="Inserir link">Link</button>
       <button data-cmd="unlink" title="Remover link">Sem link</button>
     </div><div class="gl">Links</div></div>
+    <div class="group" role="group" aria-label="Notas"><div class="gb">
+      <button id="btnFn2" type="button" class="rb bigb" title="Inserir nota de rodapé no cursor (Ctrl+Alt+F). A numeração é automática e a nota fica no fim do documento"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="18" height="26" rx="1" fill="#fff" stroke="#777"/><path d="M8 8h12M8 12h12M8 16h8" stroke="#aaa" fill="none"/><path d="M8 23h7" stroke="#777"/><path d="M8 26h12" stroke="#2b79c9"/><text x="19" y="19" font-size="10" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">AB</text><text x="27" y="15" font-size="8" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#e45a4f">1</text></svg><span>Nota de<br>Rodapé</span></button>
+    </div><div class="gl">Notas</div></div>
     <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb">
       <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
       <select id="pgNum" title="Número de Página: escolha onde colocar (usa o formato escolhido ao lado)">
@@ -1041,6 +1065,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </div><div class="gl">Modo</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-tabela" data-tab="tabela" aria-labelledby="tab-tabela" hidden>
+    <div class="group" role="group" aria-label="Tabela"><div class="gb cols">
+      <div class="stack"><select id="tSel" class="tfit" title="Selecionar a célula, a coluna, a linha ou a tabela inteira onde está o cursor" aria-label="Selecionar"><option value="" selected disabled hidden>Selecionar</option><option value="cell">Selecionar Célula</option><option value="col">Selecionar Coluna</option><option value="row">Selecionar Linha</option><option value="tbl">Selecionar Tabela</option></select>
+        <select id="tDel" class="tfit" title="Excluir célula, coluna, linha ou tabela" aria-label="Excluir"><option value="" selected disabled hidden>Excluir ▾</option><option value="cellL">Excluir Célula (deslocar para a esquerda)</option><option value="cellU">Excluir Célula (deslocar para cima)</option><option value="colD">Excluir Coluna</option><option value="rowD">Excluir Linha</option><option value="tblD">Excluir Tabela</option></select>
+        <button type="button" id="tClear" class="rb sm" title="Remove cores, bordas, negrito e espaçamento aplicados, e volta ao visual padrão da tabela"><span>Limpar Formatação</span></button></div>
+    </div><div class="gl">Tabela</div></div>
     <div class="group" role="group" aria-label="Linhas e Colunas"><div class="gb cols">
       <div class="stack"><button type="button" class="rb sm" data-t="rowB" title="Inserir linha acima"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="3.7" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir Acima</span></button><button type="button" class="rb sm" data-t="rowA" title="Inserir linha abaixo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="9.8" width="11" height="3.7" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir Abaixo</span></button></div>
       <div class="stack"><button type="button" class="rb sm" data-t="colB" title="Inserir coluna à esquerda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Esquerda</span></button><button type="button" class="rb sm" data-t="colA" title="Inserir coluna à direita"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="9.8" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Direita</span></button></div>
@@ -1058,12 +1087,27 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <div class="rr"><button type="button" class="rb" data-t="vTop" title="Alinhar ao topo" aria-label="Alinhar ao topo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 4.5h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button><button type="button" class="rb" data-t="vMid" title="Centralizar verticalmente" aria-label="Centralizar verticalmente"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 8h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button><button type="button" class="rb" data-t="vBot" title="Alinhar embaixo" aria-label="Alinhar embaixo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 11.5h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button></div>
       <div class="rr"><button type="button" class="rb" data-t="hLeft" title="Texto à esquerda" aria-label="Texto à esquerda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M1.5 6.2H9.5" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M1.5 12.6H9.5" stroke="#555"/></svg></button><button type="button" class="rb" data-t="hCenter" title="Texto centralizado" aria-label="Texto centralizado"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M4 6.2H12" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M4 12.6H12" stroke="#555"/></svg></button><button type="button" class="rb" data-t="hRight" title="Texto à direita" aria-label="Texto à direita"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M6.5 6.2H14.5" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M6.5 12.6H14.5" stroke="#555"/></svg></button></div>
     </div><div class="gl">Alinhamento</div></div>
-    <div class="group" role="group" aria-label="Estilo da Tabela"><div class="gb cols">
+    <div class="group" role="group" aria-label="Opções de Estilo de Tabela"><div class="gb cols">
+      <div class="stack tso"><label title="Primeira linha em destaque (negrito e cor do estilo)"><input type="checkbox" data-to="h"> Linha de Cabeçalho</label><label title="Última linha em negrito, com linha em cima"><input type="checkbox" data-to="t"> Linha de Totais</label><label title="Linhas alternadas com cor de fundo"><input type="checkbox" data-to="r"> Linhas em Tiras</label></div>
+      <div class="stack tso"><label title="Primeira coluna em negrito"><input type="checkbox" data-to="fc"> Primeira Coluna</label><label title="Última coluna em negrito"><input type="checkbox" data-to="lc"> Última Coluna</label><label title="Colunas alternadas com cor de fundo"><input type="checkbox" data-to="bc"> Colunas em Tiras</label></div>
+    </div><div class="gl">Opções de Estilo de Tabela</div></div>
+    <div class="group" role="group" aria-label="Estilos de Tabela"><div class="gb">
+      <div id="tsGal" class="tsgal" role="listbox" aria-label="Estilos de Tabela"></div>
+    </div><div class="gl">Estilos de Tabela</div></div>
+    <div class="group" role="group" aria-label="Bordas"><div class="gb cols">
+      <div class="stack" style="width:150px">
+        <select id="tBd" class="tfit" title="Aplicar borda nas células selecionadas (com a linha escolhida ao lado)" aria-label="Bordas"><option value="" selected disabled hidden>Bordas ▾</option><option value="bottom">Borda Inferior</option><option value="top">Borda Superior</option><option value="left">Borda Esquerda</option><option value="right">Borda Direita</option><option value="none">Sem Borda</option><option value="all">Todas as Bordas</option><option value="outer">Bordas Externas</option><option value="inner">Bordas Internas</option><option value="innerH">Borda Interna Horizontal</option><option value="innerV">Borda Interna Vertical</option></select>
+        <select id="tBdS" class="tfit" title="Estilo da linha" aria-label="Estilo da linha"><option value="solid">Linha contínua</option><option value="dashed">Tracejada</option><option value="dotted">Pontilhada</option><option value="double">Dupla</option></select>
+        <select id="tBdW" class="tfit" title="Espessura da linha" aria-label="Espessura da linha"><option value="0.25">¼ pt</option><option value="0.5" selected>½ pt</option><option value="0.75">¾ pt</option><option value="1">1 pt</option><option value="1.5">1½ pt</option><option value="2.25">2¼ pt</option><option value="3">3 pt</option><option value="4.5">4½ pt</option><option value="6">6 pt</option></select>
+      </div>
+      <label class="pc" title="Cor da linha da borda" style="align-self:flex-start;margin-top:3px">Cor da Caneta <input type="color" id="tBdC" value="#000000"></label>
+    </div><div class="gl">Bordas</div></div>
+    <div class="group" role="group" aria-label="Formatar Tabela"><div class="gb cols">
       <div class="stack"><button type="button" class="rb sm" data-t="header" title="Liga/desliga a linha de título (repete nas páginas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="3.7" fill="#2b79c9" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M2.5 6.2h11M2.5 9.8h11M8 6.2v7.3" stroke="#aaa" fill="none"/></svg><span>Linha de Título</span></button>
-        <select id="tBord" class="tfit" title="Bordas da tabela" aria-label="Bordas"><option value="" selected disabled hidden>Bordas</option><option value="bAll">Todas as bordas</option><option value="bThick">Bordas grossas (2 pt)</option><option value="bOuter">Somente externas</option><option value="bDash">Pontilhadas</option><option value="bNone">Sem bordas</option></select>
+        <select id="tBord" class="tfit" title="Bordas da tabela" aria-label="Bordas"><option value="" selected disabled hidden>Predefinidas</option><option value="bAll">Todas as bordas</option><option value="bThick">Bordas grossas (2 pt)</option><option value="bOuter">Somente externas</option><option value="bDash">Pontilhadas</option><option value="bNone">Sem bordas</option></select>
         <select id="tPad" class="tfit" title="Espaço interno das células" aria-label="Espaço interno"><option value="" selected disabled hidden>Espaço interno</option><option value="padS">Pequeno</option><option value="padM">Médio</option><option value="padL">Grande</option></select></div>
       <label class="pc" title="Sombreamento das células selecionadas (clique duas vezes para remover)" style="align-self:flex-start;margin-top:3px">Sombreamento <input type="color" id="tShade" value="#d9e2f3"></label>
-    </div><div class="gl">Estilo da Tabela</div></div>
+    </div><div class="gl">Formatar</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-desenvolvedor" data-tab="desenvolvedor" aria-labelledby="tab-desenvolvedor" hidden>
     <div class="group"><div class="gb"><span class="soon">Em breve: as opções desta guia serão criadas depois.</span></div><div class="gl">&nbsp;</div></div>
@@ -1257,6 +1301,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <datalist id="staList"></datalist>
   <p id="staMsg" role="alert" style="margin:8px 0 0;color:#c0392b;min-height:1.3em"></p>
   <div class="dlgrow"><button id="staOk">Aplicar</button><button id="staMod" type="button">Modificar…</button><button id="staClose" type="button">Fechar</button></div>
+</dialog>
+<dialog id="tblDlg">
+  <h3>Inserir Tabela</h3>
+  <div class="fdGrid">
+    <label>Número de colunas<input type="number" id="tblCols" min="1" max="30" value="5"></label>
+    <label>Número de linhas<input type="number" id="tblRows" min="1" max="200" value="2"></label>
+  </div>
+  <p id="tblMsg" role="alert" style="margin:8px 0 0;color:#c0392b;min-height:1.3em"></p>
+  <div class="dlgrow"><button id="tblOk" type="button">OK</button><button id="tblCancel" type="button">Cancelar</button></div>
 </dialog>
 <dialog id="stiDlg">
   <h3>Inspetor de Estilo</h3>
@@ -2028,7 +2081,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   document.getElementById('block').addEventListener('change', e=>{
     blockChange(e.target.value);
   });
-  document.getElementById('font').addEventListener('change', e=>exec('fontName', e.target.value));
+  document.getElementById('font').addEventListener('change', e=>{ restore(); if(typingSet({ff:e.target.value})) return; exec('fontName', e.target.value); });
   document.getElementById('fore').addEventListener('input', e=>exec('foreColor', e.target.value));
   document.getElementById('back').addEventListener('input', e=>exec('hiliteColor', e.target.value));
 
@@ -2055,15 +2108,56 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   document.getElementById('btnImg').addEventListener('click', ()=>document.getElementById('fileImg').click());
   // (a leitura do arquivo e a colocação da imagem ficam no módulo "Imagens", mais abaixo)
 
-  document.getElementById('btnTable').addEventListener('click', ()=>{
-    const rows = parseInt(prompt('Quantas linhas?', '3'), 10);
-    const cols = parseInt(prompt('Quantas colunas?', '3'), 10);
+  // ---------- Tabela: seletor em grade (como no Word) + "Inserir Tabela…" ----------
+  function insertTable(rows, cols){
     if(!(rows > 0 && cols > 0)) return;
     let h = '<table><tbody>';
     for(let r=0;r<rows;r++){ h += '<tr>' + '<td><br></td>'.repeat(cols) + '</tr>'; }
     h += '</tbody></table><p><br></p>';
     restore(); exec('insertHTML', h);
-  });
+  }
+  (function(){
+    const btn = document.getElementById('btnTable'), GC = 10, GR = 8;
+    let pop = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    function open(){
+      pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      const lab = document.createElement('div'); lab.className = 'tl'; lab.textContent = 'Inserir Tabela'; pop.appendChild(lab);
+      const g = document.createElement('div'); g.className = 'tg'; pop.appendChild(g);
+      const cells = [];
+      for(let r=1;r<=GR;r++) for(let c=1;c<=GC;c++){ const i = document.createElement('i'); i.dataset.r = r; i.dataset.c = c; g.appendChild(i); cells.push(i); }
+      function mark(r, c){
+        cells.forEach(i=>i.classList.toggle('on', +i.dataset.r <= r && +i.dataset.c <= c));
+        lab.textContent = r && c ? c + ' × ' + r + ' Tabela' : 'Inserir Tabela';
+      }
+      g.addEventListener('mouseover', e=>{ const i = e.target.closest('i'); if(i) mark(+i.dataset.r, +i.dataset.c); });
+      g.addEventListener('mouseleave', ()=>mark(0, 0));
+      g.addEventListener('click', e=>{ const i = e.target.closest('i'); if(!i) return; const r = +i.dataset.r, c = +i.dataset.c; close(); insertTable(r, c); });
+      pop.appendChild(document.createElement('hr'));
+      const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = 'Inserir Tabela…';
+      b.addEventListener('click', ()=>{ close(); document.getElementById('tblMsg').textContent = ''; document.getElementById('tblDlg').showModal(); document.getElementById('tblCols').select(); });
+      pop.appendChild(b);
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      const r = btn.getBoundingClientRect();
+      pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = r.bottom + 2 + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    }
+    btn.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('click', ()=>{ if(pop) close(); else open(); });
+    const dlg = document.getElementById('tblDlg');
+    function ok(){
+      const c = parseInt(document.getElementById('tblCols').value, 10), r = parseInt(document.getElementById('tblRows').value, 10);
+      if(!(c >= 1 && c <= 30 && r >= 1 && r <= 200)){ document.getElementById('tblMsg').textContent = 'Use de 1 a 30 colunas e de 1 a 200 linhas.'; return; }
+      dlg.close(); insertTable(r, c);
+    }
+    document.getElementById('tblOk').addEventListener('click', ok);
+    document.getElementById('tblCancel').addEventListener('click', ()=>dlg.close());
+    dlg.addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); ok(); } });
+  })();
 
   // Realça os botões ativos (negrito, itálico, etc.)
   function refresh(){
@@ -2564,6 +2658,224 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         run(b.dataset.t);
       });
     });
+    // ----- Estilos de tabela prontos + opções (linha de cabeçalho, totais, tiras, colunas) -----
+    const TS = {
+      grade:  {n:'Grade de Tabela',            mode:'box',  b:'1px solid #000',    hbg:'',        hfg:'',     band:'#f2f2f2'},
+      clara:  {n:'Grade Clara',                mode:'box',  b:'1px solid #bfbfbf', hbg:'#f2f2f2', hfg:'',     band:'#f7f7f7'},
+      azul:   {n:'Azul',                       mode:'box',  b:'1px solid #9dc3e6', hbg:'#2e74b5', hfg:'#fff', band:'#deeaf6'},
+      verde:  {n:'Verde',                      mode:'box',  b:'1px solid #a9d18e', hbg:'#548235', hfg:'#fff', band:'#e2efd9'},
+      laranja:{n:'Laranja',                    mode:'box',  b:'1px solid #f4b183', hbg:'#c55a11', hfg:'#fff', band:'#fbe4d5'},
+      cinza:  {n:'Cinza Escuro',               mode:'box',  b:'1px solid #a6a6a6', hbg:'#404040', hfg:'#fff', band:'#ededed'},
+      linhas: {n:'Só linhas horizontais',      mode:'rows', b:'1px solid #7f7f7f', hbg:'',        hfg:'',     band:'#f2f2f2'},
+      tiras:  {n:'Sem bordas, em tiras',       mode:'none', b:'',                  hbg:'#d9d9d9', hfg:'',     band:'#f2f2f2'},
+      tres:   {n:'Três linhas (ABNT)',         mode:'three',b:'',                  hbg:'',        hfg:'',     band:''}
+    };
+    const TS_RESET = ['backgroundColor', 'color', 'fontWeight', 'border', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'];
+    const tsOpts = t=>new Set((t.dataset.to === undefined ? 'h,r' : t.dataset.to).split(',').filter(Boolean));
+    function tsApply(table, key, o){
+      const st = TS[key]; if(!st) return;
+      const rows = [...table.rows], n = rows.length, G = gridOf(table), ncol = Math.max(0, ...G.g.map(r=>r.length));
+      table.style.borderCollapse = 'collapse';
+      table.style.border = st.mode === 'box' ? st.b : 'none';
+      rows.forEach((tr, ri)=>{
+        const isH = o.has('h') && ri === 0, isT = o.has('t') && ri === n - 1 && n > (o.has('h') ? 2 : 1), bi = ri - (o.has('h') ? 1 : 0);
+        [...tr.cells].forEach(c=>{
+          if(c.closest('table') !== table) return;
+          TS_RESET.forEach(k=>c.style[k] = '');
+          const q = G.pos.get(c) || {c:0, cs:1}, last = q.c + q.cs - 1 === ncol - 1;
+          let bg = '';
+          if(isH) bg = st.hbg;
+          else if(!isT){ if(st.band && ((o.has('r') && bi % 2 === 0) || (o.has('bc') && q.c % 2 === 0))) bg = st.band; }
+          if(bg) c.style.backgroundColor = bg;
+          if(isH && st.hfg) c.style.color = st.hfg;
+          if(isH || isT || (o.has('fc') && q.c === 0) || (o.has('lc') && last)) c.style.fontWeight = 'bold';
+          if(st.mode === 'box'){ c.style.border = st.b; if(isT) c.style.borderTop = '2px solid ' + st.b.split(' ').pop(); }
+          else if(st.mode === 'rows'){
+            c.style.border = 'none';
+            c.style.borderBottom = isH ? '2px solid #000' : st.b;
+            if(isT) c.style.borderTop = '2px solid #000';
+          }else if(st.mode === 'three'){
+            c.style.border = 'none';
+            if(ri === 0) c.style.borderTop = '1.5pt solid #000';
+            if(isH) c.style.borderBottom = '1pt solid #000';
+            if(isT) c.style.borderTop = '1pt solid #000';
+            if(ri === n - 1) c.style.borderBottom = '1.5pt solid #000';
+          }
+          if(st.mode === 'none') c.style.border = 'none';
+          if(!c.getAttribute('style')) c.removeAttribute('style');
+        });
+      });
+      table.dataset.ts = key; table.dataset.to = [...o].join(',');
+    }
+    (function(){
+      const gal = $('tsGal'); if(!gal) return;
+      Object.keys(TS).forEach(k=>{
+        const b = document.createElement('button'); b.type = 'button'; b.dataset.ts = k; b.title = TS[k].n; b.setAttribute('role', 'option'); b.setAttribute('aria-label', TS[k].n);
+        const t = document.createElement('table'); t.innerHTML = '<tbody>' + '<tr><td></td><td></td><td></td><td></td></tr>'.repeat(4) + '</tbody>';
+        tsApply(t, k, new Set(['h', 'r'])); t.removeAttribute('data-ts'); t.removeAttribute('data-to');
+        b.appendChild(t); gal.appendChild(b);
+        b.addEventListener('mousedown', e=>e.preventDefault());
+        b.addEventListener('click', ()=>{
+          restore(); const c = inTable(); if(!c) return;
+          const table = c.closest('table'); tsApply(table, k, tsOpts(table)); changed(); tsSync();
+        });
+      });
+      panelT.querySelectorAll('input[data-to]').forEach(i=>{
+        i.addEventListener('mousedown', e=>e.stopPropagation());
+        i.addEventListener('change', ()=>{
+          restore(); const c = inTable(); if(!c){ tsSync(); return; }
+          const table = c.closest('table'), o = tsOpts(table);
+          i.checked ? o.add(i.dataset.to) : o.delete(i.dataset.to);
+          tsApply(table, table.dataset.ts || 'grade', o); changed(); tsSync();
+        });
+      });
+    })();
+    function tsSync(){
+      const c = inTable(); if(!c || panelT.hidden) return;
+      const t = c.closest('table'), o = tsOpts(t);
+      panelT.querySelectorAll('input[data-to]').forEach(i=>{ if(document.activeElement !== i) i.checked = o.has(i.dataset.to); });
+      panelT.querySelectorAll('#tsGal button').forEach(b=>b.classList.toggle('on', b.dataset.ts === t.dataset.ts));
+    }
+    document.addEventListener('selectionchange', ()=>setTimeout(tsSync, 0));
+    tabT.addEventListener('click', ()=>setTimeout(tsSync, 0));
+
+    // ----- Bordas completas: lado, estilo, espessura e cor, só nas células selecionadas -----
+    const SIDE = {top:'borderTop', bottom:'borderBottom', left:'borderLeft', right:'borderRight'};
+    function penCss(){
+      let w = parseFloat($('tBdW').value) || .5; const st = $('tBdS').value || 'solid';
+      if(st === 'double' && w < 2.25) w = 2.25;
+      return w + 'pt ' + st + ' ' + ($('tBdC').value || '#000');
+    }
+    function applyBorders(mode){
+      const cells = selCells(); if(!cells.length) return;
+      const table = cells[0].closest('table'), {g, pos} = gridOf(table), pen = penCss();
+      const R = cells.map(c=>pos.get(c));
+      const r0 = Math.min(...R.map(q=>q.r)), r1 = Math.max(...R.map(q=>q.r + q.rs - 1)), c0 = Math.min(...R.map(q=>q.c)), c1 = Math.max(...R.map(q=>q.c + q.cs - 1));
+      table.style.borderCollapse = 'collapse';
+      const val = mode === 'none' ? 'none' : pen;
+      const set = (cell, side, v)=>{ if(cell && cell.closest('table') === table) cell.style[SIDE[side]] = v; };
+      // aplica a linha no encontro entre duas células (nas duas, para não haver conflito entre elas)
+      const horiz = (r, c, v)=>{ set((g[r - 1] || [])[c], 'bottom', v); set((g[r] || [])[c], 'top', v); };   // linha acima da linha r, na coluna c
+      const vert = (r, c, v)=>{ set((g[r] || [])[c - 1], 'right', v); set((g[r] || [])[c], 'left', v); };    // linha à esquerda da coluna c, na linha r
+      const m = mode;
+      for(let c = c0; c <= c1; c++){
+        if(m === 'top' || m === 'outer' || m === 'all' || m === 'none') horiz(r0, c, val);
+        if(m === 'bottom' || m === 'outer' || m === 'all' || m === 'none') horiz(r1 + 1, c, val);
+        if(m === 'inner' || m === 'innerH' || m === 'all' || m === 'none') for(let r = r0 + 1; r <= r1; r++) horiz(r, c, val);
+      }
+      for(let r = r0; r <= r1; r++){
+        if(m === 'left' || m === 'outer' || m === 'all' || m === 'none') vert(r, c0, val);
+        if(m === 'right' || m === 'outer' || m === 'all' || m === 'none') vert(r, c1 + 1, val);
+        if(m === 'inner' || m === 'innerV' || m === 'all' || m === 'none') for(let c = c0 + 1; c <= c1; c++) vert(r, c, val);
+      }
+      table.querySelectorAll('td,th').forEach(x=>{ if(x.closest('table') === table && !x.getAttribute('style')) x.removeAttribute('style'); });
+      changed();
+    }
+    $('tBd').addEventListener('change', e=>{ const v = e.target.value; e.target.selectedIndex = 0; if(!v) return; restore(); if(!inTable()) return; applyBorders(v); });
+    ['tBdC'].forEach(id=>$(id).addEventListener('mousedown', e=>e.stopPropagation()));
+
+    // ----- Excluir célula (com deslocamento) e limpar formatação da tabela -----
+    function caretIn(cell){ if(cell && cell.isConnected){ const r = document.createRange(), s = getSelection(); r.selectNodeContents(cell); r.collapse(true); s.removeAllRanges(); s.addRange(r); } }
+    function deleteCells(dir){
+      const cells = selCells(); if(!cells.length) return;
+      const table = cells[0].closest('table'), G = gridOf(table), first = G.pos.get(cells[0]);
+      if(dir === 'U'){
+        const q = first;
+        if(cells.length > 1 || [...table.rows].some(tr=>[...tr.cells].some(x=>(x.rowSpan > 1 || x.colSpan > 1)))){ alert('Para deslocar para cima, use uma célula só e uma tabela sem células mescladas. Use "deslocar para a esquerda" ou exclua a linha/coluna.'); return; }
+        const col = G.g.map(r=>r[q.c]).filter(Boolean);
+        for(let i = q.r; i < col.length - 1; i++) col[i].innerHTML = col[i + 1].innerHTML;
+        const last = col[col.length - 1];
+        const row = last.parentNode; last.remove();
+        if(!row.cells.length) row.remove();
+        caretIn(col[Math.min(q.r, col.length - 2)] || table.rows[0] && table.rows[0].cells[0]);
+      }else{
+        const rows = new Set(cells.map(c=>c.parentNode));
+        const nb = cells[cells.length - 1].nextElementSibling || cells[0].previousElementSibling;
+        cells.forEach(c=>c.remove());
+        rows.forEach(tr=>{ if(!tr.cells.length) tr.remove(); });
+        caretIn(nb && nb.isConnected ? nb : table.rows[0] && table.rows[0].cells[0]);
+      }
+      if(!table.querySelector('td,th')) table.remove();
+      changed(); syncT();
+    }
+    $('tDel').addEventListener('change', e=>{
+      const v = e.target.value; e.target.selectedIndex = 0; if(!v) return;
+      restore(); if(!inTable()) return;
+      if(v === 'cellL') deleteCells('L'); else if(v === 'cellU') deleteCells('U'); else run(v);
+    });
+    $('tClear').addEventListener('mousedown', e=>e.preventDefault());
+    $('tClear').addEventListener('click', ()=>{
+      restore(); const c = inTable(); if(!c) return;
+      const table = c.closest('table');
+      table.style.border = ''; table.style.borderCollapse = ''; table.removeAttribute('data-ts'); table.removeAttribute('data-to'); if(!table.getAttribute('style')) table.removeAttribute('style');
+      table.querySelectorAll('td,th').forEach(x=>{
+        if(x.closest('table') !== table) return;
+        ['backgroundColor', 'color', 'fontWeight', 'border', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight', 'padding'].forEach(k=>x.style[k] = '');
+        if(!x.getAttribute('style')) x.removeAttribute('style');
+      });
+      if(table.tHead && table.tHead.rows.length){ const tr = table.tHead.rows[0], tb = table.tBodies[0] || table.appendChild(document.createElement('tbody')); tb.insertBefore(tr, tb.firstChild); table.tHead.remove(); }
+      changed(); tsSync();
+    });
+
+    // ----- Selecionar célula / coluna / linha / tabela + realce das células selecionadas -----
+    $('tSel').addEventListener('change', e=>{
+      const a = e.target.value; e.target.selectedIndex = 0; if(!a) return;
+      restore();
+      const c = inTable(); if(!c) return;
+      const table = c.closest('table'), {g, pos} = gridOf(table), q = pos.get(c), rows = [...table.rows];
+      let first, last;
+      if(a === 'cell'){ first = last = c; }
+      else if(a === 'row'){ const tr = c.parentNode; first = tr.cells[0]; last = tr.cells[tr.cells.length - 1]; }
+      else if(a === 'col'){ first = g[0][q.c]; last = g[g.length - 1][q.c]; }
+      else{ first = rows[0].cells[0]; const lr = rows[rows.length - 1]; last = lr.cells[lr.cells.length - 1]; }
+      if(!first || !last) return;
+      const r = document.createRange(); r.setStart(first, 0); r.setEnd(last, last.childNodes.length);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      syncT(); tselDraw();
+    });
+    const tselOv = document.createElement('div'); tselOv.id = 'tselOv'; tselOv.setAttribute('aria-hidden', 'true'); document.body.appendChild(tselOv);
+    function tselCells(){
+      const s = getSelection(); if(!s.rangeCount || s.isCollapsed || !page.contains(s.anchorNode) || !page.isContentEditable) return [];
+      const r = s.getRangeAt(0), a = cellAt(r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentNode), z = cellAt(r.endContainer.nodeType === 1 ? r.endContainer : r.endContainer.parentNode);
+      if(!a || !z) return [];
+      if(a === z){   // uma célula só: realça apenas se ela estiver toda selecionada
+        return (r.startContainer === a && r.startOffset === 0 && r.endContainer === a && r.endOffset === a.childNodes.length) ? [a] : [];
+      }
+      if(a.closest('table') !== z.closest('table')) return [];
+      const table = a.closest('table'), {g, pos} = gridOf(table), pa = pos.get(a), pz = pos.get(z); if(!pa || !pz) return [];
+      const r0 = Math.min(pa.r, pz.r), r1 = Math.max(pa.r + pa.rs - 1, pz.r + pz.rs - 1), c0 = Math.min(pa.c, pz.c), c1 = Math.max(pa.c + pa.cs - 1, pz.c + pz.cs - 1), set = new Set();
+      for(let i = r0; i <= r1; i++) for(let j = c0; j <= c1; j++) if(g[i] && g[i][j]) set.add(g[i][j]);
+      return [...set];
+    }
+    function scroller(){ let n = page.parentNode; while(n && n !== document.body){ const o = getComputedStyle(n).overflowY; if(o === 'auto' || o === 'scroll') return n; n = n.parentNode; } return document.documentElement; }
+    let tselRaf = 0;
+    function tselDraw(){
+      cancelAnimationFrame(tselRaf);
+      tselRaf = requestAnimationFrame(()=>{
+        const ae = document.activeElement;
+        if(ae && ae.closest && ae.closest('dialog')) return;
+        const s = getSelection();
+        if(s.rangeCount && !page.contains(s.anchorNode) && !(ae && ae.closest && ae.closest('#toolbar'))){ tselOv.innerHTML = ''; document.body.classList.remove('tsel'); return; }
+        const cells = (s.rangeCount && page.contains(s.anchorNode)) ? tselCells() : (tselOv.children.length ? tselLast : []);
+        tselLast = cells;
+        tselOv.innerHTML = '';
+        document.body.classList.toggle('tsel', cells.length > 0);
+        if(!cells.length || !page.isContentEditable) return;
+        const sc = scroller(), cr = sc === document.documentElement ? {left:0, top:0, right:innerWidth, bottom:innerHeight} : sc.getBoundingClientRect();
+        tselOv.style.cssText = 'left:' + cr.left + 'px;top:' + cr.top + 'px;width:' + (cr.right - cr.left) + 'px;height:' + (cr.bottom - cr.top) + 'px';
+        cells.forEach(c=>{
+          if(!c.isConnected) return;
+          const b = c.getBoundingClientRect(), d = document.createElement('i');
+          d.style.cssText = 'left:' + (b.left - cr.left) + 'px;top:' + (b.top - cr.top) + 'px;width:' + b.width + 'px;height:' + b.height + 'px';
+          tselOv.appendChild(d);
+        });
+      });
+    }
+    var tselLast = [];
+    document.addEventListener('selectionchange', tselDraw);
+    document.addEventListener('scroll', tselDraw, true);
+    window.addEventListener('resize', tselDraw);
+    page.addEventListener('input', tselDraw);
     ['tFit', 'tBord', 'tPad'].forEach(id=>$(id).addEventListener('change', e=>{ const v = e.target.value; e.target.selectedIndex = 0; if(v) run(v); }));
     function distRows(){
       restore(); const c = inTable(); if(!c){ alert('Clique dentro de uma célula da tabela e escolha de novo.'); return; }
@@ -2641,9 +2953,18 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     tmp.querySelector('.fnt').textContent = t.trim(); box.appendChild(tmp.firstChild);
     restore();
     exec('insertHTML', '<sup class="fn" data-id="' + id + '" contenteditable="false">0</sup>&#8203;');
+    // o cursor fica depois do número da nota, para continuar digitando
+    const mk = page.querySelector('sup.fn[data-id="' + id + '"]');
+    if(mk){
+      const r = document.createRange(), nx = mk.nextSibling;
+      if(nx && nx.nodeType === 3) r.setStart(nx, nx.length); else r.setStartAfter(mk);
+      r.collapse(true); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r);
+    }
   }
   $('btnFn').addEventListener('mousedown', e=>e.preventDefault());
   $('btnFn').addEventListener('click', fnInsert);
+  $('btnFn2').addEventListener('mousedown', e=>e.preventDefault());
+  $('btnFn2').addEventListener('click', fnInsert);
   page.addEventListener('keydown', e=>{ if(e.ctrlKey && e.altKey && (e.key === 'f' || e.key === 'F')){ e.preventDefault(); fnInsert(); } });
   function fnJump(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1200); }
   page.addEventListener('click', e=>{
@@ -3336,7 +3657,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const pt = String(e.target.value).replace(',', '.').replace(/\s*pt$/i, '').trim();
     const n = parseFloat(pt);
     if(!(n >= 1 && n <= 1638) || !/^\d+(\.\d+)?$/.test(pt)){ syncSize(); return; }
-    restore(); exec('fontSize', 7);
+    restore(); if(typingSet({fs:n})) return; exec('fontSize', 7);
     page.querySelectorAll('font[size="7"]').forEach(f=>{
       const sp = fontToSpan(f); sp.style.fontSize = pt + 'pt';
     });
@@ -3648,15 +3969,17 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   function curPt(){ return Math.round(parseFloat(getComputedStyle(selEl()).fontSize) * 0.75 * 2) / 2; }
   function syncSize(){
+    if(typingActive()) return;
     const sel = $('size'), v = String(curPt()); if(!v || v === 'NaN') return;
     if(document.activeElement !== sel) sel.value = v;
   }
   document.addEventListener('selectionchange', ()=>{ try{ syncSize(); }catch(e){} });
   const STEPS = [6,7,8,9,10,10.5,11,12,13,14,15,16,18,20,22,24,26,28,30,32,36,40,44,48,54,60,66,72,80,88,96,120,144];
   function stepSize(dir){
-    const c = curPt(); let n;
+    const c = typingActive() ? ty.fs : curPt(); let n;
     if(dir > 0) n = STEPS.find(x=>x > c) || Math.min(c + 10, 400);
     else n = [...STEPS].reverse().find(x=>x < c) || Math.max(c - 1, 1);
+    restore(); if(typingSet({fs:n})) return;
     setSizePt(n);
   }
   $('btnGrow').addEventListener('click', ()=>stepSize(1));
@@ -3691,6 +4014,85 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(e.ctrlKey && e.shiftKey && (e.key === '>' || e.key === '.')){ e.preventDefault(); stepSize(1); }
     else if(e.ctrlKey && e.shiftKey && (e.key === '<' || e.key === ',')){ e.preventDefault(); stepSize(-1); }
     else if(e.key === 'Escape' && painter){ stopPainter(); }
+  });
+
+
+  // ---------- Estilo de digitação: fonte/tamanho escolhidos com o cursor parado (sem seleção) valem para o que for digitado ----------
+  // O navegador perde o "estilo pendente" ao mexer na barra, no Enter ou ao trocar a seleção (e volta para Calibri 11).
+  // Aqui o estilo fica guardado até o usuário clicar em outro lugar ou mover o cursor com as setas.
+  var ty = null;
+  function typingActive(){ return !!(ty && ty.ff && ty.fs); }
+  window.__tyActive = typingActive;
+  function tyCaretOk(){
+    const s = getSelection();
+    return s.rangeCount && s.isCollapsed && page.contains(s.anchorNode) && page.isContentEditable && !document.body.classList.contains('hfedit');
+  }
+  function tyFam(el){ return ((getComputedStyle(el).fontFamily || '').split(',')[0] || '').replace(/["']/g, '').trim(); }
+  function tyStyle(sp){
+    sp.style.fontFamily = '"' + ty.ff + '",Carlito,"Liberation Serif",sans-serif';
+    sp.style.fontSize = ty.fs + 'pt';
+  }
+  function tyMatches(el){
+    if(!el) return false;
+    return tyFam(el).toLowerCase() === String(ty.ff).toLowerCase() && Math.abs(parseFloat(getComputedStyle(el).fontSize) * 0.75 - ty.fs) < 0.26;
+  }
+  function tyShow(){
+    if(!typingActive()) return;
+    const f = $('font'), z = $('size');
+    if(document.activeElement !== f){ const o = [...f.options].find(o=>o.value.toLowerCase() === String(ty.ff).toLowerCase()); if(o) f.value = o.value; }
+    if(document.activeElement !== z) z.value = String(ty.fs);
+  }
+  function tyEnsure(){
+    if(!typingActive() || !tyCaretOk()) return;
+    const s = getSelection(), r = s.getRangeAt(0);
+    const el = r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentElement;
+    if(!el || !page.contains(el)) return;
+    const cur = el.closest('span[data-ty]');
+    if(cur && page.contains(cur) && cur.textContent.replace(/​/g, '') === ''){ tyStyle(cur); return; }
+    if(tyMatches(el)) return;
+    const sp = document.createElement('span'); sp.dataset.ty = '1'; tyStyle(sp); sp.textContent = '​';
+    r.insertNode(sp);
+    const nr = document.createRange(); nr.setStart(sp.firstChild, 1); nr.collapse(true);
+    s.removeAllRanges(); s.addRange(nr);    return true;
+  }
+  function typingSet(p){
+    if(!tyCaretOk()) return false;
+    if(!typingActive()){
+      const el = selEl();
+      ty = {ff: tyFam(el) || 'Calibri', fs: curPt() || 11};
+    }
+    Object.assign(ty, p);
+    tyEnsure(); tyShow();
+    return true;
+  }
+  function tyCleanup(){
+    const s = getSelection(), an = s.rangeCount ? s.anchorNode : null;
+    if(typingActive() || !an || !page.contains(an)) return;
+    page.querySelectorAll('span[data-ty]').forEach(sp=>{
+      if(sp.textContent.replace(/​/g, '') !== '' || (an && sp.contains(an))) return;
+      sp.remove();
+    });
+  }
+  page.addEventListener('beforeinput', e=>{
+    if(!typingActive()) return;
+    if(e.inputType === 'insertText' && e.data){ if(tyEnsure()){ e.preventDefault(); document.execCommand('insertText', false, e.data); } }
+    else if(e.inputType === 'insertCompositionText') tyEnsure();
+  });
+  page.addEventListener('input', e=>{
+    if(!typingActive()) return;
+    if(e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak'){ tyEnsure(); return; }
+    if(e.isComposing) return;
+    const s = getSelection(), n = s.rangeCount ? s.anchorNode : null;
+    if(n && n.nodeType === 3 && n.data.length > 1 && n.data.charCodeAt(0) === 0x200B && n.parentElement && n.parentElement.closest('span[data-ty]')) n.deleteData(0, 1);
+  });
+  page.addEventListener('mousedown', ()=>{ ty = null; setTimeout(()=>{ try{ tyCleanup(); syncSize(); }catch(_){} }, 0); });
+  page.addEventListener('touchstart', ()=>{ ty = null; }, {passive:true});
+  page.addEventListener('keydown', e=>{
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key)) ty = null;
+  });
+  document.addEventListener('selectionchange', ()=>{
+    try{ tyCleanup(); }catch(_){}
+    if(typingActive()) setTimeout(tyShow, 90);
   });
 
   const FX = {
@@ -4943,7 +5345,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     let t;
     document.addEventListener('selectionchange', ()=>{
       clearTimeout(t); t = setTimeout(()=>{
-        if(document.activeElement === sel || document.body.classList.contains('hfedit')) return;
+        if(document.activeElement === sel || document.body.classList.contains('hfedit') || (window.__tyActive && window.__tyActive())) return;
         const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return;
         let el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement; if(!el) return;
         const fam = (getComputedStyle(el).fontFamily.split(',')[0] || '').replace(/["']/g, '').trim(); if(!fam) return;
