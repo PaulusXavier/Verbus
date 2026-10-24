@@ -585,7 +585,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:1px dotted
 #toolbar .gallery button:hover{background:#f2f2f2;border-color:#d6d6d6}
 #toolbar .gallery button.on{background:var(--ctl);border-color:var(--ron)}
 #toolbar .gallery .pv{display:flex;align-items:center;height:32px;margin-top:0;overflow:hidden;white-space:nowrap;max-width:100%;zoom:1.12;padding-left:1px}
-#toolbar .gallery .nm{display:block;height:15px;line-height:15px;font:12px/15px var(--uifont);color:#444;text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;margin-top:2px}
+#toolbar .gallery .nm{text-overflow:ellipsis;display:block;height:15px;line-height:15px;font:12px/15px var(--uifont);color:#444;text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;margin-top:2px}
 #toolbar .gallery [data-gs=h1] .pv{font-size:17px !important;color:#2e74b5 !important;font-family:"Calibri Light",Calibri,"Carlito",sans-serif !important}
 #toolbar .gallery [data-gs=h2] .pv{font-size:14px !important;color:#2e74b5 !important;font-family:"Calibri Light",Calibri,"Carlito",sans-serif !important}
 #toolbar .gallery [data-gs=titulo] .pv{font-size:27px !important}
@@ -676,6 +676,30 @@ main::-webkit-scrollbar-corner{background:#dbdbdb}
 main{cursor:default}
 #sheet{cursor:text}
 
+
+/* Tabelas: arrastar bordas, alça de redimensionar e guia contextual */
+#tabs .tab[hidden]{display:none}
+#tabs #tab-tabela{margin-left:8px;box-shadow:inset 0 3px 0 #7fd18b}
+#tabs #tab-tabela.on{color:var(--accent)}
+#page.tbl-cr,#page.tbl-cr *{cursor:col-resize !important}
+#page.tbl-rr,#page.tbl-rr *{cursor:row-resize !important}
+body.tbl-drag{user-select:none;-webkit-user-select:none}
+#tblHandle{position:fixed;width:11px;height:11px;border:1px solid #8a8a8a;background:#fff;z-index:50;cursor:nwse-resize;display:none;box-sizing:border-box;touch-action:none}
+#tblHandle:hover,#tblHandle.drag{background:#dce8fb;border-color:#1d5fd1}
+#toolbar .tsz{display:flex;justify-content:space-between;gap:4px;width:130px}
+#toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
+#toolbar select.tfit{width:100%;height:22px}
+@media print{#tblHandle{display:none !important}}
+
+/* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
+@media (max-width:700px){
+  #ttl{position:static;transform:none;flex:1 1 0;min-width:0;max-width:none;margin:0 6px;overflow:hidden}
+  #ttl input{min-width:0;max-width:100%;flex:0 1 auto;text-align:left}
+  #ttl .app{display:none}
+  #qat #btnQSave,#qat [data-cmd=undo]{margin-left:2px} #qat [data-cmd=redo]{margin-left:4px} #qat #btnQMore{display:none}
+  #toolbar .tabpanel{scrollbar-width:auto;-webkit-overflow-scrolling:touch}
+}
+@media (max-width:480px){ #qat #btnRepeat{display:none} #titlebar .pessoal + .hbtn{margin-left:2px} #titlebar .hbtn{width:34px} }
 </style>
 </head>
 <body>
@@ -704,7 +728,7 @@ main{cursor:default}
 </header>
 <div id="tabs">
   <button id="btnFile" class="tabfile" title="Menu Arquivo: informações, novo, abrir, salvar, imprimir… (Ctrl+O abre a lista)" aria-haspopup="dialog">Arquivo</button>
-  <div role="tablist" aria-label="Guias da faixa de opções"><button role="tab" id="tab-inicio" class="tab on" data-tab="inicio" aria-controls="tp-inicio" aria-selected="true">Página Inicial</button><button role="tab" id="tab-inserir" class="tab" data-tab="inserir" aria-controls="tp-inserir" aria-selected="false" tabindex="-1">Inserir</button><button role="tab" id="tab-design" class="tab" data-tab="design" aria-controls="tp-design" aria-selected="false" tabindex="-1">Design</button><button role="tab" id="tab-layout" class="tab" data-tab="layout" aria-controls="tp-layout" aria-selected="false" tabindex="-1">Layout</button><button role="tab" id="tab-referencias" class="tab" data-tab="referencias" aria-controls="tp-referencias" aria-selected="false" tabindex="-1">Referências</button><button role="tab" id="tab-correspondencias" class="tab" data-tab="correspondencias" aria-controls="tp-correspondencias" aria-selected="false" tabindex="-1">Correspondências</button><button role="tab" id="tab-revisao" class="tab" data-tab="revisao" aria-controls="tp-revisao" aria-selected="false" tabindex="-1">Revisão</button><button role="tab" id="tab-exibir" class="tab" data-tab="exibir" aria-controls="tp-exibir" aria-selected="false" tabindex="-1">Exibir</button><button role="tab" id="tab-desenvolvedor" class="tab" data-tab="desenvolvedor" aria-controls="tp-desenvolvedor" aria-selected="false" tabindex="-1">Desenvolvedor</button></div><button type="button" id="tab-hf" class="tabctx" aria-label="Cabeçalho e Rodapé (guia contextual)">Cabeçalho e Rodapé</button>
+  <div role="tablist" aria-label="Guias da faixa de opções"><button role="tab" id="tab-inicio" class="tab on" data-tab="inicio" aria-controls="tp-inicio" aria-selected="true">Página Inicial</button><button role="tab" id="tab-inserir" class="tab" data-tab="inserir" aria-controls="tp-inserir" aria-selected="false" tabindex="-1">Inserir</button><button role="tab" id="tab-design" class="tab" data-tab="design" aria-controls="tp-design" aria-selected="false" tabindex="-1">Design</button><button role="tab" id="tab-layout" class="tab" data-tab="layout" aria-controls="tp-layout" aria-selected="false" tabindex="-1">Layout</button><button role="tab" id="tab-referencias" class="tab" data-tab="referencias" aria-controls="tp-referencias" aria-selected="false" tabindex="-1">Referências</button><button role="tab" id="tab-correspondencias" class="tab" data-tab="correspondencias" aria-controls="tp-correspondencias" aria-selected="false" tabindex="-1">Correspondências</button><button role="tab" id="tab-revisao" class="tab" data-tab="revisao" aria-controls="tp-revisao" aria-selected="false" tabindex="-1">Revisão</button><button role="tab" id="tab-exibir" class="tab" data-tab="exibir" aria-controls="tp-exibir" aria-selected="false" tabindex="-1">Exibir</button><button role="tab" id="tab-desenvolvedor" class="tab" data-tab="desenvolvedor" aria-controls="tp-desenvolvedor" aria-selected="false" tabindex="-1">Desenvolvedor</button><button role="tab" id="tab-tabela" class="tab tabctx2" data-tab="tabela" aria-controls="tp-tabela" aria-selected="false" tabindex="-1" hidden>Layout da Tabela</button></div><button type="button" id="tab-hf" class="tabctx" aria-label="Cabeçalho e Rodapé (guia contextual)">Cabeçalho e Rodapé</button>
   <div class="tellw"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8a4.2 4.2 0 00-2.4 7.7c.5.4.7.8.7 1.4h3.4c0-.6.2-1 .7-1.4A4.2 4.2 0 008 1.8z" fill="none" stroke="#a5b9d2" stroke-width="1.1"/><path d="M6.3 12.6h3.4M6.8 14.2h2.4" stroke="#a5b9d2" stroke-width="1.1"/></svg><input type="search" id="tell" list="tellList" placeholder="Buscar um comando…" aria-label="Buscar um comando" autocomplete="off"></div>
   <datalist id="tellList"></datalist>
   <button id="btnShare" title="Compartilhar (e-mail, aparelho, copiar texto)"><svg class="ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5.3" r="3" fill="none" stroke="#fff" stroke-width="1.2"/><path d="M2.5 14.2c0-3 2.4-4.8 5.5-4.8" fill="none" stroke="#fff" stroke-width="1.2"/><path d="M12 9.8v5M9.5 12.3h5" stroke="#fff" stroke-width="1.2"/></svg><span>Compartilhar</span></button>
@@ -802,16 +826,16 @@ main{cursor:default}
         <button type="button" role="option" data-gs="h2" data-gk="h2" aria-label="Título 2" title="Título 2"><span class="pv" style="font-size:13px;color:#2f5496">AaBbCcDc</span><span class="nm">Título 2</span></button>
         <button type="button" role="option" data-gs="titulo" data-gk="p" aria-label="Título" title="Título"><span class="pv" style="font-size:22px;font-family:'Calibri Light',Calibri,sans-serif">AaBbCcDc</span><span class="nm">Título</span></button>
         <button type="button" role="option" data-gs="subtitulo" data-gk="p" aria-label="Subtítulo" title="Subtítulo"><span class="pv" style="font-size:12px;color:#5a5a5a;letter-spacing:.6px">AaBbCcDc</span><span class="nm">Subtítulo</span></button>
-        <button type="button" role="option" data-gs="ensut" data-gk="c" aria-label="Ênfase Sutil" title="Ênfase Sutil"><span class="pv" style="font-size:12px;font-style:italic;color:#404040">AaBbCcDc</span><span class="nm">Ênfase Sutil</span></button>
+        <button type="button" role="option" data-gs="ensut" data-gk="c" aria-label="Ênfase Sutil" title="Ênfase Sutil"><span class="pv" style="font-size:12px;font-style:italic;color:#404040">AaBbCcDc</span><span class="nm">Ênf. Sutil</span></button>
         <button type="button" role="option" data-gs="enfase" data-gk="c" aria-label="Ênfase" title="Ênfase"><span class="pv" style="font-size:12px;font-style:italic">AaBbCcDc</span><span class="nm">Ênfase</span></button>
-        <button type="button" role="option" data-gs="enfint" data-gk="c" aria-label="Ênfase Intensa" title="Ênfase Intensa"><span class="pv" style="font-size:12px;font-style:italic;color:#4472c4">AaBbCcDc</span><span class="nm">Ênfase Int...</span></button>
+        <button type="button" role="option" data-gs="enfint" data-gk="c" aria-label="Ênfase Intensa" title="Ênfase Intensa"><span class="pv" style="font-size:12px;font-style:italic;color:#4472c4">AaBbCcDc</span><span class="nm">Ênf. Int.</span></button>
         <button type="button" role="option" data-gs="forte" data-gk="c" aria-label="Forte" title="Forte"><span class="pv" style="font-size:12px;font-weight:bold">AaBbCcDc</span><span class="nm">Forte</span></button>
         <button type="button" role="option" data-gs="citacao" data-gk="p" aria-label="Citação" title="Citação"><span class="pv" style="font-size:12px;font-style:italic;color:#404040">AaBbCcDc</span><span class="nm">Citação</span></button>
-        <button type="button" role="option" data-gs="citint" data-gk="p" aria-label="Citação Intensa" title="Citação Intensa"><span class="pv" style="font-size:12px;font-style:italic;color:#4472c4">AaBbCcDc</span><span class="nm">Citação In...</span></button>
-        <button type="button" role="option" data-gs="refsut" data-gk="c" aria-label="Referência Sutil" title="Referência Sutil"><span class="pv" style="font-size:12px;font-variant:small-caps;color:#5a5a5a">AaBbCcDc</span><span class="nm">Referência...</span></button>
+        <button type="button" role="option" data-gs="citint" data-gk="p" aria-label="Citação Intensa" title="Citação Intensa"><span class="pv" style="font-size:12px;font-style:italic;color:#4472c4">AaBbCcDc</span><span class="nm">Cit. Int.</span></button>
+        <button type="button" role="option" data-gs="refsut" data-gk="c" aria-label="Referência Sutil" title="Referência Sutil"><span class="pv" style="font-size:12px;font-variant:small-caps;color:#5a5a5a">AaBbCcDc</span><span class="nm">Ref. Sutil</span></button>
  <button type="button" class="gact" id="gsClear" title="Remove toda a formatação do trecho e dos parágrafos selecionados (Ctrl+Espaço remove só a do texto)">✕&nbsp; Limpar Formatação</button>
         <button type="button" class="gact" id="gsCreate" title="Salva a formatação do parágrafo atual como um estilo seu, que aparece na galeria">＋&nbsp; Criar um Estilo…</button>
-        <button type="button" role="option" data-gs="refint" data-gk="c" aria-label="Referência Intensa" title="Referência Intensa"><span class="pv" style="font-size:12px;font-weight:bold;font-variant:small-caps;color:#4472c4">AaBbCcDc</span><span class="nm">Referência...</span></button>
+        <button type="button" role="option" data-gs="refint" data-gk="c" aria-label="Referência Intensa" title="Referência Intensa"><span class="pv" style="font-size:12px;font-weight:bold;font-variant:small-caps;color:#4472c4">AaBbCcDc</span><span class="nm">Ref. Int.</span></button>
       </div>
 
         <div class="galbtns"><button type="button" id="galUp" title="Rolar para trás" aria-label="Rolar estilos para trás"><svg class="ic" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 9l4-4 4 4z" fill="#999"/></svg></button><button type="button" id="galDn" title="Rolar para frente" aria-label="Rolar estilos para frente"><svg class="ic" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5l4 4 4-4z" fill="#555"/></svg></button><button type="button" id="galMore" title="Mais" aria-label="Mostrar todos os estilos"><svg class="ic" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3h8" stroke="#555"/><path d="M3 6l4 4 4-4z" fill="#555"/></svg></button></div>
@@ -988,6 +1012,31 @@ main{cursor:default}
       <button id="btnTheme" title="Alternar tema claro/escuro">Tema</button>
     </div><div class="gl">Modo</div></div>
   </div>
+  <div class="tabpanel" role="tabpanel" id="tp-tabela" data-tab="tabela" aria-labelledby="tab-tabela" hidden>
+    <div class="group" role="group" aria-label="Linhas e Colunas"><div class="gb cols">
+      <div class="stack"><button type="button" class="rb sm" data-t="rowB" title="Inserir linha acima"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="3.7" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir Acima</span></button><button type="button" class="rb sm" data-t="rowA" title="Inserir linha abaixo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="9.8" width="11" height="3.7" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir Abaixo</span></button></div>
+      <div class="stack"><button type="button" class="rb sm" data-t="colB" title="Inserir coluna à esquerda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Esquerda</span></button><button type="button" class="rb sm" data-t="colA" title="Inserir coluna à direita"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="9.8" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Direita</span></button></div>
+      <div class="stack"><button type="button" class="rb sm" data-t="rowD" title="Excluir a linha da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="6.2" width="11" height="3.6" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Linha</span></button><button type="button" class="rb sm" data-t="colD" title="Excluir a coluna da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="6.2" y="2.5" width="3.6" height="11" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Coluna</span></button><button type="button" class="rb sm" data-t="tblD" title="Excluir a tabela inteira"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="#e45a4f" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Tabela</span></button></div>
+    </div><div class="gl">Linhas e Colunas</div></div>
+    <div class="group" role="group" aria-label="Mesclar"><div class="gb cols"><div class="stack"><button type="button" class="rb sm" data-t="merge" title="Mesclar as células selecionadas (arraste o mouse sobre elas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="#2b79c9" fill-opacity=".25" stroke="#777"/><path d="M5.5 8h5M8.6 6.2L10.5 8l-1.9 1.8M7.4 6.2L5.5 8l1.9 1.8" stroke="#2b79c9" fill="none"/></svg><span>Mesclar Células</span></button><button type="button" class="rb sm" data-t="split" title="Dividir a célula (ou desfazer a mesclagem)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="none" stroke="#777"/><path d="M8 3.5v9" stroke="#777"/><path d="M3.8 8h2.6M5.4 6.8L6.5 8 5.4 9.2M12.2 8H9.6M10.6 6.8L9.5 8l1.1 1.2" stroke="#2b79c9" fill="none"/></svg><span>Dividir Células</span></button></div></div><div class="gl">Mesclar</div></div>
+    <div class="group" role="group" aria-label="Tamanho da Célula"><div class="gb cols">
+      <div class="stack" style="gap:4px;padding-top:2px">
+        <label class="pc tsz" title="Altura da linha da célula atual, em cm">Altura <input type="number" id="tCellH" min="0.3" max="40" step="0.1" aria-label="Altura da linha (cm)"> cm</label>
+        <label class="pc tsz" title="Largura da coluna da célula atual, em cm">Largura <input type="number" id="tCellW" min="0.5" max="40" step="0.1" aria-label="Largura da coluna (cm)"> cm</label>
+      </div>
+      <div class="stack"><button type="button" class="rb sm" data-t="dRows" title="Deixar as linhas com a mesma altura"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M2.5 6.2h11M2.5 9.8h11" stroke="#2b79c9"/></svg><span>Distribuir Linhas</span></button><button type="button" class="rb sm" data-t="equal" title="Deixar as colunas com a mesma largura"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11" stroke="#2b79c9"/></svg><span>Distribuir Colunas</span></button><select id="tFit" class="tfit" title="AutoAjuste" aria-label="AutoAjuste"><option value="" selected disabled hidden>AutoAjuste</option><option value="fit">Ajustar à janela</option><option value="auto">Ajustar ao conteúdo</option></select></div>
+    </div><div class="gl">Tamanho da Célula</div></div>
+    <div class="group" role="group" aria-label="Alinhamento"><div class="gb rows">
+      <div class="rr"><button type="button" class="rb" data-t="vTop" title="Alinhar ao topo" aria-label="Alinhar ao topo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 4.5h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button><button type="button" class="rb" data-t="vMid" title="Centralizar verticalmente" aria-label="Centralizar verticalmente"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 8h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button><button type="button" class="rb" data-t="vBot" title="Alinhar embaixo" aria-label="Alinhar embaixo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#999"/><path d="M5 11.5h6" stroke="#2b79c9" stroke-width="1.6"/></svg></button></div>
+      <div class="rr"><button type="button" class="rb" data-t="hLeft" title="Texto à esquerda" aria-label="Texto à esquerda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M1.5 6.2H9.5" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M1.5 12.6H9.5" stroke="#555"/></svg></button><button type="button" class="rb" data-t="hCenter" title="Texto centralizado" aria-label="Texto centralizado"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M4 6.2H12" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M4 12.6H12" stroke="#555"/></svg></button><button type="button" class="rb" data-t="hRight" title="Texto à direita" aria-label="Texto à direita"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3H14.5" stroke="#555"/><path d="M6.5 6.2H14.5" stroke="#555"/><path d="M1.5 9.4H14.5" stroke="#555"/><path d="M6.5 12.6H14.5" stroke="#555"/></svg></button></div>
+    </div><div class="gl">Alinhamento</div></div>
+    <div class="group" role="group" aria-label="Estilo da Tabela"><div class="gb cols">
+      <div class="stack"><button type="button" class="rb sm" data-t="header" title="Liga/desliga a linha de título (repete nas páginas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="3.7" fill="#2b79c9" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M2.5 6.2h11M2.5 9.8h11M8 6.2v7.3" stroke="#aaa" fill="none"/></svg><span>Linha de Título</span></button>
+        <select id="tBord" class="tfit" title="Bordas da tabela" aria-label="Bordas"><option value="" selected disabled hidden>Bordas</option><option value="bAll">Todas as bordas</option><option value="bThick">Bordas grossas (2 pt)</option><option value="bOuter">Somente externas</option><option value="bDash">Pontilhadas</option><option value="bNone">Sem bordas</option></select>
+        <select id="tPad" class="tfit" title="Espaço interno das células" aria-label="Espaço interno"><option value="" selected disabled hidden>Espaço interno</option><option value="padS">Pequeno</option><option value="padM">Médio</option><option value="padL">Grande</option></select></div>
+      <label class="pc" title="Sombreamento das células selecionadas (clique duas vezes para remover)" style="align-self:flex-start;margin-top:3px">Sombreamento <input type="color" id="tShade" value="#d9e2f3"></label>
+    </div><div class="gl">Estilo da Tabela</div></div>
+  </div>
   <div class="tabpanel" role="tabpanel" id="tp-desenvolvedor" data-tab="desenvolvedor" aria-labelledby="tab-desenvolvedor" hidden>
     <div class="group"><div class="gb"><span class="soon">Em breve: as opções desta guia serão criadas depois.</span></div><div class="gl">&nbsp;</div></div>
   </div>
@@ -1155,6 +1204,7 @@ main{cursor:default}
     <label>Cor da fonte<input type="color" id="fdColor" value="#000000"></label>
     <label>Estilo de sublinhado<select id="fdUl"><option value="none">(nenhum)</option><option value="single">Simples</option><option value="double">Duplo</option><option value="dotted">Pontilhado</option><option value="dashed">Tracejado</option><option value="wavy">Ondulado</option></select></label>
     <label>Espaçamento entre caracteres<select id="fdSpc"><option value="0">Normal</option><option value="1">Expandido</option><option value="-0.5">Condensado</option></select></label>
+    <span aria-hidden="true"></span>
     <label>Em (pt)<input type="number" id="fdSpcBy" min="-5" max="30" step="0.1" value="0"></label>
   </div>
   <div class="fdChecks">
@@ -1899,6 +1949,8 @@ main{cursor:default}
 
   // Realça os botões ativos (negrito, itálico, etc.)
   function refresh(){
+    { const ae = document.activeElement;
+      if(ae && ae.closest && ae.closest('dialog')) return; }   // foco dentro de um diálogo: não mexe nos botões da faixa
     document.querySelectorAll('[data-cmd]').forEach(b=>{
       let on = false;
       try{ on = document.queryCommandState(b.dataset.cmd); }catch(e){}
@@ -2084,6 +2136,7 @@ main{cursor:default}
     const c = cellOf();
     if(!c){ alert('Clique dentro de uma célula da tabela e escolha de novo.'); return; }
     const row = c.parentNode, table = c.closest('table'), idx = [...row.children].indexOf(c);
+    const gcol = (gridOf(table).pos.get(c) || {c:idx}).c, tw = tblSnap(table);   // larguras antes da mudança (tabelas redimensionadas)
     if(a==='rowA' || a==='rowB'){
       const n = row.cloneNode(true); n.querySelectorAll('td,th').forEach(x=>x.innerHTML = '<br>');
       row.parentNode.insertBefore(n, a==='rowA' ? row.nextSibling : row);
@@ -2098,6 +2151,7 @@ main{cursor:default}
       table.querySelectorAll('tr').forEach(r=>{ if(r.children[idx]) r.children[idx].remove(); });
       if(!table.querySelector('td,th')) table.remove();
     }else if(a==='tblD'){ table.remove(); }
+    if(tw && table.isConnected) tblAdjust(table, tw, a==='colA' ? 'ins' + (gcol + 1) : a==='colB' ? 'ins' + gcol : a==='colD' ? 'del' + gcol : '');
     changed();
   });
 
@@ -2204,7 +2258,7 @@ main{cursor:default}
     if(!c){ alert('Clique dentro de uma célula da tabela e escolha de novo.'); return; }
     const table = c.closest('table');
     if(a === 'merge'){ if(!mergeCells()) return; }
-    else if(a === 'split'){ if(!splitCell()) return; }
+    else if(a === 'split'){ const tw = tblSnap(table), q0 = (gridOf(table).pos.get(c) || {c:0, cs:1, rs:1}); const was = q0.cs > 1 || q0.rs > 1; if(!splitCell()) return; if(tw && !was) tblAdjust(table, tw, 'spl' + q0.c); else if(tw) tblAdjust(table, tw, ''); }
     else if(/^v(Top|Mid|Bot)$/.test(a)){ const v = {vTop:'top', vMid:'middle', vBot:'bottom'}[a]; selCells().forEach(x=>x.style.verticalAlign = v); }
     else if(/^h(Left|Center|Right)$/.test(a)){ const v = a.slice(1).toLowerCase(); selCells().forEach(x=>x.style.textAlign = v); }
     else if(/^b(All|Thick|Outer|Dash|None)$/.test(a)) setBorders(table, a);
@@ -2222,13 +2276,17 @@ main{cursor:default}
       }
     }
     else if(a === 'equal'){
-      table.style.tableLayout = 'fixed'; table.style.width = '100%';
-      const n = Math.max(...[...table.rows].map(r=>[...r.cells].reduce((t,x)=>t + (x.colSpan || 1), 0)));
-      table.querySelectorAll('td,th').forEach(x=>{ if(x.closest('table') === table) x.style.width = (100 / n * (x.colSpan || 1)).toFixed(2) + '%'; });
+      const n = tblCols(table).length, cw = tblCont(table);
+      tblApply(table, new Array(n).fill(cw / n), cw);
+    }
+    else if(a === 'fit'){
+      const w = tblCols(table), cw = tblCont(table), t = w.reduce((x, y)=>x + y, 0);
+      tblApply(table, w.map(x=>x * cw / t), cw);
     }
     else if(a === 'auto'){
       table.style.tableLayout = ''; table.style.width = '';
-      table.querySelectorAll('td,th').forEach(x=>{ x.style.width = ''; });
+      const cg = table.querySelector(':scope > colgroup'); if(cg) cg.remove();
+      table.querySelectorAll('td,th').forEach(x=>{ if(x.closest('table') !== table) return; x.style.width = ''; x.style.boxSizing = ''; if(!x.getAttribute('style')) x.removeAttribute('style'); });
     }
     else if(a === 'tCenter'){ if(table.style.width === '100%') table.style.width = '80%'; table.style.marginLeft = 'auto'; table.style.marginRight = 'auto'; }
     else if(a === 'tLeft'){ table.style.marginLeft = ''; table.style.marginRight = ''; }
@@ -2239,6 +2297,180 @@ main{cursor:default}
     const v = e.target.value; restore(); selCells().forEach(x=>x.style.backgroundColor = v); changed();
   });
   $('cellShade').addEventListener('dblclick', ()=>{ restore(); selCells().forEach(x=>{ x.style.backgroundColor = ''; if(!x.getAttribute('style')) x.removeAttribute('style'); }); changed(); });
+
+  // ---------- Tabela: largura/altura por arrastar, alça de tamanho e guia contextual "Layout da Tabela" ----------
+  function tblScale(table){ const w = table.offsetWidth; return w ? table.getBoundingClientRect().width / w : 1; }
+  function tblCont(table){ const p = table.parentElement, cs = getComputedStyle(p); return Math.max(40, p.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)); }
+  function tblCols(table){                       // largura de cada coluna da grade (px de layout)
+    const G = gridOf(table), n = Math.max(0, ...G.g.map(r=>r.length)), w = new Array(n).fill(0), sc = tblScale(table);
+    G.pos.forEach((q, cell)=>{ if(q.cs === 1) w[q.c] = Math.max(w[q.c], cell.getBoundingClientRect().width / sc); });
+    G.pos.forEach((q, cell)=>{
+      if(q.cs < 2) return;
+      const idx = []; let known = 0;
+      for(let k = q.c; k < q.c + q.cs; k++){ if(w[k]) known += w[k]; else idx.push(k); }
+      if(idx.length){ const rest = Math.max(cell.getBoundingClientRect().width / sc - known, idx.length * 24) / idx.length; idx.forEach(k=>w[k] = rest); }
+    });
+    return w.map(x=>x || 40);
+  }
+  function tblApply(table, w, cw){                // grava larguras em % (tabela, colgroup e células)
+    const total = w.reduce((a, b)=>a + b, 0), G = gridOf(table);
+    table.style.tableLayout = 'fixed'; table.style.width = (total / cw * 100).toFixed(3) + '%';
+    let cg = table.querySelector(':scope > colgroup');
+    if(!cg){ cg = document.createElement('colgroup'); table.insertBefore(cg, table.firstChild); }
+    cg.innerHTML = w.map(x=>'<col style="width:' + (x / total * 100).toFixed(3) + '%">').join('');
+    G.pos.forEach((q, cell)=>{
+      let sum = 0; for(let k = q.c; k < q.c + q.cs; k++) sum += w[k];
+      cell.style.width = (sum / total * 100).toFixed(3) + '%'; cell.style.boxSizing = 'border-box';
+    });
+  }
+  function tblSnap(table){ return table.querySelector(':scope > colgroup') ? {w:tblCols(table), cw:tblCont(table)} : null; }
+  function tblAdjust(table, snap, op){            // após inserir/excluir/dividir coluna, mantém as larguras que o usuário definiu
+    let w = snap.w.slice(); const m = /^(ins|del|spl)(\d+)$/.exec(op || ''), k = m ? +m[2] : -1, now = gridOf(table).g.reduce((a, r)=>Math.max(a, r.length), 0);
+    if(m && m[1] === 'ins') w.splice(k, 0, snap.w[Math.min(k, snap.w.length - 1)]);
+    else if(m && m[1] === 'del') w.splice(k, 1);
+    else if(m && m[1] === 'spl'){ const n = now - w.length + 1; w.splice(k, 1, ...new Array(n).fill(snap.w[k] / n)); }
+    if(w.length !== now) w = new Array(now).fill(snap.cw / now);
+    const t = w.reduce((a, b)=>a + b, 0); if(t > snap.cw) w = w.map(x=>x * snap.cw / t);
+    tblApply(table, w, snap.cw);
+  }
+  function rowH(table, r){ return table.rows[r].getBoundingClientRect().height / tblScale(table); }
+
+  (function(){
+    const HIT = 4, MINW = 24, MINH = 14, handle = document.createElement('div');
+    handle.id = 'tblHandle'; handle.title = 'Arraste para mudar o tamanho da tabela'; document.body.appendChild(handle);
+    let drag = null, hoverT = null;
+    const off = ()=>document.body.classList.contains('hfedit');
+    function hit(e){
+      const pts = [[0, 0], [HIT, 0], [-HIT, 0], [0, HIT], [0, -HIT]], cells = new Set();
+      pts.forEach(([dx, dy])=>{ const el = document.elementFromPoint(e.clientX + dx, e.clientY + dy), c = el && el.closest && el.closest('td,th'); if(c && page.contains(c)) cells.add(c); });
+      let best = null;
+      cells.forEach(c=>{
+        const r = c.getBoundingClientRect(), table = c.closest('table'), q = gridOf(table).pos.get(c); if(!q) return;
+        const dR = Math.abs(e.clientX - r.right), dB = Math.abs(e.clientY - r.bottom);
+        if(dR <= HIT && e.clientY >= r.top - 1 && e.clientY <= r.bottom + 1 && (!best || dR < best.d)) best = {t:'col', table, k:q.c + q.cs - 1, d:dR};
+        if(dB <= HIT && e.clientX >= r.left - 1 && e.clientX <= r.right + 1 && (!best || dB < best.d - 0.01)) best = {t:'row', table, k:q.r + q.rs - 1, d:dB};
+      });
+      return best;
+    }
+    function cursorFor(h){ page.classList.toggle('tbl-cr', !!h && h.t === 'col'); page.classList.toggle('tbl-rr', !!h && h.t === 'row'); }
+    function placeHandle(table){
+      if(!table || off()){ handle.style.display = 'none'; return; }
+      const r = table.getBoundingClientRect(), pr = page.getBoundingClientRect();
+      if(r.bottom < pr.top - 2 || r.top > innerHeight){ handle.style.display = 'none'; return; }
+      handle.style.display = 'block'; handle.style.left = Math.round(r.right + 1) + 'px'; handle.style.top = Math.round(r.bottom + 1) + 'px';
+    }
+    page.addEventListener('mousemove', e=>{
+      if(drag || off()) return;
+      const h = hit(e); cursorFor(h);
+      const c = e.target.closest && e.target.closest('td,th'); const t = c ? c.closest('table') : null;
+      if(t !== hoverT){ hoverT = t; placeHandle(t); }
+    });
+    page.addEventListener('mouseleave', ()=>{ cursorFor(null); setTimeout(()=>{ if(!drag && !handle.matches(':hover')){ hoverT = null; handle.style.display = 'none'; } }, 250); });
+    handle.addEventListener('mouseleave', ()=>{ if(!drag && !page.matches(':hover')){ hoverT = null; handle.style.display = 'none'; } });
+    document.addEventListener('scroll', ()=>{ if(!drag) { hoverT = null; handle.style.display = 'none'; } }, true);
+
+    function start(e, kind, table, k){
+      const w0 = tblCols(table), sc = tblScale(table);
+      drag = {kind, table, k, x0:e.clientX, y0:e.clientY, sc, w0, cw:tblCont(table), t0:w0.reduce((a, b)=>a + b, 0),
+              h0:[...table.rows].map((r, i)=>rowH(table, i))};
+      document.body.classList.add('tbl-drag'); document.body.style.cursor = kind === 'col' ? 'col-resize' : kind === 'row' ? 'row-resize' : 'nwse-resize';
+      if(kind === 'corner') handle.classList.add('drag');
+    }
+    page.addEventListener('mousedown', e=>{
+      if(e.button !== 0 || off()) return;
+      const h = hit(e); if(!h) return;
+      e.preventDefault(); e.stopPropagation(); start(e, h.t, h.table, h.k);
+    }, true);
+    handle.addEventListener('mousedown', e=>{
+      if(e.button !== 0 || !hoverT) return; e.preventDefault(); e.stopPropagation(); start(e, 'corner', hoverT, 0);
+    });
+    document.addEventListener('mousemove', e=>{
+      if(!drag) return; e.preventDefault();
+      const d = drag, dx = (e.clientX - d.x0) / d.sc, dy = (e.clientY - d.y0) / d.sc;
+      if(d.kind === 'col'){
+        const w = d.w0.slice(), k = d.k, last = k === w.length - 1;
+        if(!last && !e.shiftKey){ const x = Math.max(MINW - w[k], Math.min(dx, w[k + 1] - MINW)); w[k] += x; w[k + 1] -= x; }
+        else { w[k] += Math.max(MINW - w[k], Math.min(dx, Math.max(0, d.cw - d.t0))); }
+        tblApply(d.table, w, d.cw);
+      }else if(d.kind === 'row'){
+        d.table.rows[d.k].style.height = Math.max(MINH, d.h0[d.k] + dy).toFixed(1) + 'px';
+      }else{
+        const t = Math.max(MINW * d.w0.length, Math.min(d.cw, d.t0 + dx)), f = t / d.t0;
+        tblApply(d.table, d.w0.map(x=>x * f), d.cw);
+        if(Math.abs(dy) > 2){ const H = d.h0.reduce((a, b)=>a + b, 0), g = Math.max(.2, (H + dy) / H); [...d.table.rows].forEach((r, i)=>r.style.height = Math.max(MINH, d.h0[i] * g).toFixed(1) + 'px'); }
+        placeHandle(d.table);
+      }
+    });
+    document.addEventListener('mouseup', ()=>{
+      if(!drag) return;
+      const t = drag.table; drag = null; handle.classList.remove('drag');
+      document.body.classList.remove('tbl-drag'); document.body.style.cursor = ''; cursorFor(null);
+      placeHandle(t); changed(); syncT();
+    });
+
+    // ----- guia contextual "Layout da Tabela" -----
+    const tabT = $('tab-tabela'), panelT = $('tp-tabela'), hI = $('tCellH'), wI = $('tCellW');
+    function inTable(){
+      const s = getSelection(); if(off() || !s.rangeCount || !page.contains(s.anchorNode)) return null;
+      return cellAt(s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentNode);
+    }
+    function syncT(){
+      const c = inTable(); if(!c || panelT.hidden) return;
+      const table = c.closest('table'), q = gridOf(table).pos.get(c); if(!q) return;
+      if(document.activeElement !== hI) hI.value = (rowH(table, q.r) / CMPX).toFixed(2);
+      if(document.activeElement !== wI){ const w = tblCols(table); let sum = 0; for(let k = q.c; k < q.c + q.cs; k++) sum += w[k]; wI.value = (sum / CMPX).toFixed(2); }
+    }
+    document.addEventListener('selectionchange', ()=>{
+      if(document.activeElement && document.activeElement.closest && document.activeElement.closest('#toolbar')) return;
+      const c = inTable(); tabT.hidden = !c;
+      if(!c && tabT.classList.contains('on')) $('tab-inicio').click();
+      syncT();
+    });
+    tabT.addEventListener('click', ()=>setTimeout(syncT, 0));
+    function run(a){
+      restore();
+      let next = null;                                   // após excluir linha/coluna, o cursor vai para a célula vizinha
+      if(a === 'rowD' || a === 'colD'){
+        const c = inTable(), table = c && c.closest('table'), G = table && gridOf(table), q = G && G.pos.get(c);
+        if(q) next = a === 'colD' ? (G.g[q.r][q.c + q.cs] || G.g[q.r][q.c - 1]) : ((G.g[q.r + q.rs] || [])[q.c] || (G.g[q.r - 1] || [])[q.c]);
+      }
+      const sel = /^(rowB|rowA|colB|colA|rowD|colD|tblD)$/.test(a) ? $('tbl') : $('tbl2');
+      sel.value = a; sel.dispatchEvent(new Event('change'));
+      if(next && next.isConnected){ const r = document.createRange(), s = getSelection(); r.selectNodeContents(next); r.collapse(true); s.removeAllRanges(); s.addRange(r); }
+      setTimeout(()=>{ const c = inTable(); tabT.hidden = !c; if(!c && tabT.classList.contains('on')) $('tab-inicio').click(); syncT(); }, 0);
+    }
+    panelT.querySelectorAll('button[data-t]').forEach(b=>{
+      b.addEventListener('mousedown', e=>e.preventDefault());
+      b.addEventListener('click', ()=>{
+        if(b.dataset.t === 'dRows') return distRows();
+        run(b.dataset.t);
+      });
+    });
+    ['tFit', 'tBord', 'tPad'].forEach(id=>$(id).addEventListener('change', e=>{ const v = e.target.value; e.target.selectedIndex = 0; if(v) run(v); }));
+    function distRows(){
+      restore(); const c = inTable(); if(!c){ alert('Clique dentro de uma célula da tabela e escolha de novo.'); return; }
+      const table = c.closest('table'), G = gridOf(table), cells = selCells(), rs = new Set();
+      cells.forEach(x=>{ const q = G.pos.get(x); if(q) for(let r = q.r; r < q.r + q.rs; r++) rs.add(r); });
+      const idx = rs.size > 1 ? [...rs] : [...table.rows].map((_, i)=>i);
+      const avg = idx.reduce((a, r)=>a + rowH(table, r), 0) / idx.length;
+      idx.forEach(r=>table.rows[r].style.height = avg.toFixed(1) + 'px'); changed(); syncT();
+    }
+    hI.addEventListener('change', ()=>{
+      restore(); const c = inTable(), v = parseFloat(String(hI.value).replace(',', '.')); if(!c || !(v > 0)) return;
+      const q = gridOf(c.closest('table')).pos.get(c); c.closest('table').rows[q.r].style.height = Math.max(MINH, v * CMPX).toFixed(1) + 'px'; changed(); syncT();
+    });
+    wI.addEventListener('change', ()=>{
+      restore(); const c = inTable(), v = parseFloat(String(wI.value).replace(',', '.')); if(!c || !(v > 0)) return;
+      const table = c.closest('table'), q = gridOf(table).pos.get(c), w = tblCols(table), cw = tblCont(table);
+      const k = q.c + q.cs - 1, want = Math.max(MINW, v * CMPX), cur = w.slice(q.c, k + 1).reduce((a, b)=>a + b, 0), x = want - cur;
+      w[k] += x;
+      if(w.length > 1){ const j = k < w.length - 1 ? k + 1 : k - 1; if(j >= 0 && w[j] - x >= MINW && !(q.cs > 1 && j >= q.c && j <= k)) w[j] -= x; }
+      const t = w.reduce((a, b)=>a + b, 0); tblApply(table, t > cw ? w.map(y=>y * cw / t) : w, cw); changed(); syncT();
+    });
+    ['mousedown'].forEach(ev=>$('tShade').addEventListener(ev, e=>e.stopPropagation()));
+    $('tShade').addEventListener('input', e=>{ const v = e.target.value; restore(); selCells().forEach(x=>x.style.backgroundColor = v); changed(); });
+    $('tShade').addEventListener('dblclick', ()=>{ restore(); selCells().forEach(x=>{ x.style.backgroundColor = ''; if(!x.getAttribute('style')) x.removeAttribute('style'); }); changed(); });
+  })();
 
 
   // ---------- Notas de rodapé (numeração automática, ficam no fim do documento) ----------
@@ -3255,6 +3487,7 @@ main{cursor:default}
   document.addEventListener('cut', clipCapture);
   window.__openClip = ()=>{ clipRender(); if(!clipDlg.open) clipDlg.show(); };
   $('clipClose').addEventListener('click', ()=>clipDlg.close());
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && clipDlg.open && !e.defaultPrevented) clipDlg.close(); });
   $('clipClear').addEventListener('click', ()=>{ clipHist.length = 0; clipRender(); });
   $('clipAll').addEventListener('click', ()=>{ if(!clipHist.length) return; restore(); exec('insertHTML', clipHist.slice().reverse().map(x=>x.html).join('<br>')); });
   [$('clipAll'), $('clipClear')].forEach(b=>b.addEventListener('mousedown', e=>e.preventDefault()));
@@ -5169,21 +5402,24 @@ main{cursor:default}
     function show(k){
       tabs.forEach(t=>{ const on = t.dataset.tab === k; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
       panels.forEach(p=>{ p.hidden = p.dataset.tab !== k; });
-      try{ localStorage.setItem('verba:tab', k); }catch(e){}
+      try{ if(k !== 'tabela') localStorage.setItem('verba:tab', k); }catch(e){}
     }
     tabs.forEach((t, i)=>{
       t.addEventListener('mousedown', e=>e.preventDefault());
       t.addEventListener('click', ()=>show(t.dataset.tab));
       t.addEventListener('keydown', e=>{
         const j = e.key === 'ArrowRight' ? (i + 1) % tabs.length : e.key === 'ArrowLeft' ? (i - 1 + tabs.length) % tabs.length : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : -1;
-        if(j < 0) return; e.preventDefault(); show(tabs[j].dataset.tab); tabs[j].focus();
+        if(j < 0) return; e.preventDefault();
+        let jj = j; const dir = e.key === 'ArrowLeft' || e.key === 'End' ? -1 : 1;
+        for(let n = 0; tabs[jj].hidden && n < tabs.length; n++) jj = (jj + dir + tabs.length) % tabs.length;
+        show(tabs[jj].dataset.tab); tabs[jj].focus();
       });
     });
     $('btnFile').addEventListener('mousedown', e=>e.preventDefault());
     $('btnQSave').addEventListener('mousedown', e=>e.preventDefault());
     $('btnQSave').addEventListener('click', ()=>$('btnDocx').click());
     let k0 = 'inicio'; try{ k0 = localStorage.getItem('verba:tab') || 'inicio'; }catch(e){}
-    show(tabs.some(t=>t.dataset.tab === k0) ? k0 : 'inicio');
+    show(tabs.some(t=>t.dataset.tab === k0 && !t.hidden) ? k0 : 'inicio');
   })();
 
 
