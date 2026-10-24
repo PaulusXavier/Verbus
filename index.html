@@ -71,8 +71,8 @@ header button:hover{background:rgba(255,255,255,.3)}
 #toolbar button:hover,#toolbar select:hover{background:var(--accent-soft)}
 #toolbar .dd select,#toolbar .dd input[type=color]{min-width:0}
 body.painting #page{cursor:copy}
-#page sup.fn{color:#1d5fd1;cursor:pointer;user-select:none}
-#page .fnote .fnn{color:#1d5fd1;cursor:pointer;user-select:none;margin-right:4px}
+#page sup.fn{color:inherit;cursor:pointer;user-select:none;line-height:0}
+#page .fnote .fnn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0}
 #page .fnote:target,#page .fnote.flash{background:#fff3b0}
 #toolbar label.pc{display:inline-flex;align-items:center;gap:2px;font-size:12px;cursor:pointer}
 #page.marks p::after,#page.marks h1::after,#page.marks h2::after,#page.marks h3::after,#page.marks li::after,#page.marks blockquote::after{content:"¶";color:#4a7fd6;font-size:.8em;margin-left:2px;user-select:none}
@@ -961,7 +961,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <button data-cmd="unlink" title="Remover link">Sem link</button>
     </div><div class="gl">Links</div></div>
     <div class="group" role="group" aria-label="Notas"><div class="gb">
-      <button id="btnFn2" type="button" class="rb bigb" title="Inserir nota de rodapé no cursor (Ctrl+Alt+F). A numeração é automática e a nota fica no fim do documento"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="18" height="26" rx="1" fill="#fff" stroke="#777"/><path d="M8 8h12M8 12h12M8 16h8" stroke="#aaa" fill="none"/><path d="M8 23h7" stroke="#777"/><path d="M8 26h12" stroke="#2b79c9"/><text x="19" y="19" font-size="10" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">AB</text><text x="27" y="15" font-size="8" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#e45a4f">1</text></svg><span>Nota de<br>Rodapé</span></button>
+      <button id="btnFn2" type="button" class="rb bigb" title="Inserir nota de rodapé no cursor (Ctrl+Alt+F). A numeração é automática e a nota fica no pé da página, como no Word"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="18" height="26" rx="1" fill="#fff" stroke="#777"/><path d="M8 8h12M8 12h12M8 16h8" stroke="#aaa" fill="none"/><path d="M8 23h7" stroke="#777"/><path d="M8 26h12" stroke="#2b79c9"/><text x="19" y="19" font-size="10" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">AB</text><text x="27" y="15" font-size="8" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#e45a4f">1</text></svg><span>Nota de<br>Rodapé</span></button>
     </div><div class="gl">Notas</div></div>
     <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb">
       <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
@@ -2007,8 +2007,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   // Quebras de página: mesma conta da pré-visualização de impressão (um bloco que não cabe vai inteiro para a página seguinte;
   // título com "manter com o próximo" não fica sozinho no fim da página)
-  function pgPlan(kids, use, rectOf){
+  function pgPlan(kids, use0, rectOf){
     const starts = [0], tops = []; let ps = 0, brk = false;
+    const U = ()=>typeof use0 === 'function' ? use0(starts.length - 1) : use0;   // capacidade da página atual (menor quando há notas de rodapé)
     const next = y=>{ starts.push(y); ps = y; };
     const keep = k=>((k.style && (k.style.breakAfter || k.style.pageBreakAfter)) === 'avoid');
     kids.forEach((k, i)=>{
@@ -2017,9 +2018,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const top = r.top, bot = r.bot; tops[i] = top;
       const chain = ()=>{ let j = i, t = top; while(j > 0 && keep(kids[j - 1]) && tops[j - 1] != null && tops[j - 1] > ps + 1){ j--; t = tops[j]; } return t; };
       if(brk){ brk = false; if(top > ps + 1) next(top); }
-      if(bot - ps > use + 1){
-        if(top > ps + 1 && bot - top <= use) next(chain());
-        else while(bot - ps > use + 1) next(ps + use);
+      if(bot - ps > U() + 1){
+        if(top > ps + 1 && bot - top <= U()) next(chain());
+        else while(bot - ps > U() + 1) next(ps + U());
       }
     });
     return starts;
@@ -2036,6 +2037,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function pgShiftSet(css){
     if(!pgShiftEl){ pgShiftEl = document.createElement('style'); pgShiftEl.id = 'pgShift'; document.head.appendChild(pgShiftEl); }
     if(pgShiftEl.textContent !== css) pgShiftEl.textContent = css;
+  }
+  let fnPosEl = null;
+  function fnPosSet(css){
+    if(!fnPosEl){ fnPosEl = document.createElement('style'); fnPosEl.id = 'fnPos'; document.head.appendChild(fnPosEl); }
+    if(fnPosEl.textContent !== css) fnPosEl.textContent = css;
   }
   function pgClones(){
     document.querySelectorAll('.himgc,.hfc').forEach(n=>n.remove());
@@ -2067,15 +2073,33 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const sh = document.getElementById('sheet'); if(!sh || !page.isConnected) return;
       let ov = document.getElementById('pgOv');
       const pg = pgOf();
-      if(pg.cols > 1){ if(ov) ov.remove(); pgState = null; pgShiftSet(''); pgClones(); page.style.minHeight = ''; return; }
-      pgShiftSet('');                       // mede o texto sem o espaço entre as páginas
+      if(pg.cols > 1){ if(ov) ov.remove(); pgState = null; pgShiftSet(''); fnPosSet(''); pgClones(); page.style.minHeight = ''; return; }
+      pgShiftSet(''); fnPosSet('');         // mede o texto sem o espaço entre as páginas e com as notas no fluxo
       if(!ov){ ov = document.createElement('div'); ov.id = 'pgOv'; ov.setAttribute('aria-hidden', 'true'); sh.appendChild(ov); }
       const sr = sh.getBoundingClientRect(), sc = sh.offsetWidth ? sr.width / sh.offsetWidth : 1;
       const e = effMar(), use = Math.max(CMPX, pg.h * CMPX - e.t - e.b);
       const pr = page.getBoundingClientRect(), padT = parseFloat(getComputedStyle(page).paddingTop) || 0, O = pr.top + padT * sc;
-      const kids = [...page.children].filter(k=>{ if(k.hasAttribute('data-hid')) return false; const p = getComputedStyle(k).position; return p !== 'absolute' && p !== 'fixed'; });
-      const R = new Map();
-      const starts = pgPlan(kids, use, k=>{ const r = k.getBoundingClientRect(), o = {top:(r.top - O) / sc, bot:(r.bottom - O) / sc}; R.set(k, o); return o; });
+      const kids0 = [...page.children].filter(k=>{ if(k.hasAttribute('data-hid')) return false; const p = getComputedStyle(k).position; return p !== 'absolute' && p !== 'fixed'; });
+      let R = new Map(), kids = kids0, starts, fn = null;
+      const rectOf = k=>{ const r = k.getBoundingClientRect(), o = {top:(r.top - O) / sc, bot:(r.bottom - O) / sc}; R.set(k, o); return o; };
+      const isHard = (kl, st)=>st.slice(1).every(x=>kl.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - x) <= 1; }) >= 0);
+      // Notas de rodapé como no Word: cada nota fica no pé da página onde está o número, e o texto da página ganha menos espaço
+      const fnBx = fnBox(false), fnMk = [...page.querySelectorAll('sup.fn')].filter(m=>!m.closest('.fnotes'));
+      if(fnBx && fnMk.length && !matchMedia('(max-width:700px)').matches){
+        kids = kids0.filter(k=>k !== fnBx);
+        const hOf = new Map(); fnBx.querySelectorAll('p.fnote').forEach(nn=>{ if(!hOf.has(nn.dataset.id)) hOf.set(nn.dataset.id, nn.getBoundingClientRect().height / sc); });
+        const mk = fnMk.map(m=>{ let k = m; while(k && k.parentNode !== page) k = k.parentNode; return {id:m.dataset.id, k}; });
+        const res = []; let pn = null, st = null, good = false;
+        for(let it = 0; it < 8 && !good; it++){
+          R = new Map(); st = pgPlan(kids, p=>Math.max(CMPX, use - (res[p] || 0)), rectOf);
+          pn = []; mk.forEach(x=>{ const r = R.get(x.k); if(!r) return; let p = 0; while(p + 1 < st.length && st[p + 1] <= r.top + 1) p++; (pn[p] = pn[p] || []).push(x.id); });
+          good = true;
+          pn.forEach((ids, p)=>{ if(!ids) return; const h = FN_PAD + ids.reduce((a, id)=>a + (hOf.get(id) || 0), 0); if(h > (res[p] || 0) + .5){ res[p] = h; good = false; } });
+        }
+        if(good && res.every(h=>!h || h <= use * .6) && isHard(kids, st)){ fn = {pn, hOf}; starts = st; }
+        else{ kids = kids0; }
+      }
+      if(!fn){ R = new Map(); starts = pgPlan(kids, use, rectOf); }
       const base = (O - sr.top) / sc, was = pgState ? pgState.starts.length : 0, n = starts.length;
       // cada início de página precisa coincidir com o topo de um bloco; senão (bloco maior que a página) usa só a linha tracejada
       const firstAt = s=>kids.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - s) <= 1; });
@@ -2107,8 +2131,30 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         const need = Math.ceil(endY + e.b - (page.offsetTop || 0));
         page.style.minHeight = need > pg.h * CMPX ? need + 'px' : '';
       }
+      if(fn){
+        // posiciona cada nota no pé da sua página (só por CSS gerado: nada disso é gravado no documento)
+        const cw = Math.max(CMPX, pg.w * CMPX - e.l - e.r), P2 = e.t + use + e.b + PG_GAP;
+        const rules = (left, bottomOf)=>{
+          let r = '#page>.fnotes{height:0;margin:0;padding:0;border:0}#page>.fnotes .fnsep{display:none}' +
+            '#page>.fnotes p.fnote{position:absolute;left:' + left + 'px;width:' + cw + 'px;margin:0;box-sizing:border-box}';
+          fn.pn.forEach((ids, p)=>{
+            const bh = FN_PAD + ids.reduce((a, id)=>a + (fn.hOf.get(id) || 0), 0), y0 = bottomOf(p) - bh; let cum = FN_PAD;
+            ids.forEach((id, i)=>{
+              const q = '#page>.fnotes p.fnote[data-id="' + id + '"]';
+              r += q + '{top:' + (i ? y0 + cum : y0).toFixed(2) + 'px' + (i ? '' : ';padding-top:' + FN_PAD + 'px') + '}';
+              if(!i) r += q + '::before{content:"";position:absolute;left:0;top:' + FN_LINE + 'px;width:5cm;border-top:1px solid currentColor}';
+              cum += fn.hOf.get(id) || 0;
+            });
+          });
+          return r;
+        };
+        let brk = '';
+        for(let p = 1; p < n; p++){ const k = kids[kids.findIndex(x=>{ const r = R.get(x); return r && Math.abs(r.top - starts[p]) <= 1; })]; if(k) brk += '#page>:nth-child(' + ([...page.children].indexOf(k) + 1) + '){break-before:page}'; }
+        fnPosSet('@media screen{' + rules(e.l, p=>p * P2 + e.t + use) + '}@media print{' + brk + rules(0, p=>(p + 1) * use) + 'html #page{min-height:' + Math.floor(n * use - 1) + 'px !important}}');
+      }
       pgClones();
-      if(was !== n){ try{ hfRender(); }catch(err){} try{ pgUpdate(); }catch(err){} }
+      if(was !== n){ try{ hfRender(); }catch(err){} }
+      try{ window.__pgUpdate && window.__pgUpdate(); }catch(err){}   // atualiza "Página x de y" (pgUpdate fica dentro de outra função)
     });
   }
   function hfRender(){
@@ -3637,8 +3683,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   })();
 
 
-  // ---------- Notas de rodapé (numeração automática, ficam no fim do documento) ----------
-  const FN_NOTE = 'font-size:10pt;line-height:1;margin:0 0 3pt;text-indent:0;text-align:left';
+  // ---------- Notas de rodapé (numeração automática; na tela e na impressão cada nota fica no pé da página do seu número) ----------
+  const FN_NOTE = 'font-size:10pt;line-height:1.15;margin:0;text-indent:0;text-align:left';
+  const FN_PAD = 12, FN_LINE = 6;   // espaço acima da 1ª nota de cada página e posição do filete (px)
   const FN_SEP = 'width:5cm;border-top:1px solid #000;margin:14pt 0 6pt;height:0';
   function fnBox(create){
     let box = page.querySelector(':scope > .fnotes');
@@ -3671,6 +3718,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       let n = notes.get(id);
       if(!n){ const t = document.createElement('div'); t.innerHTML = fnNoteHtml(id, i + 1, ''); n = t.firstChild; notes.set(id, n); }
       const num = n.querySelector('.fnn'); if(num && num.textContent !== String(i + 1)) num.textContent = i + 1;
+      if(n.getAttribute('style') !== FN_NOTE) n.setAttribute('style', FN_NOTE);
       order.push(n);
     });
     const cur = [...box.querySelectorAll('p.fnote')];
@@ -4537,9 +4585,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         two(L('Endereço') + '<b>:</b>', '<b>Bairro:</b>', 32) +
         full(L('Contato') + '<b>:</b>', 52) +
         full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270) +
-        full('<p style="margin:0 0 0 326px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
+        full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
         full('&nbsp;', 40) +
-        full('<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">__________________________________</p>' +
+        full('<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">____________________________</p>' +
              '<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">Técnico de Referência</p>', 70, {b:1}) +
       '</tbody></table>' +
       '<div class="pb" contenteditable="false"></div>' +
@@ -6599,7 +6647,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
           ifr.style.left = e.l + 'px'; ifr.style.top = e.t + 'px'; ifr.style.width = cw + 'px'; ifr.style.height = use + 'px';
           fit();
           const gap = 1.25 * CMPX;
-          const styles = [...document.querySelectorAll('style')].filter(x=>x.id !== 'pgShift').map(x=>x.outerHTML).join('');
+          const styles = [...document.querySelectorAll('style')].filter(x=>x.id !== 'pgShift' && x.id !== 'fnPos').map(x=>x.outerHTML).join('');
           const over = '<style>html,body{margin:0;padding:0;background:transparent !important;height:auto !important;overflow:hidden;display:block}' +
             '#page{zoom:1 !important;position:static !important;width:' + cw + 'px !important;max-width:none !important;min-height:0 !important;padding:0 !important;margin:0 !important;box-shadow:none !important;background:transparent !important;color:#111;caret-color:transparent;isolation:auto}' +
             '#page [data-hid]{display:none !important}#page .pb{border:0 !important;margin:0 !important}' +
@@ -7614,6 +7662,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         $('pgInfo').textContent = 'Página ' + cur + ' de ' + n;
       }catch(e){}
     }
+    window.__pgUpdate = pgUpdate;
     document.addEventListener('selectionchange', pgUpdate);
     page.addEventListener('input', ()=>setTimeout(pgUpdate, 0));
     setTimeout(pgUpdate, 400); setTimeout(pgUpdate, 1500);
