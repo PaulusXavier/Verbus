@@ -119,6 +119,7 @@ footer{background:var(--bar);border-top:1px solid var(--line);color:var(--muted)
   padding:5px 16px;display:flex;gap:16px;font-size:12px}
 footer span:last-child{margin-left:auto}
 @media (max-width:700px){ main{padding:0 12px 48px} #page{padding:32px 20px;min-height:80vh} }
+@media (max-width:700px){ #page table{width:100% !important;max-width:100%;table-layout:auto !important;margin-left:0 !important;margin-right:0 !important} .himg,.himgc{display:none !important} }
 @media print{
   header,#tabs,#toolbar,footer{display:none}
   body{background:#fff;display:block}
@@ -771,11 +772,14 @@ main{cursor:default}
 @media print{#ctxMenu{display:none !important}}
 body.tbl-drag{user-select:none;-webkit-user-select:none}
 #tblHandle{position:fixed;width:11px;height:11px;border:1px solid #8a8a8a;background:#fff;z-index:50;cursor:nwse-resize;display:none;box-sizing:border-box;touch-action:none}
+#tblMove{position:fixed;width:16px;height:16px;border:1px solid #8a8a8a;background:#fff;z-index:50;cursor:move;display:none;box-sizing:border-box;touch-action:none;font:12px/14px system-ui,sans-serif;text-align:center;color:#555;user-select:none;border-radius:2px}
+#tblMove:hover,#tblMove.drag{background:#dce8fb;border-color:#1d5fd1;color:#1d5fd1}
+#tblDrop{position:fixed;height:3px;background:#1d5fd1;z-index:60;display:none;pointer-events:none;border-radius:2px}
 #tblHandle:hover,#tblHandle.drag{background:#dce8fb;border-color:#1d5fd1}
 #toolbar .tsz{display:flex;justify-content:space-between;gap:4px;width:130px}
 #toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
 #toolbar select.tfit{width:100%;height:22px}
-@media print{#tblHandle{display:none !important}}
+@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}}
 
 /* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
 @media (max-width:700px){
@@ -2092,6 +2096,32 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     for(let k = 1; k < n; k++) mk(hdr, k * step, k + 1);
     for(let k = 0; k < n - 1; k++) mk(ftr, -(n - 1 - k) * step, k + 1);
   }
+  // Tabelas com várias linhas podem quebrar entre as linhas (como no Word): cada linha vira uma unidade da paginação
+  function pgFlat(ks){
+    const out = [];
+    ks.forEach(k=>{
+      if(k.tagName === 'TABLE' && k.rows.length > 1 && ![...k.rows].some(r=>[...r.cells].some(c=>c.rowSpan > 1))) out.push(...k.rows);
+      else out.push(k);
+    });
+    return out;
+  }
+  function pgRowCss(tr, extra, room){             // empurra a linha para a próxima página: espaço no topo das células; as bordas laterais só aparecem onde há conteúdo
+    const sec = tr.parentNode, tb = sec.parentNode, T = [...page.children].indexOf(tb) + 1;
+    const S = [...tb.children].indexOf(sec) + 1, M = [...sec.children].indexOf(tr) + 1;
+    let css = '';
+    [...tr.cells].forEach((c, ci)=>{
+      const cs = getComputedStyle(c), pt = parseFloat(cs.paddingTop) || 0;
+      const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:parseFloat(w), col} : null;
+      const L = side(cs.borderLeftWidth, cs.borderLeftStyle, cs.borderLeftColor), Rr = side(cs.borderRightWidth, cs.borderRightStyle, cs.borderRightColor);
+      const g = o=>'linear-gradient(to bottom,' + o.col + ' 0,' + o.col + ' ' + Math.max(0, room).toFixed(1) + 'px,transparent ' + Math.max(0, room).toFixed(1) + 'px,transparent ' + extra.toFixed(1) + 'px,' + o.col + ' ' + extra.toFixed(1) + 'px,' + o.col + ' 100%)';
+      const imgs = [], sz = [], ps = [];
+      if(L){ imgs.push(g(L)); sz.push(L.w + 'px 100%'); ps.push('left top'); }
+      if(Rr){ imgs.push(g(Rr)); sz.push(Rr.w + 'px 100%'); ps.push('right top'); }
+      css += '#page>:nth-child(' + T + ')>:nth-child(' + S + ')>tr:nth-child(' + M + ')>:nth-child(' + (ci + 1) + '){padding-top:' + (pt + extra).toFixed(2) + 'px !important;' +
+        (imgs.length ? 'border-left-color:transparent !important;border-right-color:transparent !important;background-image:' + imgs.join(',') + ' !important;background-size:' + sz.join(',') + ' !important;background-position:' + ps.join(',') + ' !important;background-repeat:no-repeat !important;' : '') + '}';
+    });
+    return css;
+  }
   function pgMarks(){
     cancelAnimationFrame(pgRaf);
     pgRaf = requestAnimationFrame(()=>{
@@ -2116,27 +2146,28 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         const mk = fnMk.map(m=>{ let k = m; while(k && k.parentNode !== page) k = k.parentNode; return {id:m.dataset.id, k}; });
         const res = []; let pn = null, st = null, good = false;
         for(let it = 0; it < 8 && !good; it++){
-          R = new Map(); st = pgPlan(kids, p=>Math.max(CMPX, use - (res[p] || 0)), rectOf);
+          R = new Map(); st = pgPlan(pgFlat(kids), p=>Math.max(CMPX, use - (res[p] || 0)), rectOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); });
           pn = []; mk.forEach(x=>{ const r = R.get(x.k); if(!r) return; let p = 0; while(p + 1 < st.length && st[p + 1] <= r.top + 1) p++; (pn[p] = pn[p] || []).push(x.id); });
           good = true;
           pn.forEach((ids, p)=>{ if(!ids) return; const h = FN_PAD + ids.reduce((a, id)=>a + (hOf.get(id) || 0), 0); if(h > (res[p] || 0) + .5){ res[p] = h; good = false; } });
         }
-        if(good && res.every(h=>!h || h <= use * .6) && isHard(kids, st)){ fn = {pn, hOf}; starts = st; }
+        if(good && res.every(h=>!h || h <= use * .6) && isHard(pgFlat(kids), st)){ fn = {pn, hOf}; starts = st; }
         else{ kids = kids0; }
       }
-      if(!fn){ R = new Map(); starts = pgPlan(kids, use, rectOf); }
+      if(!fn){ R = new Map(); starts = pgPlan(pgFlat(kids), use, rectOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); }); }
       const base = (O - sr.top) / sc, was = pgState ? pgState.starts.length : 0, n = starts.length;
       // cada início de página precisa coincidir com o topo de um bloco; senão (bloco maior que a página) usa só a linha tracejada
-      const firstAt = s=>kids.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - s) <= 1; });
+      const ku = pgFlat(kids), firstAt = s=>ku.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - s) <= 1; });
       const hard = starts.slice(1).every(s=>firstAt(s) >= 0);
       let out = '', total = 0;
       if(hard && n > 1){
         const H = e.t + use + e.b, P = H + PG_GAP, off = base - padT;
         let css = '';
         for(let p = 1; p < n; p++){
-          const i = firstAt(starts[p]), k = kids[i], prev = kids[i - 1], r = R.get(k), pv = prev && R.get(prev);
+          const i = firstAt(starts[p]), k = ku[i], prev = ku[i - 1], r = R.get(k), pv = prev && R.get(prev);
           const nat = pv ? Math.max(0, r.top - pv.bot) : 0, extra = P - (starts[p] - starts[p - 1]);
-          css += '#page>:nth-child(' + ([...page.children].indexOf(k) + 1) + '){margin-top:' + (nat + extra).toFixed(2) + 'px !important}';
+          if(k.tagName === 'TR' && k.rowIndex > 0) css += pgRowCss(k, extra, starts[p - 1] + use - r.top);
+          else{ const el = k.tagName === 'TR' ? k.closest('table') : k; css += '#page>:nth-child(' + ([...page.children].indexOf(el) + 1) + '){margin-top:' + (nat + extra).toFixed(2) + 'px !important}'; }
         }
         pgShiftSet('@media screen{' + css + '}');
         pgState = {starts, base, use, shifted:true, P, H, GAP:PG_GAP, et:e.t, off};
@@ -2406,7 +2437,28 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
 
   // ---------- Comandos de formatação ----------
+  // ---------- Desfazer/refazer das operações em tabelas (mover, redimensionar, inserir linha/coluna, estilos): o desfazer nativo não enxerga mudanças feitas direto no DOM ----------
+  const TH = {u:[], r:[], n:0};
+  page.addEventListener('beforeinput', ()=>{ TH.n++; });
+  const tSnap = ()=>page.innerHTML;
+  function tCommit(before){
+    if(before == null || page.innerHTML === before) return;
+    TH.u.push({h:before, n:TH.n}); if(TH.u.length > 30) TH.u.shift(); TH.r = [];
+  }
+  function tSwap(from, to){
+    const top = from[from.length - 1]; if(!top || top.n !== TH.n) return false;
+    from.pop(); to.push({h:page.innerHTML, n:TH.n});
+    page.innerHTML = top.h; changed();
+    try{ page.focus(); }catch(e){}
+    return true;
+  }
+  const tUndo = ()=>tSwap(TH.u, TH.r), tRedo = ()=>tSwap(TH.r, TH.u);
+  page.addEventListener('keydown', e=>{
+    if(!(e.ctrlKey || e.metaKey) || e.altKey) return; const k = e.key.toLowerCase();
+    if((k === 'z' && !e.shiftKey && tUndo()) || ((k === 'y' || (k === 'z' && e.shiftKey)) && tRedo())) e.preventDefault();
+  }, true);
   function exec(cmd, val){
+    if((cmd === 'undo' && tUndo()) || (cmd === 'redo' && tRedo())) return;
     page.focus();
     document.execCommand('styleWithCSS', false, false);
     document.execCommand(cmd, false, val || null);
@@ -3190,12 +3242,18 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const t = w.reduce((a, b)=>a + b, 0); if(t > snap.cw) w = w.map(x=>x * snap.cw / t);
     tblApply(table, w, snap.cw);
   }
+  function setRowH(tr, h){                        // a altura da linha vale também para células com height fixo (modelos), senão a linha não encolhe
+    tr.style.height = h.toFixed(1) + 'px';
+    [...tr.cells].forEach(c=>{ if(c.style.height){ c.style.height = ''; if(!c.getAttribute('style')) c.removeAttribute('style'); } });
+  }
   function rowH(table, r){ return table.rows[r].getBoundingClientRect().height / tblScale(table); }
 
   (function(){
     const HIT = 4, MINW = 24, MINH = 14, handle = document.createElement('div');
     handle.id = 'tblHandle'; handle.title = 'Arraste para mudar o tamanho da tabela'; document.body.appendChild(handle);
-    let drag = null, hoverT = null;
+    const mv = document.createElement('div'); mv.id = 'tblMove'; mv.textContent = '✥'; mv.title = 'Arraste para mover a tabela (para cima/baixo entre os blocos e para os lados)'; document.body.appendChild(mv);
+    const drop = document.createElement('div'); drop.id = 'tblDrop'; document.body.appendChild(drop);
+    let drag = null, hoverT = null, mdrag = null;
     const off = ()=>document.body.classList.contains('hfedit');
     function hit(e){
       const pts = [[0, 0], [HIT, 0], [-HIT, 0], [0, HIT], [0, -HIT]], cells = new Set();
@@ -3211,10 +3269,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     function cursorFor(h){ page.classList.toggle('tbl-cr', !!h && h.t === 'col'); page.classList.toggle('tbl-rr', !!h && h.t === 'row'); }
     function placeHandle(table){
-      if(!table || off()){ handle.style.display = 'none'; return; }
+      if(!table || off()){ handle.style.display = 'none'; mv.style.display = 'none'; return; }
       const r = table.getBoundingClientRect(), pr = page.getBoundingClientRect();
-      if(r.bottom < pr.top - 2 || r.top > innerHeight){ handle.style.display = 'none'; return; }
+      if(r.bottom < pr.top - 2 || r.top > innerHeight){ handle.style.display = 'none'; mv.style.display = 'none'; return; }
       handle.style.display = 'block'; handle.style.left = Math.round(r.right + 1) + 'px'; handle.style.top = Math.round(r.bottom + 1) + 'px';
+      if(!mdrag){ mv.style.display = 'block'; mv.style.left = Math.round(Math.max(2, r.left - 19)) + 'px'; mv.style.top = Math.round(Math.max(r.top, pr.top) + 1) + 'px'; }
     }
     page.addEventListener('mousemove', e=>{
       if(drag || off()) return;
@@ -3222,13 +3281,57 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const c = e.target.closest && e.target.closest('td,th'); const t = c ? c.closest('table') : null;
       if(t !== hoverT){ hoverT = t; placeHandle(t); }
     });
-    page.addEventListener('mouseleave', ()=>{ cursorFor(null); setTimeout(()=>{ if(!drag && !handle.matches(':hover')){ hoverT = null; handle.style.display = 'none'; } }, 250); });
-    handle.addEventListener('mouseleave', ()=>{ if(!drag && !page.matches(':hover')){ hoverT = null; handle.style.display = 'none'; } });
-    document.addEventListener('scroll', ()=>{ if(!drag) { hoverT = null; handle.style.display = 'none'; } }, true);
+    page.addEventListener('mouseleave', ()=>{ cursorFor(null); setTimeout(()=>{ if(!drag && !mdrag && !handle.matches(':hover') && !mv.matches(':hover')){ hoverT = null; handle.style.display = 'none'; mv.style.display = 'none'; } }, 250); });
+    handle.addEventListener('mouseleave', ()=>{ if(!drag && !mdrag && !page.matches(':hover') && !mv.matches(':hover')){ hoverT = null; handle.style.display = 'none'; mv.style.display = 'none'; } });
+    mv.addEventListener('mouseleave', ()=>{ if(!mdrag && !page.matches(':hover')){ hoverT = null; handle.style.display = 'none'; mv.style.display = 'none'; } });
+    document.addEventListener('scroll', ()=>{ if(!drag && !mdrag) { hoverT = null; handle.style.display = 'none'; mv.style.display = 'none'; } }, true);
+
+    // ----- mover a tabela: ✥ no canto; solta entre blocos (muda a ordem) e para os lados (recuo à esquerda) -----
+    function slotAt(y, tbl){
+      const ks = [...page.children].filter(k=>k !== tbl && !k.hasAttribute('data-hid') && !k.classList.contains('hf') && !/^(absolute|fixed)$/.test(getComputedStyle(k).position));
+      for(const k of ks){ const r = k.getBoundingClientRect(); if(y < r.top + r.height / 2) return {ref:k, y:r.top}; }
+      const l = ks[ks.length - 1]; return {ref:null, y:l ? l.getBoundingClientRect().bottom : 0};
+    }
+    mv.addEventListener('pointerdown', e=>{
+      if(e.button !== 0 || !hoverT) return; e.preventDefault(); e.stopPropagation();
+      let t = hoverT; while(t && t.parentNode !== page){ t = t.parentNode && t.parentNode.closest ? t.parentNode.closest('table') : null; if(!t) break; }
+      t = t || hoverT; if(t.parentNode !== page){ return; }
+      mdrag = {hb:tSnap(), t, x0:e.clientX, y0:e.clientY, sc:tblScale(t), ml0:parseFloat(getComputedStyle(t).marginLeft) || 0, moved:false};
+      mv.classList.add('drag'); mv.setPointerCapture(e.pointerId); document.body.style.cursor = 'move';
+    });
+    mv.addEventListener('pointermove', e=>{
+      if(!mdrag) return; const d = mdrag, dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+      if(!d.moved && Math.abs(dx) + Math.abs(dy) < 4) return; d.moved = true;
+      d.t.style.opacity = '.55'; d.t.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      const r0 = d.t.getBoundingClientRect(), s = slotAt(e.clientY, d.t), pr = page.getBoundingClientRect();
+      drop.style.display = 'block'; drop.style.left = Math.round(pr.left + 10) + 'px'; drop.style.width = Math.round(pr.width - 20) + 'px'; drop.style.top = Math.round(s.y - 1) + 'px';
+      d.slot = s;
+    });
+    const mend = (e, cancel)=>{
+      if(!mdrag) return; const d = mdrag; mdrag = null;
+      d.t.style.opacity = ''; d.t.style.transform = ''; if(!d.t.getAttribute('style')) d.t.removeAttribute('style');
+      drop.style.display = 'none'; mv.classList.remove('drag'); document.body.style.cursor = '';
+      try{ mv.releasePointerCapture(e.pointerId); }catch(_){}
+      if(cancel || !d.moved){ placeHandle(d.t); return; }
+      const t = d.t, dx = (e.clientX - d.x0) / d.sc, s = d.slot;
+      if(s){
+        const here = t.nextElementSibling === s.ref || (!s.ref && !t.nextElementSibling);
+        if(!here && s.ref !== t){ if(s.ref) page.insertBefore(t, s.ref); else page.appendChild(t); }
+      }
+      if(Math.abs(dx) > 3){
+        const cw = tblCont(t), w = t.offsetWidth, ml = Math.max(0, Math.min(Math.max(0, cw - w), d.ml0 + dx));
+        t.style.marginLeft = Math.round(ml) + 'px';
+      }
+      if(!t.nextElementSibling || t.nextElementSibling.tagName === 'TABLE'){ const p = document.createElement('p'); p.innerHTML = '<br>'; t.after(p); }
+      tCommit(d.hb); changed(); placeHandle(t);
+    };
+    mv.addEventListener('pointerup', e=>mend(e, false));
+    mv.addEventListener('pointercancel', e=>mend(e, true));
+    document.addEventListener('keydown', e=>{ if(mdrag && e.key === 'Escape') mend({clientX:mdrag.x0, clientY:mdrag.y0, pointerId:0}, true); });
 
     function start(e, kind, table, k){
       const w0 = tblCols(table), sc = tblScale(table);
-      drag = {kind, table, k, x0:e.clientX, y0:e.clientY, sc, w0, cw:tblCont(table), t0:w0.reduce((a, b)=>a + b, 0),
+      drag = {hb:tSnap(), kind, table, k, x0:e.clientX, y0:e.clientY, sc, w0, cw:tblCont(table), t0:w0.reduce((a, b)=>a + b, 0),
               h0:[...table.rows].map((r, i)=>rowH(table, i))};
       document.body.classList.add('tbl-drag'); document.body.style.cursor = kind === 'col' ? 'col-resize' : kind === 'row' ? 'row-resize' : 'nwse-resize';
       if(kind === 'corner') handle.classList.add('drag');
@@ -3250,17 +3353,17 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         else { w[k] += Math.max(MINW - w[k], Math.min(dx, Math.max(0, d.cw - d.t0))); }
         tblApply(d.table, w, d.cw);
       }else if(d.kind === 'row'){
-        d.table.rows[d.k].style.height = Math.max(MINH, d.h0[d.k] + dy).toFixed(1) + 'px';
+        setRowH(d.table.rows[d.k], Math.max(MINH, d.h0[d.k] + dy));
       }else{
         const t = Math.max(MINW * d.w0.length, Math.min(d.cw, d.t0 + dx)), f = t / d.t0;
         tblApply(d.table, d.w0.map(x=>x * f), d.cw);
-        if(Math.abs(dy) > 2){ const H = d.h0.reduce((a, b)=>a + b, 0), g = Math.max(.2, (H + dy) / H); [...d.table.rows].forEach((r, i)=>r.style.height = Math.max(MINH, d.h0[i] * g).toFixed(1) + 'px'); }
+        if(Math.abs(dy) > 2){ const H = d.h0.reduce((a, b)=>a + b, 0), g = Math.max(.2, (H + dy) / H); [...d.table.rows].forEach((r, i)=>setRowH(r, Math.max(MINH, d.h0[i] * g))); }
         placeHandle(d.table);
       }
     });
     document.addEventListener('mouseup', ()=>{
       if(!drag) return;
-      const t = drag.table; drag = null; handle.classList.remove('drag');
+      const t = drag.table; tCommit(drag.hb); drag = null; handle.classList.remove('drag');
       document.body.classList.remove('tbl-drag'); document.body.style.cursor = ''; cursorFor(null);
       placeHandle(t); changed(); syncT();
     });
@@ -3284,6 +3387,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       syncT();
     });
     tabT.addEventListener('click', ()=>setTimeout(syncT, 0));
+    let tPend = null;
+    [[panelT, 'click'], [$('tbl'), 'change'], [$('tbl2'), 'change'], [$('tblStyle') || panelT, 'change']].forEach(([el, ev])=>{
+      if(!el) return;
+      el.addEventListener(ev, ()=>{ if(tPend !== null) return; tPend = tSnap(); setTimeout(()=>{ const b = tPend; tPend = null; tCommit(b); }, 80); }, true);
+    });
     function run(a){
       restore();
       let next = null;                                   // após excluir linha/coluna, o cursor vai para a célula vizinha
@@ -4848,20 +4956,20 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function tplRelatorio(){
     // Baseado no Modelo_Pronto.docx do CRAS, com texto em Times New Roman 12, espaçamento 1,5: cabeçalho e rodapé em imagem, 5 campos e assinatura. Medidas em px (96 por polegada).
     const F = 'font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;';
-    const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left">' + t + '</p>';
+    const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
     const box = (w, h, ml)=>'<table style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left">&nbsp;</td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
     const html =
-      '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:40px 0 0">Relatório Informativo</p>' +
+      '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">Relatório Informativo</p>' +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left">01 – Identificação:</p>' +
       '<table style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><tbody>' +
         '<tr>' + c(616, 36, 'Nome:', 3) + '</tr>' +
         '<tr>' + c(404, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
         '<tr>' + c(333, 36, 'Endereço:') + c(283, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
-      hd('02 – Demanda:', 28) + box(613, 37, 7) +
-      hd('03 – Composição Familiar:', 28) + box(613, 37, 7) +
-      hd('04 – Situação Apresentada:', 28) + box(616, 350, 3) + box(616, 238, 3) +
-      hd('05 – Providências Socioassistenciais:', 33) + box(605, 139, 3) +
+      hd('02 – Demanda:', 28) + box(616, 37, 5) +
+      hd('03 – Composição Familiar:', 28) + box(616, 37, 5) +
+      hd('04 – Situação Apresentada:', 28) + box(616, 350, 5) + box(616, 238, 5) +
+      hd('05 – Providências Socioassistenciais:', 33) + box(616, 139, 5) +
       '<p style="' + F + 'line-height:1.5;margin:31px 0 0 319px;text-align:left">Boa Vista – RR, {{DATA}}</p>' +
       ('<p style="' + F + 'line-height:1.5;margin:0"><br></p>').repeat(3) +
       '<p style="' + F + 'font-weight:bold;font-style:italic;line-height:1.5;width:329px;margin:0 0 0 295px;padding-top:3px;border-top:1px solid #000;text-align:right">(Assinado eletronicamente)</p>' +
@@ -4869,7 +4977,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     return {
       title:'Relatório Informativo', html, abnt:false,
       sty:{f:'Times New Roman', hc:'', sp:'padrao'},
-      mar:{t:156, r:56.7, b:101.3, l:113.4},
+      mar:{t:176, r:56.7, b:101.3, l:113.4},
       hf:{h:'', f:'', ha:'left', fa:'left', dif:false, imgs:[
         {id:'tplh', src:TPL_HDR, x:0, y:0, w:794, h:156, z:'back', op:0},
         {id:'tplf', src:TPL_FTR, x:0, y:870, w:794, h:253, z:'back', op:0}]}
@@ -4891,7 +4999,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     // linha com dois campos, um em cada coluna
     const two = (a, b, h, o)=>'<tr>' + td(1, 315, a, h, Object.assign({l:1}, o)) + td(1, 291, b, h, Object.assign({r:1}, o)) + '</tr>';
     const html =
-      '<table style="border-collapse:collapse;table-layout:fixed;width:606px;margin:61px 0 0 4px"><tbody>' +
+      '<table style="border-collapse:collapse;table-layout:fixed;width:606px;margin:41px 0 0 4px"><tbody>' +
         two('<b>Encaminhamento:</b>', '<b>CRAS/CRISTIANA VICENTE NUNES</b>', 40, {t:1}) +
         full(L('Assunto:'), 56) +
         full(L('Nome do adolescente/criança:'), 36) +
@@ -4909,11 +5017,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
              '<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">Técnico de Referência</p>', 70, {b:1}) +
       '</tbody></table>' +
       '<div class="pb" contenteditable="false"></div>' +
-      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.2;margin:8px 0 0">ANEXO</p>';
+      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.2;margin:0">ANEXO</p>';
     return {
       title:'Encaminhamento', html, abnt:false,
       sty:{f:'Arial', hc:'', sp:'padrao'},
-      mar:{t:156, r:104, b:101.3, l:75.5},
+      mar:{t:176, r:104, b:101.3, l:75.5},
       hf:{h:'', f:'', ha:'left', fa:'left', dif:false, imgs:[
         {id:'tplh', src:TPL_ENC_HDR, x:0, y:0, w:794, h:156, z:'back', op:0},
         {id:'tplf', src:TPL_ENC_FTR, x:0, y:870, w:794, h:253, z:'back', op:0}]}
