@@ -779,7 +779,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 #toolbar .tsz{display:flex;justify-content:space-between;gap:4px;width:130px}
 #toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
 #toolbar select.tfit{width:100%;height:22px}
-@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}}
+@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}}
 
 /* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
 @media (max-width:700px){
@@ -2036,7 +2036,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   // Quebras de página: mesma conta da pré-visualização de impressão (um bloco que não cabe vai inteiro para a página seguinte;
   // título com "manter com o próximo" não fica sozinho no fim da página)
-  function pgPlan(kids, use0, rectOf){
+  function pgPlan(kids, use0, rectOf, splitOf){
     const starts = [0], tops = []; let ps = 0, brk = false;
     const U = ()=>typeof use0 === 'function' ? use0(starts.length - 1) : use0;   // capacidade da página atual (menor quando há notas de rodapé)
     const next = y=>{ starts.push(y); ps = y; };
@@ -2048,7 +2048,21 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const chain = ()=>{ let j = i, t = top; while(j > 0 && keep(kids[j - 1]) && tops[j - 1] != null && tops[j - 1] > ps + 1){ j--; t = tops[j]; } return t; };
       if(brk){ brk = false; if(top > ps + 1) next(top); }
       if(bot - ps > U() + 1){
-        if(top > ps + 1 && bot - top <= U()) next(chain());
+        // quadro "data-flow" (modelos): começa onde houver pelo menos ~3 linhas de espaço e continua na página seguinte
+        const flow = k.hasAttribute && k.hasAttribute('data-flow') && ps + U() - top >= 90;
+        let done = false;
+        if(flow && splitOf){      // quebra por linha: a 1ª linha que não cabe começa a próxima página (o espaço é aberto só por CSS, em pgRun)
+          const ps0 = ps, n0 = starts.length, ys = [];
+          while(bot - ps > U() + 1){
+            const y = splitOf(k, ps + U());
+            if(y == null || y <= ps + 1 || y > ps + U() + .5) break;
+            ys.push([y, ps + U()]); next(y);
+          }
+          if(bot - ps > U() + 1){ starts.length = n0; ps = ps0; }
+          else{ done = true; starts.splits = starts.splits || new Map(); ys.forEach(([y, end])=>starts.splits.set(y, {k, end})); }
+        }
+        if(done){ /* já dividido por linhas */ }
+        else if(!flow && top > ps + 1 && bot - top <= U()) next(chain());
         else while(bot - ps > U() + 1) next(ps + U());
       }
     });
@@ -2122,6 +2136,36 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     });
     return css;
   }
+  function cellSel(c){
+    const tr = c.parentNode, sec = tr.parentNode, tb = sec.parentNode;
+    return '#page>:nth-child(' + ([...page.children].indexOf(tb) + 1) + ')>:nth-child(' + ([...tb.children].indexOf(sec) + 1) + ')>tr:nth-child(' + ([...sec.children].indexOf(tr) + 1) + ')>:nth-child(' + ([...tr.children].indexOf(c) + 1) + ')';
+  }
+  // Caixa de uma célula só que atravessa a quebra: um espaço do tamanho do rodapé + intervalo + cabeçalho é aberto antes da 1ª linha que
+  // não cabe (float invisível com shape-outside no ::before da célula) e as bordas laterais somem nesse trecho. Só CSS gerado, nada é gravado.
+  function splitCss(k, list){
+    const cell = k.tagName === 'TR' ? k.cells[0] : k.rows[0].cells[0];
+    const sh = document.getElementById('sheet'), sr = sh.getBoundingClientRect(), sc = sh.offsetWidth ? sr.width / sh.offsetWidth : 1;
+    const pr = page.getBoundingClientRect(), O = pr.top + (parseFloat(getComputedStyle(page).paddingTop) || 0) * sc;
+    const cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
+    const cbTop = (cr.top - O) / sc, ctTop = cbTop + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.paddingTop) || 0);
+    let S = 0, hf = 0; const poly = ['0 0', '0.1px 0'], gaps = [];
+    list.forEach(b=>{
+      const a = b.y + 1 + S - ctTop, bb = a + b.extra - 1;
+      poly.push('0.1px ' + a.toFixed(2) + 'px', '100% ' + a.toFixed(2) + 'px', '100% ' + bb.toFixed(2) + 'px', '0.1px ' + bb.toFixed(2) + 'px');
+      gaps.push([b.end + S - cbTop, b.y + S + b.extra - cbTop]); S += b.extra; hf = bb;
+    });
+    poly.push('0.1px ' + hf.toFixed(2) + 'px', '0 ' + hf.toFixed(2) + 'px');
+    const sel = cellSel(cell);
+    let css = sel + '::before{content:"";float:left;width:100%;height:' + hf.toFixed(2) + 'px;shape-outside:polygon(' + poly.join(',') + ')}';
+    const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:parseFloat(w), col} : null;
+    const Lb = side(cs.borderLeftWidth, cs.borderLeftStyle, cs.borderLeftColor), Rb = side(cs.borderRightWidth, cs.borderRightStyle, cs.borderRightColor);
+    const g = o=>{ const q = []; let cur = 0; gaps.forEach(([a, b])=>{ q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + b.toFixed(1) + 'px'); cur = b; }); q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' 100%'); return 'linear-gradient(to bottom,' + q.join(',') + ')'; };
+    const imgs = [], sz = [], ps = [];
+    if(Lb){ imgs.push(g(Lb)); sz.push(Lb.w + 'px 100%'); ps.push('left top'); }
+    if(Rb){ imgs.push(g(Rb)); sz.push(Rb.w + 'px 100%'); ps.push('right top'); }
+    if(imgs.length) css += sel + '{border-left-color:transparent !important;border-right-color:transparent !important;background-image:' + imgs.join(',') + ' !important;background-size:' + sz.join(',') + ' !important;background-position:' + ps.join(',') + ' !important;background-repeat:no-repeat !important;background-origin:border-box !important}';
+    return css;
+  }
   // A paginação tira e recoloca os espaços entre as páginas só para medir. Sem este cuidado o navegador rola a tela sozinho
   // enquanto se digita (ex.: no quadro "05 – Situação Apresentada"). Aqui o cursor volta ao mesmo ponto da tela depois de medir.
   function pgKeepView(){
@@ -2157,7 +2201,19 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const kids0 = [...page.children].filter(k=>{ if(k.hasAttribute('data-hid')) return false; const p = getComputedStyle(k).position; return p !== 'absolute' && p !== 'fixed'; });
       let R = new Map(), kids = kids0, starts, fn = null;
       const rectOf = k=>{ const r = k.getBoundingClientRect(), o = {top:(r.top - O) / sc, bot:(r.bottom - O) / sc}; R.set(k, o); return o; };
-      const isHard = (kl, st)=>st.slice(1).every(x=>kl.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - x) <= 1; }) >= 0);
+      const isHard = (kl, st)=>st.slice(1).every(x=>(st.splits && st.splits.has(x)) || kl.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - x) <= 1; }) >= 0);
+      // topo (px, sem espaço entre páginas) da 1ª linha da caixa que passa de "limit": é onde começa a próxima página
+      const splitOf = (k, limit)=>{
+        const cell = k.tagName === 'TR' ? (k.cells.length === 1 ? k.cells[0] : null) : (k.tagName === 'TABLE' && k.rows.length === 1 && k.rows[0].cells.length === 1 ? k.rows[0].cells[0] : null);
+        if(!cell) return null;
+        let best = null;
+        const take = (r, el)=>{ if(r.height < 1) return; const cs = getComputedStyle(el), lh = parseFloat(cs.lineHeight), hl = isFinite(lh) ? Math.max(0, (lh * 1 - r.height / sc) / 2) : 0, top = (r.top - O) / sc - hl, bot = top + (isFinite(lh) ? lh : r.height / sc); if(bot > limit + .5 && (best == null || top < best)) best = top; };
+        const tw = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT, {acceptNode:n=>n.nodeValue.replace(/[\s\u200b]/g, '') ? 1 : 2}), rg = document.createRange();
+        for(let n; (n = tw.nextNode());){ rg.selectNodeContents(n); [...rg.getClientRects()].forEach(r=>take(r, n.parentElement)); }
+        cell.querySelectorAll('p,div,li,h1,h2,h3,h4').forEach(b=>{ if(!b.textContent.replace(/[\s\u200b]/g, '') && !b.querySelector('img,table')) take(b.getBoundingClientRect(), b); });
+        cell.querySelectorAll('img').forEach(im=>take(im.getBoundingClientRect(), im));
+        return best;
+      };
       // Notas de rodapé como no Word: cada nota fica no pé da página onde está o número, e o texto da página ganha menos espaço
       const fnBx = fnBox(false), fnMk = [...page.querySelectorAll('sup.fn')].filter(m=>!m.closest('.fnotes'));
       if(fnBx && fnMk.length && !matchMedia('(max-width:700px)').matches){
@@ -2166,7 +2222,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         const mk = fnMk.map(m=>{ let k = m; while(k && k.parentNode !== page) k = k.parentNode; return {id:m.dataset.id, k}; });
         const res = []; let pn = null, st = null, good = false;
         for(let it = 0; it < 8 && !good; it++){
-          R = new Map(); st = pgPlan(pgFlat(kids), p=>Math.max(CMPX, use - (res[p] || 0)), rectOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); });
+          R = new Map(); st = pgPlan(pgFlat(kids), p=>Math.max(CMPX, use - (res[p] || 0)), rectOf, splitOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); });
           pn = []; mk.forEach(x=>{ const r = R.get(x.k); if(!r) return; let p = 0; while(p + 1 < st.length && st[p + 1] <= r.top + 1) p++; (pn[p] = pn[p] || []).push(x.id); });
           good = true;
           pn.forEach((ids, p)=>{ if(!ids) return; const h = FN_PAD + ids.reduce((a, id)=>a + (hOf.get(id) || 0), 0); if(h > (res[p] || 0) + .5){ res[p] = h; good = false; } });
@@ -2174,21 +2230,24 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(good && res.every(h=>!h || h <= use * .6) && isHard(pgFlat(kids), st)){ fn = {pn, hOf}; starts = st; }
         else{ kids = kids0; }
       }
-      if(!fn){ R = new Map(); starts = pgPlan(pgFlat(kids), use, rectOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); }); }
+      if(!fn){ R = new Map(); starts = pgPlan(pgFlat(kids), use, rectOf, splitOf); kids.forEach(k=>{ if(k.tagName === 'TABLE' && !R.has(k)) rectOf(k); }); }
       const base = (O - sr.top) / sc, was = pgState ? pgState.starts.length : 0, n = starts.length;
       // cada início de página precisa coincidir com o topo de um bloco; senão (bloco maior que a página) usa só a linha tracejada
       const ku = pgFlat(kids), firstAt = s=>ku.findIndex(k=>{ const r = R.get(k); return r && Math.abs(r.top - s) <= 1; });
-      const hard = starts.slice(1).every(s=>firstAt(s) >= 0);
+      const sp = starts.splits || new Map(), hard = starts.slice(1).every(s=>sp.has(s) || firstAt(s) >= 0);
       let out = '', total = 0;
       if(hard && n > 1){
         const H = e.t + use + e.b, P = H + PG_GAP, off = base - padT;
         let css = '';
+        const bands = new Map();
         for(let p = 1; p < n; p++){
+          if(sp.has(starts[p])){ const o = sp.get(starts[p]); if(!bands.has(o.k)) bands.set(o.k, []); bands.get(o.k).push({y:starts[p], end:o.end, extra:P - (starts[p] - starts[p - 1])}); continue; }
           const i = firstAt(starts[p]), k = ku[i], prev = ku[i - 1], r = R.get(k), pv = prev && R.get(prev);
           const nat = pv ? Math.max(0, r.top - pv.bot) : 0, extra = P - (starts[p] - starts[p - 1]);
           if(k.tagName === 'TR' && k.rowIndex > 0) css += pgRowCss(k, extra, starts[p - 1] + use - r.top);
           else{ const el = k.tagName === 'TR' ? k.closest('table') : k; css += '#page>:nth-child(' + ([...page.children].indexOf(el) + 1) + '){margin-top:' + (nat + extra).toFixed(2) + 'px !important}'; }
         }
+        bands.forEach((list, k)=>{ css += splitCss(k, list); });
         pgShiftSet('@media screen{' + css + '}');
         pgState = {starts, base, use, shifted:true, P, H, GAP:PG_GAP, et:e.t, off};
         for(let k = 0; k < n - 1; k++)
@@ -2376,6 +2435,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const tr = document.createElement('tr'); tr.appendChild(td); const tb = document.createElement('tbody'); tb.appendChild(tr); t.appendChild(tb);
       b.parentNode.replaceChild(t, b);
     });
+    c.querySelectorAll('table, col, td, th').forEach(el=>{   // (.doc, .docx e .html) Word e LibreOffice respeitam melhor o atributo width do que só o CSS (senão as tabelas do modelo encolhem)
+      const w = el.style && el.style.width; if(el.hasAttribute('width') || !w || !/^[\d.]+(px|%)$/.test(w)) return;
+      el.setAttribute('width', w.replace('px', ''));
+    });
+    c.querySelectorAll('.pb').forEach(q=>{ const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'page-break-before:always;mso-break-type:page-break'); q.replaceWith(br); });   // quebra de página (sem isso o ANEXO e outras quebras se perdiam no .doc/.docx/.html)
     c.querySelectorAll('.colb').forEach(q=>{ const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'mso-break-type:column-break'); q.replaceWith(br); });
     c.querySelectorAll('span.cit').forEach(f=>{ f.removeAttribute('contenteditable'); f.removeAttribute('data-ref'); f.removeAttribute('data-narr'); f.removeAttribute('data-pg'); f.removeAttribute('class'); });
     flattenLists(c); diagToMso(c);
@@ -3054,6 +3118,25 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   });
 
   // Editar tabela
+  function delTable(table){   // nas caixas dos modelos (data-flow) o título da seção ("05 – Situação…") sai junto, para não sobrar sozinho
+    if((table.hasAttribute('data-flow') || table.hasAttribute('data-sec')) && table.parentNode === page){
+      let pv = table.previousElementSibling;
+      while(pv && pv.tagName !== 'TABLE' && pv.tagName !== 'DIV' && (pv.style.breakAfter || pv.style.pageBreakAfter) === 'avoid'){ const x = pv; pv = pv.previousElementSibling; x.remove(); }
+    }
+    table.remove();
+  }
+  function insCol(table, G, k, nC){               // coluna nova na posição k da grade
+    const done = new Set();
+    [...table.rows].forEach((tr, ri)=>{
+      const x = k < nC ? G.g[ri][k] : null, q = x ? G.pos.get(x) : null;
+      if(q && q.c < k){ if(!done.has(x)){ done.add(x); x.colSpan = q.cs + 1; } return; }   // cai dentro de uma célula mesclada
+      const own = [...tr.cells]; let before = null;
+      for(const cell of own){ if(G.pos.get(cell).c >= k){ before = cell; break; } }
+      const nb = own.filter(cell=>G.pos.get(cell).c < k).pop() || own[0]; if(!nb) return;   // vizinho que serve de modelo de estilo
+      const n = nb.cloneNode(false); n.removeAttribute('colspan'); n.removeAttribute('rowspan'); n.innerHTML = '<br>';
+      tr.insertBefore(n, before);
+    });
+  }
   function cellOf(){
     let n = savedRange ? savedRange.startContainer : getSelection().anchorNode;
     while(n && n !== page){ if(n.nodeName==='TD' || n.nodeName==='TH') return n; n = n.parentNode; }
@@ -3065,21 +3148,29 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(!c){ alert('Clique dentro de uma célula da tabela e escolha de novo.'); return; }
     const row = c.parentNode, table = c.closest('table'), idx = [...row.children].indexOf(c);
     const gcol = (gridOf(table).pos.get(c) || {c:idx}).c, tw = tblSnap(table);   // larguras antes da mudança (tabelas redimensionadas)
+    let kIns = -1;
     if(a==='rowA' || a==='rowB'){
       const n = row.cloneNode(true); n.querySelectorAll('td,th').forEach(x=>x.innerHTML = '<br>');
+      const big = v=>parseFloat(v) > 60;   // caixa alta (ex.: "Situação" com 370 px): a linha nova nasce com altura normal, e não com outra caixa inteira
+      if(big(n.style.height)) n.style.height = '';
+      n.querySelectorAll('td,th').forEach(x=>{ if(big(x.style.height)){ x.style.height = ''; if(!x.getAttribute('style')) x.removeAttribute('style'); } });
       row.parentNode.insertBefore(n, a==='rowA' ? row.nextSibling : row);
     }else if(a==='colA' || a==='colB'){
-      table.querySelectorAll('tr').forEach(r=>{
-        const ref = r.children[idx]; if(!ref) return;
-        const n = ref.cloneNode(false); n.innerHTML = '<br>';
-        r.insertBefore(n, a==='colA' ? ref.nextSibling : ref);
-      });
-    }else if(a==='rowD'){ table.rows.length > 1 ? row.remove() : table.remove();
+      // pela grade (e não pelo índice da célula na linha): células mescladas (ex.: "Nome:" do modelo) só ficam mais largas
+      const G = gridOf(table), q0 = G.pos.get(c) || {c:idx, cs:1};
+      kIns = a==='colA' ? q0.c + q0.cs : q0.c;
+      insCol(table, G, kIns, Math.max(0, ...G.g.map(r=>r.length)));
+    }else if(a==='rowD'){ table.rows.length > 1 ? row.remove() : delTable(table);
     }else if(a==='colD'){
-      table.querySelectorAll('tr').forEach(r=>{ if(r.children[idx]) r.children[idx].remove(); });
-      if(!table.querySelector('td,th')) table.remove();
-    }else if(a==='tblD'){ table.remove(); }
-    if(tw && table.isConnected) tblAdjust(table, tw, a==='colA' ? 'ins' + (gcol + 1) : a==='colB' ? 'ins' + gcol : a==='colD' ? 'del' + gcol : '');
+      const G = gridOf(table), seen = new Set();
+      [...table.rows].forEach((tr, ri)=>{
+        const x = G.g[ri] && G.g[ri][gcol]; if(!x || seen.has(x)) return; seen.add(x);
+        if((x.colSpan || 1) > 1) x.colSpan = x.colSpan - 1; else x.remove();
+      });
+      [...table.rows].forEach(tr=>{ if(!tr.cells.length) tr.remove(); });
+      if(!table.querySelector('td,th')) delTable(table);
+    }else if(a==='tblD'){ delTable(table); }
+    if(tw && table.isConnected) tblAdjust(table, tw, kIns >= 0 ? 'ins' + kIns : a==='colD' ? 'del' + gcol : '');
     changed();
   });
 
@@ -3204,12 +3295,12 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       }
     }
     else if(a === 'equal'){
-      const n = tblCols(table).length, cw = tblCont(table);
-      tblApply(table, new Array(n).fill(cw / n), cw);
+      const n = tblCols(table).length, cw = tblCont(table), room = tblRoom(table, cw);
+      tblApply(table, new Array(n).fill(room / n), cw);
     }
     else if(a === 'fit'){
-      const w = tblCols(table), cw = tblCont(table), t = w.reduce((x, y)=>x + y, 0);
-      tblApply(table, w.map(x=>x * cw / t), cw);
+      const w = tblCols(table), cw = tblCont(table), t = w.reduce((x, y)=>x + y, 0), room = tblRoom(table, cw);
+      tblApply(table, w.map(x=>x * room / t), cw);
     }
     else if(a === 'auto'){
       table.style.tableLayout = ''; table.style.width = '';
@@ -3251,14 +3342,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       cell.style.width = (sum / total * 100).toFixed(3) + '%'; cell.style.boxSizing = 'border-box';
     });
   }
-  function tblSnap(table){ return table.querySelector(':scope > colgroup') ? {w:tblCols(table), cw:tblCont(table)} : null; }
+  function tblSnap(table){ return (table.querySelector(':scope > colgroup') || table.style.tableLayout === 'fixed') ? {w:tblCols(table), cw:tblCont(table)} : null; }
+  function tblRoom(table, cw){ return Math.max(40, cw - (parseFloat(table.style.marginLeft) || 0) - (parseFloat(table.style.marginRight) || 0)); }   // largura útil descontando as margens da tabela
   function tblAdjust(table, snap, op){            // após inserir/excluir/dividir coluna, mantém as larguras que o usuário definiu
     let w = snap.w.slice(); const m = /^(ins|del|spl)(\d+)$/.exec(op || ''), k = m ? +m[2] : -1, now = gridOf(table).g.reduce((a, r)=>Math.max(a, r.length), 0);
     if(m && m[1] === 'ins') w.splice(k, 0, snap.w[Math.min(k, snap.w.length - 1)]);
     else if(m && m[1] === 'del') w.splice(k, 1);
     else if(m && m[1] === 'spl'){ const n = now - w.length + 1; w.splice(k, 1, ...new Array(n).fill(snap.w[k] / n)); }
     if(w.length !== now) w = new Array(now).fill(snap.cw / now);
-    const t = w.reduce((a, b)=>a + b, 0); if(t > snap.cw) w = w.map(x=>x * snap.cw / t);
+    const t = w.reduce((a, b)=>a + b, 0), room = tblRoom(table, snap.cw); if(t > room) w = w.map(x=>x * room / t);
     tblApply(table, w, snap.cw);
   }
   function setRowH(tr, h){                        // a altura da linha vale também para células com height fixo (modelos), senão a linha não encolhe
@@ -3306,36 +3398,47 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     document.addEventListener('scroll', ()=>{ if(!drag && !mdrag) { hoverT = null; handle.style.display = 'none'; mv.style.display = 'none'; } }, true);
 
     // ----- mover a tabela: ✥ no canto; solta entre blocos (muda a ordem) e para os lados (recuo à esquerda) -----
+    // o título da seção (parágrafo com "manter com o próximo") anda junto com a caixa
+    function grpOf(t){
+      const g = []; let pv = t.previousElementSibling;
+      while(pv && pv.tagName !== 'TABLE' && pv.tagName !== 'DIV' && (pv.style.breakAfter || pv.style.pageBreakAfter) === 'avoid'){ g.unshift(pv); pv = pv.previousElementSibling; }
+      return g.concat([t]);
+    }
     function slotAt(y, tbl){
-      const ks = [...page.children].filter(k=>k !== tbl && !k.hasAttribute('data-hid') && !k.classList.contains('hf') && !/^(absolute|fixed)$/.test(getComputedStyle(k).position));
-      for(const k of ks){ const r = k.getBoundingClientRect(); if(y < r.top + r.height / 2) return {ref:k, y:r.top}; }
+      const skip = Array.isArray(tbl) ? tbl : [tbl];
+      const ks = [...page.children].filter(k=>skip.indexOf(k) < 0 && !k.hasAttribute('data-hid') && !k.classList.contains('hf') && !/^(absolute|fixed)$/.test(getComputedStyle(k).position));
+      const keepN = n=>n && n.tagName !== 'TABLE' && n.tagName !== 'DIV' && (n.style.breakAfter || n.style.pageBreakAfter) === 'avoid' && skip.indexOf(n) < 0;
+      for(const k of ks){
+        const r = k.getBoundingClientRect();
+        if(y < r.top + r.height / 2){ let ref = k; while(keepN(ref.previousElementSibling)) ref = ref.previousElementSibling; return {ref, y:ref.getBoundingClientRect().top}; }   // nunca solta entre o título e a caixa dele
+      }
       const l = ks[ks.length - 1]; return {ref:null, y:l ? l.getBoundingClientRect().bottom : 0};
     }
     mv.addEventListener('pointerdown', e=>{
       if(e.button !== 0 || !hoverT) return; e.preventDefault(); e.stopPropagation();
       let t = hoverT; while(t && t.parentNode !== page){ t = t.parentNode && t.parentNode.closest ? t.parentNode.closest('table') : null; if(!t) break; }
       t = t || hoverT; if(t.parentNode !== page){ return; }
-      mdrag = {hb:tSnap(), t, x0:e.clientX, y0:e.clientY, sc:tblScale(t), ml0:parseFloat(getComputedStyle(t).marginLeft) || 0, moved:false};
+      mdrag = {hb:tSnap(), t, grp:grpOf(t), x0:e.clientX, y0:e.clientY, sc:tblScale(t), ml0:parseFloat(getComputedStyle(t).marginLeft) || 0, moved:false};
       mv.classList.add('drag'); mv.setPointerCapture(e.pointerId); document.body.style.cursor = 'move';
     });
     mv.addEventListener('pointermove', e=>{
       if(!mdrag) return; const d = mdrag, dx = e.clientX - d.x0, dy = e.clientY - d.y0;
       if(!d.moved && Math.abs(dx) + Math.abs(dy) < 4) return; d.moved = true;
-      d.t.style.opacity = '.55'; d.t.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-      const r0 = d.t.getBoundingClientRect(), s = slotAt(e.clientY, d.t), pr = page.getBoundingClientRect();
+      d.grp.forEach(n=>{ n.style.opacity = '.55'; n.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; });
+      const s = slotAt(e.clientY, d.grp), pr = page.getBoundingClientRect();
       drop.style.display = 'block'; drop.style.left = Math.round(pr.left + 10) + 'px'; drop.style.width = Math.round(pr.width - 20) + 'px'; drop.style.top = Math.round(s.y - 1) + 'px';
       d.slot = s;
     });
     const mend = (e, cancel)=>{
       if(!mdrag) return; const d = mdrag; mdrag = null;
-      d.t.style.opacity = ''; d.t.style.transform = ''; if(!d.t.getAttribute('style')) d.t.removeAttribute('style');
+      d.grp.forEach(n=>{ n.style.opacity = ''; n.style.transform = ''; if(!n.getAttribute('style')) n.removeAttribute('style'); });
       drop.style.display = 'none'; mv.classList.remove('drag'); document.body.style.cursor = '';
       try{ mv.releasePointerCapture(e.pointerId); }catch(_){}
       if(cancel || !d.moved){ placeHandle(d.t); return; }
       const t = d.t, dx = (e.clientX - d.x0) / d.sc, s = d.slot;
       if(s){
         const here = t.nextElementSibling === s.ref || (!s.ref && !t.nextElementSibling);
-        if(!here && s.ref !== t){ if(s.ref) page.insertBefore(t, s.ref); else page.appendChild(t); }
+        if(!here && s.ref !== t){ d.grp.forEach(n=>{ if(s.ref) page.insertBefore(n, s.ref); else page.appendChild(n); }); }
       }
       if(Math.abs(dx) > 3){
         const cw = tblCont(t), w = t.offsetWidth, ml = Math.max(0, Math.min(Math.max(0, cw - w), d.ml0 + dx));
@@ -3360,10 +3463,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const h = hit(e); if(!h) return;
       e.preventDefault(); e.stopPropagation(); start(e, h.t, h.table, h.k);
     }, true);
-    handle.addEventListener('mousedown', e=>{
+    handle.addEventListener('pointerdown', e=>{
       if(e.button !== 0 || !hoverT) return; e.preventDefault(); e.stopPropagation(); start(e, 'corner', hoverT, 0);
+      try{ handle.setPointerCapture(e.pointerId); }catch(_){}
     });
-    document.addEventListener('mousemove', e=>{
+    document.addEventListener('pointermove', e=>{
       if(!drag) return; e.preventDefault();
       const d = drag, dx = (e.clientX - d.x0) / d.sc, dy = (e.clientY - d.y0) / d.sc;
       if(d.kind === 'col'){
@@ -3380,12 +3484,13 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         placeHandle(d.table);
       }
     });
-    document.addEventListener('mouseup', ()=>{
+    const dragEnd = ()=>{
       if(!drag) return;
       const t = drag.table; tCommit(drag.hb); drag = null; handle.classList.remove('drag');
       document.body.classList.remove('tbl-drag'); document.body.style.cursor = ''; cursorFor(null);
       placeHandle(t); changed(); syncT();
-    });
+    };
+    document.addEventListener('pointerup', dragEnd); document.addEventListener('pointercancel', dragEnd); document.addEventListener('mouseup', dragEnd);
 
     // ----- guia contextual "Layout da Tabela" -----
     const tabT = $('tab-tabela'), panelT = $('tp-tabela'), hI = $('tCellH'), wI = $('tCellW');
@@ -3402,6 +3507,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     document.addEventListener('selectionchange', ()=>{
       if(document.activeElement && document.activeElement.closest && document.activeElement.closest('#toolbar')) return;
       const c = inTable(); tabT.hidden = !c;
+      if(c && !drag && !mdrag && matchMedia('(pointer:coarse)').matches){   // celular/tablet não tem "passar o mouse": mostra as alças da tabela onde está o cursor
+        let top = c.closest('table'); while(top && top.parentNode !== page){ const up = top.parentNode && top.parentNode.closest ? top.parentNode.closest('table') : null; if(!up) break; top = up; }
+        if(top && top.parentNode === page && top !== hoverT){ hoverT = top; placeHandle(top); }
+      }
       if(!c && tabT.classList.contains('on')) $('tab-inicio').click();
       syncT();
     });
@@ -3568,7 +3677,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         rows.forEach(tr=>{ if(!tr.cells.length) tr.remove(); });
         caretIn(nb && nb.isConnected ? nb : table.rows[0] && table.rows[0].cells[0]);
       }
-      if(!table.querySelector('td,th')) table.remove();
+      if(!table.querySelector('td,th')) delTable(table);
       changed(); syncT();
     }
     // Inserir células (como no Word): deslocar as existentes para a direita ou para baixo
@@ -3818,7 +3927,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         });
         tr.remove();
       });
-      if(!table.querySelector('td,th')) table.remove();
+      if(!table.querySelector('td,th')) delTable(table);
     }
     function delCols(table, set){
       [...set].sort((a, b)=>b - a).forEach(j=>{
@@ -3830,7 +3939,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         [...table.rows].forEach(tr=>{ if(!tr.cells.length) tr.remove(); });
         if(tw && table.isConnected && table.querySelector('td,th')) tblAdjust(table, tw, 'del' + j);
       });
-      if(!table.querySelector('td,th')) table.remove();
+      if(!table.querySelector('td,th')) delTable(table);
     }
     function spans(cells){
       const table = cells[0].closest('table'), G = gridOf(table), R = new Set(), C = new Set();
@@ -3865,9 +3974,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const nCols = G.g.reduce((m, r)=>Math.max(m, r.length), 0);
       const colsFull = [...C].every(j=>G.g.every(row=>!row[j] || set.has(row[j])));
       const r0 = Math.min(...R), c0 = Math.min(...C);
-      if(rowsFull && R.size === G.g.length){ table.remove(); changed(); syncT(); tselDraw(); return; }
+      if(rowsFull && R.size === G.g.length){ delTable(table); changed(); syncT(); tselDraw(); return; }
       if(rowsFull){ delRows(table, R); afterDel(table, r0, 0); return; }
-      if(colsFull && C.size >= nCols){ table.remove(); changed(); syncT(); tselDraw(); return; }
+      if(colsFull && C.size >= nCols){ delTable(table); changed(); syncT(); tselDraw(); return; }
       if(colsFull){ delCols(table, C); afterDel(table, 0, c0); return; }
       clearCells(cells);
     }, true);
@@ -4976,14 +5085,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     // Baseado no Modelo_Pronto.docx do CRAS, com texto em Times New Roman 12, espaçamento 1,5: cabeçalho e rodapé em imagem, 5 campos e assinatura. Medidas em px (96 por polegada).
     const F = 'font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;';
     const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
-    const box = (w, h, ml)=>'<table style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left">&nbsp;</td></tr></tbody></table>';
+    const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
     // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
-    const big = (w, h, ml)=>'<table style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left">&nbsp;</td></tr></tbody></table>';
+    const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
     const html =
       '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">Relatório Informativo</p>' +
-      '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left">01 – Identificação:</p>' +
-      '<table style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><colgroup><col style="width:333px"><col style="width:71px"><col style="width:212px"></colgroup><tbody>' +
+      '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left;break-after:avoid">01 – Identificação:</p>' +
+      '<table data-sec="1" style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><colgroup><col style="width:333px"><col style="width:71px"><col style="width:212px"></colgroup><tbody>' +
         '<tr>' + c(616, 36, 'Nome:', 3) + '</tr>' +
         '<tr>' + c(404, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
         '<tr>' + c(333, 36, 'Endereço:') + c(283, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
@@ -5010,6 +5119,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const F = 'font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000;';
     const B = '1px solid #000';
     const L = t=>'<b><u>' + t + '</u></b>';
+    const SP = '&nbsp;';   // espaço fora do negrito/sublinhado: o que for digitado depois do rótulo sai em texto normal
     // grade de 2 colunas: 315 + 291 = 606 px (Encaminhamento/Idade/Bairro começam na 2ª coluna)
     const td = (span, w, inner, h, o)=>{
       o = o || {};
@@ -5017,22 +5127,22 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         (o.l ? 'border-left:' + B + ';' : '') + (o.r ? 'border-right:' + B + ';' : '') + (o.t ? 'border-top:' + B + ';' : '') + (o.b ? 'border-bottom:' + B + ';' : '') + '">' + inner + '</td>';
     };
     // linha com um campo que ocupa a largura toda
-    const full = (inner, h, o)=>'<tr>' + td(2, 606, inner, h, Object.assign({l:1, r:1}, o)) + '</tr>';
+    const full = (inner, h, o, flow)=>'<tr' + (flow ? ' data-flow="1"' : '') + '>' + td(2, 606, inner, h, Object.assign({l:1, r:1}, o)) + '</tr>';
     // linha com dois campos, um em cada coluna
     const two = (a, b, h, o)=>'<tr>' + td(1, 315, a, h, Object.assign({l:1}, o)) + td(1, 291, b, h, Object.assign({r:1}, o)) + '</tr>';
     const html =
       '<table style="border-collapse:collapse;table-layout:fixed;width:606px;margin:41px 0 0 4px"><tbody>' +
-        two('<b>Encaminhamento:</b>', '<b>CRAS/CRISTIANA VICENTE NUNES</b>', 40, {t:1}) +
-        full(L('Assunto:'), 56) +
-        full(L('Nome do adolescente/criança:'), 36) +
-        two(L('Data de nascimento:'), '<b>Idade:</b>', 32) +
-        full(L('CPF:'), 32) +
-        full(L('NIS:'), 32) +
-        full(L('Responsável Familiar') + '<b>:</b>', 32) +
-        full(L('CPF:'), 32) +
-        two(L('Endereço') + '<b>:</b>', '<b>Bairro:</b>', 32) +
-        full(L('Contato') + '<b>:</b>', 52) +
-        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270) +
+        two('<b>Encaminhamento:</b>' + SP, '<b>CRAS/CRISTIANA VICENTE NUNES</b>', 40, {t:1}) +
+        full(L('Assunto:') + SP, 56) +
+        full(L('Nome do adolescente/criança:') + SP, 36) +
+        two(L('Data de nascimento:') + SP, '<b>Idade:</b>' + SP, 32) +
+        full(L('CPF:') + SP, 32) +
+        full(L('NIS:') + SP, 32) +
+        full(L('Responsável Familiar') + '<b>:</b>' + SP, 32) +
+        full(L('CPF:') + SP, 32) +
+        two(L('Endereço') + '<b>:</b>' + SP, '<b>Bairro:</b>' + SP, 32) +
+        full(L('Contato') + '<b>:</b>' + SP, 52) +
+        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270, null, 1) +
         full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
         full('&nbsp;', 40) +
         full('<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">____________________________</p>' +
@@ -5068,6 +5178,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const c = JSON.parse(JSON.stringify(d));
     ['cm', 'out', 'refs'].forEach(k=>{ delete c[k]; });
     c.title = nome.trim(); c.modelo = true; c.abnt = page.classList.contains('abnt'); c.t = Date.now();
+    // a linha "Boa Vista – RR, <data>" dos modelos do CRAS volta a ser {{DATA}}: o documento novo sai com a data de hoje, não com a de quando o modelo foi salvo
+    if(c.html) c.html = c.html.replace(/(Boa Vista – RR,(?:\s|&nbsp;)*)\d{1,2}º? de [A-Za-zÀ-ÿ]+ de \d{4}/g, '$1{{DATA}}');
     store.docs[uid()] = c; persist(); return c.title;
   }
   function delDoc(id){
