@@ -74,6 +74,11 @@ body.painting #page{cursor:copy}
 #page sup.fn{color:inherit;cursor:pointer;user-select:none;line-height:0}
 #page .fnote .fnn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0}
 #page .fnote:target,#page .fnote.flash{background:#fff3b0}
+#page sup.en{color:inherit;cursor:pointer;user-select:none;line-height:0}
+#page .enote .enn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0}
+#page span.cit.missing{color:#c0392b;border-bottom:1px dashed #c0392b}
+@media print{#page span.cit.missing{color:inherit;border:0}}
+#page .enote:target,#page .enote.flash,#page sup.fn.flash,#page sup.en.flash{background:#fff3b0}
 #toolbar label.pc{display:inline-flex;align-items:center;gap:2px;font-size:12px;cursor:pointer}
 #page.marks p::after,#page.marks h1::after,#page.marks h2::after,#page.marks h3::after,#page.marks li::after,#page.marks blockquote::after{content:"¶";color:#4a7fd6;font-size:.8em;margin-left:2px;user-select:none}
 #page ol.nf-decimal li::marker{content:var(--pre,"") counter(list-item,decimal) var(--suf,".")}
@@ -596,6 +601,13 @@ body.tsel #page ::selection{background:transparent}
 #page .cf-date,#page .cf-sel{cursor:pointer;user-select:none}
 #page .cf[data-empty]{color:#7a8794}
 #page .cf-sel::after{content:" ▾";font-size:.8em;color:#567}
+#page .colb{border-top:2px dotted #b9c3cf;height:0;margin:0;break-after:column;page-break-after:auto}
+@media print{#page .colb{border:0}}
+#page .tbx{box-sizing:border-box;position:relative;break-inside:avoid;page-break-inside:avoid}
+#page .tbx:focus-within{outline:1px dashed #2b79c9;outline-offset:3px}
+#page .tbx>:first-child{margin-top:0}#page .tbx>:last-child{margin-bottom:0}
+#page .tbx p{text-indent:0}
+@media print{#page .tbx:focus-within{outline:0}}
 @media print{#page .cf-txt,#page .cf-date,#page .cf-sel{background:none;border-bottom:1px solid #000}#page .cf[data-empty]{color:transparent;display:inline-block;min-width:140px}#page .cf-sel::after{content:none}}
 #toolbar .rb.bigb{flex-direction:column;height:47px;width:44px;padding:0;gap:3px;justify-content:flex-start}
 #toolbar .rb.caronly{height:14px;width:44px;min-width:0;padding:0}
@@ -962,6 +974,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </div><div class="gl">Links</div></div>
     <div class="group" role="group" aria-label="Notas"><div class="gb">
       <button id="btnFn2" type="button" class="rb bigb" title="Inserir nota de rodapé no cursor (Ctrl+Alt+F). A numeração é automática e a nota fica no pé da página, como no Word"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="18" height="26" rx="1" fill="#fff" stroke="#777"/><path d="M8 8h12M8 12h12M8 16h8" stroke="#aaa" fill="none"/><path d="M8 23h7" stroke="#777"/><path d="M8 26h12" stroke="#2b79c9"/><text x="19" y="19" font-size="10" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">AB</text><text x="27" y="15" font-size="8" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#e45a4f">1</text></svg><span>Nota de<br>Rodapé</span></button>
+      <button id="btnEn2" type="button" class="rb bigb" title="Inserir nota de fim no cursor (Ctrl+Alt+D). Ficam reunidas no final do documento, numeradas em algarismos romanos"><span>Nota de<br>Fim</span></button>
     </div><div class="gl">Notas</div></div>
     <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb">
       <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
@@ -986,6 +999,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <button id="btnTask" title="Lista de tarefas">☑ Tarefas</button>
       <button data-cmd="insertHorizontalRule" title="Linha horizontal">―</button>
     </div><div class="gl">Texto</div></div>
+    <div class="group" role="group" aria-label="Caixa de Texto"><div class="gb">
+      <button id="btnTbx" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Caixa de texto: um quadro com borda para destacar um trecho, avisos ou barras laterais. Se houver texto selecionado, ele vai para dentro da caixa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4.5" y="6.5" width="23" height="19" rx="1.5"/><path d="M9 12h14M9 16h14M9 20h8" stroke-linecap="round"/></svg><span>Caixa <i class="car"></i></span></button>
+    </div><div class="gl">Caixa de Texto</div></div>
     <div class="group" role="group" aria-label="Campos"><div class="gb">
       <button id="btnCampos" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Campos de preenchimento: caixa de seleção, texto, data e lista suspensa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="9" height="9" fill="#fff" stroke="#777"/><path d="M6 9.5l2 2 3.5-4.5" stroke="#2b79c9" stroke-width="1.6" fill="none"/><rect x="16" y="6" width="12" height="7" fill="#eef3fb" stroke="#777"/><rect x="4" y="19" width="24" height="7" fill="#eef3fb" stroke="#777"/><path d="M22 21.5l2 2 2-2" stroke="#777" fill="none"/></svg><span>Campos <i class="car"></i></span></button>
     </div><div class="gl">Campos</div></div>
@@ -1013,12 +1029,16 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <select id="pgOri" title="Orientação da página"><option value="p">Retrato</option><option value="l">Paisagem</option></select>
       <select id="pgSize" title="Tamanho do papel"><option value="a4">A4 (21 × 29,7 cm)</option><option value="carta">Carta (21,6 × 27,9 cm)</option><option value="oficio">Ofício (21,6 × 35,6 cm)</option><option value="a5">A5 (14,8 × 21 cm)</option><option value="a3">A3 (29,7 × 42 cm)</option></select>
       <select id="pgCols" title="Colunas do texto"><option value="1">Uma coluna</option><option value="2">Duas colunas</option><option value="3">Três colunas</option></select>
+      <select id="pgBrk" title="Quebras: de página, de coluna (precisa de duas ou mais colunas) ou quebra de texto (nova linha no mesmo parágrafo)"><option value="" selected disabled hidden>Quebras</option><option value="page">Quebra de página</option><option value="col">Quebra de coluna</option><option value="line">Quebra de texto (linha)</option></select>
+      <select id="pgHyph" title="Hifenização: divide palavras longas no fim da linha. Vale na tela e na impressão; depende do idioma do navegador. Para um parágrafo só: Parágrafo > Não hifenizar"><option value="">Hifenização: nenhuma</option><option value="auto">Hifenização: automática</option></select>
       <button id="btnPgDlg" title="Configurar página: margens, papel, orientação e colunas" aria-label="Configurar página">⚙</button>
     </div><div class="gl">Configurar Página</div></div>
     <div class="group" role="group" aria-label="Números de Linha"><div class="gb">
       <select id="lnMode" title="Números de linha na margem esquerda (só na tela). Para tirar de um parágrafo: Parágrafo > Suprimir números de linha"><option value="">Números de linha: nenhum</option><option value="c">Contínuo</option><option value="p">Reiniciar a cada página</option></select>
     </div><div class="gl">Números de Linha</div></div>
     <div class="group" role="group" aria-label="Parágrafo"><div class="gb">
+      <label class="pc" title="Recuo à esquerda do parágrafo, em cm (como no Word)">Recuo esq.<input type="number" id="lyIndL" min="0" max="20" step="0.25" value="0" style="width:62px"> cm</label>
+      <label class="pc" title="Recuo à direita do parágrafo, em cm (como no Word)">dir.<input type="number" id="lyIndR" min="0" max="20" step="0.25" value="0" style="width:62px"> cm</label>
       <select id="spB" title="Espaço antes do parágrafo"><option value="" selected disabled hidden>Antes</option><option value="auto">Padrão</option><option value="0">0 pt</option><option value="3">3 pt</option><option value="6">6 pt</option><option value="8">8 pt</option><option value="10">10 pt</option><option value="12">12 pt</option><option value="18">18 pt</option><option value="24">24 pt</option><option value="36">36 pt</option></select>
       <select id="spA" title="Espaço depois do parágrafo"><option value="" selected disabled hidden>Depois</option><option value="auto">Padrão</option><option value="0">0 pt</option><option value="3">3 pt</option><option value="6">6 pt</option><option value="8">8 pt</option><option value="10">10 pt</option><option value="12">12 pt</option><option value="18">18 pt</option><option value="24">24 pt</option><option value="36">36 pt</option></select>
     </div><div class="gl">Parágrafo</div></div>
@@ -1071,11 +1091,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </select>
       <button id="btnNum" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button>
     </div><div class="gl">Títulos</div></div>
-    <div class="group" role="group" aria-label="Notas de Rodapé"><div class="gb">
-      <button id="btnFn" title="Inserir nota de rodapé (Ctrl+Alt+F)">Nota <sup>1</sup></button>
-    </div><div class="gl">Notas de Rodapé</div></div>
+    <div class="group" role="group" aria-label="Notas"><div class="gb">
+      <button id="btnFn" title="Inserir nota de rodapé (Ctrl+Alt+F): fica no pé da página">Nota de rodapé <sup>1</sup></button>
+      <button id="btnEn" title="Inserir nota de fim (Ctrl+Alt+D): fica reunida no final do documento, numerada em algarismos romanos">Nota de fim <sup>i</sup></button>
+      <button id="btnNoteNav" type="button" aria-haspopup="menu" aria-expanded="false" title="Ir para a nota de rodapé ou de fim seguinte ou anterior">Nota seguinte <i class="car"></i></button>
+      <button id="btnNoteShow" title="Alterna entre o texto e a sua nota: do número vai para a nota, e da nota volta para o número">Mostrar notas</button>
+    </div><div class="gl">Notas</div></div>
     <div class="group" role="group" aria-label="Citações e Bibliografia"><div class="gb">
-      <button id="btnRefs" title="Referências (NBR 6023) e citações (NBR 10520)">Referências</button>
+      <button id="btnRefs" title="Referências (NBR 6023) e citações (NBR 10520): cadastrar, editar e excluir fontes, inserir citações e a lista de referências">Referências</button>
+      <button id="btnRefUpd" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar referências</button>
     </div><div class="gl">Citações e Bibliografia</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
@@ -1534,7 +1558,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 <dialog id="gotoDlg">
   <h3>Ir para</h3>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <select id="gtWhat" aria-label="Ir para o tipo"><option value="page">Página</option><option value="head">Título</option><option value="fn">Nota de rodapé</option><option value="tbl">Tabela</option><option value="img">Imagem</option></select>
+    <select id="gtWhat" aria-label="Ir para o tipo"><option value="page">Página</option><option value="head">Título</option><option value="fn">Nota de rodapé</option><option value="en">Nota de fim</option><option value="tbl">Tabela</option><option value="img">Imagem</option><option value="tbx">Caixa de texto</option></select>
     <input type="number" id="gtNum" min="1" value="1" style="width:90px" aria-label="Número">
   </div>
   <p id="gtMsg" style="color:var(--muted);font-size:13px;min-height:18px;margin:8px 0 0"></p>
@@ -1567,7 +1591,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <h3>Referências (ABNT NBR 6023)</h3>
   <select id="rType"><option value="livro">Livro</option><option value="artigo">Artigo de periódico</option><option value="site">Site ou página web</option><option value="tcc">TCC, dissertação ou tese</option></select>
   <div id="rFields"></div>
-  <div class="dlgrow"><button id="rAdd">Adicionar à lista</button></div>
+  <div class="dlgrow"><button id="rAdd">Adicionar à lista</button><button id="rCancelEdit" type="button" hidden>Cancelar edição</button></div>
   <ul id="rList"></ul>
   <div class="dlgrow"><button id="rInsert">Inserir REFERÊNCIAS no texto</button><button id="rClose">Fechar</button></div>
 </dialog>
@@ -1832,7 +1856,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const sr = sh.getBoundingClientRect(), sc = sh.offsetWidth ? sr.width / sh.offsetWidth : 1;
       const e = effMar(), pg = pgOf(), use = Math.max(CMPX, pg.h * CMPX - e.t - e.b);
       let n = 0, pgi = -1, out = '';
-      const leaf = [...page.querySelectorAll(BLK)].filter(b=>!b.querySelector(BLK) && !b.closest('table,.hf,[data-hid],#fnotes,.fnotes') && b.dataset.sln !== '1');
+      const leaf = [...page.querySelectorAll(BLK)].filter(b=>!b.querySelector(BLK) && !b.closest('table,.hf,[data-hid],#fnotes,.fnotes,.endnotes') && b.dataset.sln !== '1');
       for(const b of leaf){
         const r = document.createRange(); r.selectNodeContents(b);
         let rs = [...r.getClientRects()].filter(x=>x.width > 0 && x.height > 0).sort((a, c)=>a.top - c.top);
@@ -1871,6 +1895,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       if(m && m[k] != null && !mob) page.style.setProperty('--m' + k, m[k] + 'px');
       else page.style.removeProperty('--m' + k);
     });
+    if(d && d.hyph){ page.style.hyphens = 'auto'; page.lang = 'pt-BR'; } else { page.style.hyphens = ''; page.removeAttribute('lang'); }
     if(d && d.tabdef) page.style.setProperty('--tabdef', d.tabdef + 'cm'); else page.style.removeProperty('--tabdef');   // tabulação padrão do documento
     if(window.__tabsSoon) window.__tabsSoon();
     const e = effMar(), st = document.getElementById('pgStyle'), sh = document.getElementById('sheet'), pg = pgOf();
@@ -2287,6 +2312,22 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       f.removeAttribute('contenteditable'); f.removeAttribute('role');
       if(f.hasAttribute('data-empty')) f.textContent = '____________________';
     });
+    c.querySelectorAll('.tbx').forEach(b=>{   // caixa de texto: o Word entende melhor uma tabela de uma célula (a flutuante fica alinhada com o texto em volta)
+      const st = b.style, fl = st.cssFloat || st.float, w = st.width || '100%';
+      const t = document.createElement('table'), td = document.createElement('td');
+      t.setAttribute('width', w); t.setAttribute('cellspacing', '0'); t.setAttribute('cellpadding', '0');
+      if(fl === 'right' || fl === 'left') t.setAttribute('align', fl);
+      t.setAttribute('style', 'border-collapse:collapse;width:' + w + ';margin:' + (st.margin || '6pt 0') + (fl ? ';mso-table-lspace:9pt;mso-table-rspace:9pt;mso-table-wrap:around' : ''));
+      let tds = 'border:' + (st.border || 'none') + ';padding:' + (st.padding || '8px 10px') + ';vertical-align:top';
+      if(st.borderLeft) tds += ';border-left:' + st.borderLeft;
+      if(st.backgroundColor) tds += ';background:' + st.backgroundColor;
+      td.setAttribute('style', tds);
+      while(b.firstChild) td.appendChild(b.firstChild);
+      const tr = document.createElement('tr'); tr.appendChild(td); const tb = document.createElement('tbody'); tb.appendChild(tr); t.appendChild(tb);
+      b.parentNode.replaceChild(t, b);
+    });
+    c.querySelectorAll('.colb').forEach(q=>{ const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'mso-break-type:column-break'); q.replaceWith(br); });
+    c.querySelectorAll('span.cit').forEach(f=>{ f.removeAttribute('contenteditable'); f.removeAttribute('data-ref'); f.removeAttribute('data-narr'); f.removeAttribute('data-pg'); f.removeAttribute('class'); });
     flattenLists(c); diagToMso(c);
     c.querySelectorAll('.tb').forEach(t=>{ t.setAttribute('style', 'mso-tab-count:1'); t.textContent = '    '; });   // tabulação: o Word lê mso-tab-count como uma parada de tabulação
     cl.forEach((im, i)=>{
@@ -2349,6 +2390,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   function changed(){
     try{ fnRenumber(); }catch(e){}
+    try{ enRenumber(); }catch(e){}
     updateCount();
     clearTimeout(saveTimer);
     saveTimer = setTimeout(()=>{ save(); renderSide(); }, 500);
@@ -2513,6 +2555,101 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const rows = lines.map(l=>l.split(sep).map(x=>x.trim())), n = Math.max(...rows.map(r=>r.length));
       rows.forEach(r=>{ while(r.length < n) r.push(''); });
       d2.close(); insertTableHtml(grid(rows), document.getElementById('t2tStyle').value, ['h', 'r']);
+    });
+  })();
+
+  // ---------- Caixa de texto (guia Inserir): quadro com borda, sombreado, barra lateral e flutuante ----------
+  (function(){
+    const btn = document.getElementById('btnTbx'); if(!btn) return;
+    const BASE = 'padding:8px 10px;margin:.6em 0;';
+    const TIPOS = {
+      simples: {n:'Caixa simples', st:BASE + 'border:1px solid #000000'},
+      sombreada: {n:'Caixa sombreada', st:BASE + 'border:1px solid #8aa0b8;background-color:#eef3fb'},
+      destaque: {n:'Destaque (barra à esquerda)', st:BASE + 'border:0;border-left:4px solid #2b79c9;background-color:#f3f6fa'},
+      aviso: {n:'Aviso', st:BASE + 'border:1px solid #c9a227;background-color:#fff8dc'},
+      dir: {n:'Barra lateral à direita', st:'padding:8px 10px;margin:.2em 0 .4em .9em;float:right;width:38%;border:1px solid #8aa0b8;background-color:#eef3fb;font-size:.9em'},
+      esq: {n:'Barra lateral à esquerda', st:'padding:8px 10px;margin:.2em .9em .4em 0;float:left;width:38%;border:1px solid #8aa0b8;background-color:#eef3fb;font-size:.9em'},
+      centro: {n:'Caixa centralizada (60%)', st:'padding:8px 10px;margin:.6em auto;width:60%;border:1px solid #000000'}
+    };
+    let pop = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    function showPop(items, x, y){
+      close(); pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      items.forEach(it=>{
+        if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it[0];
+        if(it[2]){ b.disabled = true; b.style.opacity = '.5'; }
+        else b.addEventListener('click', ()=>{ close(); it[1](); });
+        pop.appendChild(b);
+      });
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      pop.style.left = Math.max(4, Math.min(x, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.max(4, Math.min(y, innerHeight - pop.offsetHeight - 4)) + 'px';
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    }
+    function boxAtCursor(){
+      const s = getSelection(); let n = s.rangeCount ? s.anchorNode : null;
+      if(!n || !page.contains(n)){ n = savedRange && savedRange.startContainer; }
+      const el = n && (n.nodeType === 1 ? n : n.parentElement), b = el && el.closest && el.closest('.tbx');
+      return b && page.contains(b) ? b : null;
+    }
+    function selHtml(){
+      const s = getSelection();
+      let r = s.rangeCount && page.contains(s.anchorNode) && !s.isCollapsed ? s.getRangeAt(0) : (savedRange && !savedRange.collapsed ? savedRange : null);
+      if(!r) return '';
+      const d = document.createElement('div'); d.appendChild(r.cloneContents());
+      if(!d.textContent.trim() && !d.querySelector('img,table')) return '';
+      if(!d.querySelector('p,h1,h2,h3,li,table,blockquote,div')) d.innerHTML = '<p>' + d.innerHTML + '</p>';
+      return d.innerHTML;
+    }
+    function inserir(k){
+      const t = TIPOS[k]; if(!t) return;
+      restore();
+      if(boxAtCursor()){ alert('O cursor já está dentro de uma caixa. Clique fora dela para inserir outra.'); return; }
+      const sel = selHtml();
+      const h = '<p><br></p><div class="tbx" data-new="1" data-tbx="' + k + '" style="' + t.st + '">' + (sel || '<p>Digite o texto da caixa aqui.</p>') + '</div><p><br></p>';
+      exec('insertHTML', h);
+      const b = page.querySelector('.tbx[data-new]');
+      if(b){
+        b.removeAttribute('data-new');
+        if(!sel){ const r = document.createRange(), p = b.querySelector('p') || b; r.selectNodeContents(p); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+        changed();
+      }
+    }
+    function alterar(fn){ const b = boxAtCursor(); if(!b) return; fn(b); changed(); }
+    function remover(){
+      alterar(b=>{
+        const pr = b.parentNode, fl = document.createDocumentFragment();
+        while(b.firstChild) fl.appendChild(b.firstChild);
+        pr.insertBefore(fl, b); b.remove();
+      });
+    }
+    function contorno(){
+      alterar(b=>{
+        const sem = /^(0|none)/.test(b.style.borderTopWidth ? b.style.borderTopWidth : '') || b.style.borderTopStyle === 'none';
+        if(sem) b.style.border = '1px solid #000000'; else { b.style.border = '0'; b.style.borderLeft = ''; }
+      });
+    }
+    function fundo(){
+      alterar(b=>{ b.style.backgroundColor = b.style.backgroundColor ? '' : '#eef3fb'; });
+    }
+    function largura(){
+      const b = boxAtCursor(); if(!b) return;
+      const v = prompt('Largura da caixa em % da página (10 a 100):', parseInt(b.style.width) || 100);
+      const n = v === null ? NaN : parseInt(v);
+      if(!(n >= 10 && n <= 100)) return;
+      b.style.width = n + '%'; changed();
+    }
+    btn.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('click', ()=>{
+      if(pop){ close(); return; }
+      const r = btn.getBoundingClientRect(), dentro = !!boxAtCursor();
+      const items = Object.keys(TIPOS).map(k=>[TIPOS[k].n, ()=>inserir(k)]);
+      items.push('-', ['Largura da caixa…', largura, !dentro], ['Ligar/desligar contorno', contorno, !dentro], ['Ligar/desligar fundo', fundo, !dentro], ['Remover caixa (mantém o texto)', remover, !dentro]);
+      showPop(items, r.left, r.bottom + 2);
+      btn.setAttribute('aria-expanded', 'true');
     });
   })();
 
@@ -2765,6 +2902,34 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(!hit) page.style.lineHeight = v;
     changed();
   });
+
+
+  // O seletor de espaçamento mostra o valor do parágrafo onde está o cursor e só oferece "Adicionar" ou "Remover" espaço conforme o caso (como no Word)
+  (function(){
+    const sel = $('lh'); if(!sel) return;
+    const OPT = v=>sel.querySelector('option[value="' + v + '"]');
+    let tm = null;
+    function sync(){
+      if(document.activeElement === sel) return;
+      const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return;
+      let el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
+      const b = el && el.closest ? el.closest('p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th') : null;
+      if(!b || !page.contains(b) || b.closest('.fnotes,.endnotes')) return;
+      const cs = getComputedStyle(b), fs = parseFloat(cs.fontSize) || 16;
+      let v = '';
+      if(!b.dataset.lh){
+        const lh = cs.lineHeight === 'normal' ? 1.15 : parseFloat(cs.lineHeight) / fs;
+        const m = ['1', '1.15', '1.5', '2', '2.5', '3'].find(x=>Math.abs(+x - lh) < 0.03);
+        if(m) v = m;
+      }
+      if(sel.value !== v) sel.value = v;
+      const hasB = parseFloat(cs.marginTop) > 0.5, hasA = parseFloat(cs.marginBottom) > 0.5;
+      const show = (val, on)=>{ const o = OPT(val); if(o){ o.hidden = !on; o.disabled = !on; } };
+      show('__bef', !hasB); show('__rmb', hasB); show('__aft', !hasA); show('__rma', hasA);
+    }
+    document.addEventListener('selectionchange', ()=>{ clearTimeout(tm); tm = setTimeout(sync, 60); });
+    sel.addEventListener('mousedown', sync, true);   // atualiza também logo antes de abrir a lista
+  })();
 
 
   // Espaçamento antes/depois do parágrafo
@@ -3726,6 +3891,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       cur.forEach(x=>x.remove()); order.forEach(x=>box.appendChild(x));
     }
   }
+  // O Chrome joga o número para fora do parágrafo quando o cursor está no fim dele (o número ficava sozinho numa linha): traz de volta para o fim do parágrafo
+  function tuckMark(mk){
+    if(!mk || mk.parentNode !== page) return;
+    const pv = mk.previousSibling;
+    if(!pv || pv.nodeType !== 1 || !/^(P|H[1-6]|BLOCKQUOTE)$/.test(pv.tagName)) return;
+    const z = mk.nextSibling && mk.nextSibling.nodeType === 3 && mk.nextSibling.data === '\u200b' ? mk.nextSibling : null;
+    if(pv.childNodes.length === 1 && pv.firstChild.nodeName === 'BR') pv.removeChild(pv.firstChild);
+    pv.appendChild(mk); if(z) pv.appendChild(z);
+  }
   function fnInsert(){
     restore();
     const t = prompt('Texto da nota de rodapé:'); if(!t || !t.trim()) return;
@@ -3736,7 +3910,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     restore();
     exec('insertHTML', '<sup class="fn" data-id="' + id + '" contenteditable="false">0</sup>&#8203;');
     // o cursor fica depois do número da nota, para continuar digitando
-    const mk = page.querySelector('sup.fn[data-id="' + id + '"]');
+    const mk = page.querySelector('sup.fn[data-id="' + id + '"]'); tuckMark(mk);
     if(mk){
       const r = document.createRange(), nx = mk.nextSibling;
       if(nx && nx.nodeType === 3) r.setStart(nx, nx.length); else r.setStartAfter(mk);
@@ -3757,6 +3931,148 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   });
 
 
+  // ---------- Notas de fim (numeração romana, reunidas no final do documento) e navegação entre notas ----------
+  const EN_NOTE = FN_NOTE;
+  function roman(n){
+    let r = '';
+    [[1000,'m'],[900,'cm'],[500,'d'],[400,'cd'],[100,'c'],[90,'xc'],[50,'l'],[40,'xl'],[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']].forEach(a=>{ while(n >= a[0]){ r += a[1]; n -= a[0]; } });
+    return r;
+  }
+  function enBox(create){
+    let box = page.querySelector(':scope > .endnotes');
+    if(!box && create){
+      box = document.createElement('div'); box.className = 'endnotes';
+      box.innerHTML = '<div class="fnsep" contenteditable="false" style="' + FN_SEP + '"></div>';
+      page.insertBefore(box, fnBox(false) || null);     // as notas de rodapé continuam sendo o último bloco
+    }
+    return box;
+  }
+  function enNoteHtml(id, n, text){
+    return '<p class="enote" data-id="' + id + '" style="' + EN_NOTE + '"><span class="enn" contenteditable="false">' + n + '</span> <span class="ent">' + (text || '<br>') + '</span></p>';
+  }
+  function enRenumber(){
+    const marks = [...page.querySelectorAll('sup.en')].filter(m=>!m.closest('.fnotes,.endnotes'));
+    let box = enBox(false);
+    if(!marks.length){ if(box) box.remove(); return; }
+    box = enBox(true);
+    const fb = fnBox(false);
+    if(fb ? box.nextElementSibling !== fb : page.lastElementChild !== box) page.insertBefore(box, fb || null);
+    const notes = new Map(); box.querySelectorAll('p.enote').forEach(n=>{ if(!notes.has(n.dataset.id)) notes.set(n.dataset.id, n); });
+    const used = new Set(), order = [];
+    marks.forEach((m, i)=>{
+      let id = m.dataset.id; const num = roman(i + 1);
+      if(!id || used.has(id)){            // marcador duplicado (copiar/colar): cria nova nota com o mesmo texto
+        const old = notes.get(id); id = 'e' + Date.now().toString(36) + i; m.dataset.id = id;
+        if(old){ const c = old.cloneNode(true); c.dataset.id = id; notes.set(id, c); }
+      }
+      used.add(id);
+      if(m.textContent !== num) m.textContent = num;
+      let n = notes.get(id);
+      if(!n){ const t = document.createElement('div'); t.innerHTML = enNoteHtml(id, num, ''); n = t.firstChild; notes.set(id, n); }
+      const nn = n.querySelector('.enn'); if(nn && nn.textContent !== num) nn.textContent = num;
+      if(n.getAttribute('style') !== EN_NOTE) n.setAttribute('style', EN_NOTE);
+      order.push(n);
+    });
+    const cur = [...box.querySelectorAll('p.enote')];
+    if(cur.length !== order.length || cur.some((x, i)=>x !== order[i])){
+      cur.forEach(x=>x.remove()); order.forEach(x=>box.appendChild(x));
+    }
+  }
+  function caretAfter(el){
+    const r = document.createRange(), nx = el.nextSibling;
+    if(nx && nx.nodeType === 3) r.setStart(nx, nx.length); else r.setStartAfter(el);
+    r.collapse(true); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r);
+  }
+  function enInsert(){
+    restore();
+    if(boxOfNote(curEl())){ alert('Clique no texto do documento (fora das notas) para inserir uma nota de fim.'); return; }
+    const t = prompt('Texto da nota de fim:'); if(!t || !t.trim()) return;
+    const id = 'e' + Date.now().toString(36);
+    const box = enBox(true);
+    const tmp = document.createElement('div'); tmp.innerHTML = enNoteHtml(id, '', '');
+    tmp.querySelector('.ent').textContent = t.trim(); box.appendChild(tmp.firstChild);
+    restore();
+    exec('insertHTML', '<sup class="en" data-id="' + id + '" contenteditable="false">i</sup>&#8203;');
+    const mk = page.querySelector('sup.en[data-id="' + id + '"]'); tuckMark(mk);
+    if(mk) caretAfter(mk);
+  }
+  function curEl(){
+    const s = getSelection(); let n = s.rangeCount && page.contains(s.anchorNode) ? s.anchorNode : (savedRange && savedRange.startContainer);
+    return n ? (n.nodeType === 1 ? n : n.parentElement) : null;
+  }
+  function boxOfNote(el){ return el && el.closest ? el.closest('p.fnote,p.enote,.fnotes,.endnotes') : null; }
+  function curRange(){
+    const s = getSelection();
+    return s.rangeCount && page.contains(s.anchorNode) ? s.getRangeAt(0) : savedRange;
+  }
+  const noteMarks = k=>[...page.querySelectorAll('sup.' + k)].filter(m=>!m.closest('.fnotes,.endnotes'));
+  function atMark(m, r){
+    const nx = m.nextSibling;
+    if(!r.collapsed) return false;
+    if(r.startContainer === m.parentNode && r.startOffset === [...m.parentNode.childNodes].indexOf(m) + 1) return true;
+    return !!nx && nx.nodeType === 3 && r.startContainer === nx && nx.data === '\u200b' && r.startOffset === 1;
+  }
+  function goNote(k, dir){
+    const ms = noteMarks(k);
+    if(!ms.length){ alert(k === 'fn' ? 'Não há notas de rodapé no documento.' : 'Não há notas de fim no documento.'); return; }
+    const r = curRange(); let tg;
+    if(!r) tg = dir > 0 ? ms[0] : ms[ms.length - 1];
+    else if(dir > 0) tg = ms.find(m=>r.comparePoint(m, 0) > 0) || ms[0];
+    else tg = ms.slice().reverse().find(m=>r.comparePoint(m, 0) < 0 && !atMark(m, r)) || ms[ms.length - 1];   // o número em que o cursor acabou de parar não conta como anterior
+    page.focus(); caretAfter(tg); fnJump(tg);
+  }
+  function showNotes(){
+    const el = curEl(), note = el && el.closest && el.closest('p.fnote,p.enote');
+    if(note){                                  // dentro de uma nota: volta para o número no texto
+      const k = note.classList.contains('fnote') ? 'fn' : 'en', mk = noteMarks(k).find(x=>x.dataset.id === note.dataset.id);
+      if(mk){ page.focus(); caretAfter(mk); fnJump(mk); }
+      return;
+    }
+    const all = noteMarks('fn').concat(noteMarks('en')).sort((a, b)=>a.compareDocumentPosition(b) & 4 ? -1 : 1);
+    if(!all.length){ alert('Este documento não tem notas de rodapé nem de fim.'); return; }
+    const r = curRange();
+    const mk = (r && all.slice().reverse().find(m=>r.comparePoint(m, 0) < 0)) || all[0];   // a nota do número que vem antes do cursor
+    const nt = page.querySelector('p.' + (mk.classList.contains('fn') ? 'fnote' : 'enote') + '[data-id="' + mk.dataset.id + '"]');
+    if(!nt) return;
+    const tx = nt.querySelector('.fnt,.ent');
+    if(tx){ const rg = document.createRange(); rg.selectNodeContents(tx); rg.collapse(false); page.focus(); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); }
+    fnJump(nt);
+  }
+  ['btnEn', 'btnEn2', 'btnNoteShow', 'btnNoteNav'].forEach(id=>{ const b = $(id); if(b) b.addEventListener('mousedown', e=>e.preventDefault()); });
+  $('btnEn').addEventListener('click', enInsert);
+  $('btnEn2').addEventListener('click', enInsert);
+  $('btnNoteShow').addEventListener('click', showNotes);
+  page.addEventListener('keydown', e=>{ if(e.ctrlKey && e.altKey && (e.key === 'd' || e.key === 'D')){ e.preventDefault(); enInsert(); } });
+  page.addEventListener('click', e=>{
+    const m = e.target.closest && e.target.closest('sup.en');
+    if(m && !m.closest('.endnotes')){ const n = page.querySelector('p.enote[data-id="' + m.dataset.id + '"]'); if(n) fnJump(n); return; }
+    const num = e.target.closest && e.target.closest('.enn');
+    if(num){ const n = num.closest('p.enote'); const mk = n && noteMarks('en').find(x=>x.dataset.id === n.dataset.id); if(mk) fnJump(mk); }
+  });
+  (function(){
+    const btn = $('btnNoteNav'); let pop = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    btn.addEventListener('click', ()=>{
+      if(pop){ close(); return; }
+      const items = [['Nota de rodapé seguinte', ()=>goNote('fn', 1)], ['Nota de rodapé anterior', ()=>goNote('fn', -1)], '-', ['Nota de fim seguinte', ()=>goNote('en', 1)], ['Nota de fim anterior', ()=>goNote('en', -1)]];
+      pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      items.forEach(it=>{
+        if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it[0];
+        b.addEventListener('click', ()=>{ close(); it[1](); }); pop.appendChild(b);
+      });
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      const r = btn.getBoundingClientRect();
+      pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4) + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    });
+  })();
+
+
   // ---------- Contagem detalhada ----------
   let savedSelStats = null;
   function statsOf(text, paras){
@@ -3773,7 +4089,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const box = page.querySelector(':scope > .fnotes');
     const blocks = [...page.querySelectorAll('p,h1,h2,h3,h4,li,blockquote,td,th')].filter(b=>!b.querySelector('p,h1,h2,h3,h4,li,blockquote,td,th') && b.textContent.replace(/[\u200b\s]/g,''));
     if(box && !inclNotes){ const nt = box.innerText || ''; if(text.endsWith(nt)) text = text.slice(0, text.length - nt.length); }
-    paras = blocks.filter(b=>inclNotes || !b.closest('.fnotes')).length;
+    paras = blocks.filter(b=>inclNotes || !b.closest('.fnotes,.endnotes')).length;
     return statsOf(text, paras);
   }
   function selStats(){
@@ -4295,6 +4611,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     else if(what === 'head') el = page.querySelectorAll('h1,h2,h3')[n - 1];
     else if(what === 'fn') el = [...page.querySelectorAll('sup.fn')].filter(x=>!x.closest('.fnotes'))[n - 1];
+    else if(what === 'en') el = [...page.querySelectorAll('sup.en')].filter(x=>!x.closest('.endnotes'))[n - 1];
+    else if(what === 'tbx') el = page.querySelectorAll('.tbx')[n - 1];
     else if(what === 'tbl') el = page.querySelectorAll('table')[n - 1];
     else if(what === 'img') el = page.querySelectorAll('img')[n - 1];
     if(!el){ $('gtMsg').textContent = 'Não encontrado: ' + $('gtWhat').selectedOptions[0].textContent.toLowerCase() + ' ' + n + '.'; return; }
@@ -5550,40 +5868,92 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function renderFields(){
     $('rFields').innerHTML = RT[$('rType').value].map(([k,l])=>'<input type="text" data-k="' + k + '" placeholder="' + l + '" aria-label="' + l + '">').join('');
   }
+  // Bibliografia automática: a lista de REFERÊNCIAS e as citações no texto acompanham as fontes cadastradas
+  let refEdit = null;
+  const ensureIds = ()=>{ refs().forEach((r, i)=>{ if(!r.id) r.id = 'r' + Date.now().toString(36) + i; }); };
+  function bibFind(){
+    let b = page.querySelector('.biblio'); if(b) return b;
+    const old = [...page.querySelectorAll('h1.sn')].find(h=>/^refer[eê]ncias$/i.test(h.textContent.trim()));
+    if(!old) return null;
+    b = document.createElement('div'); b.className = 'biblio'; old.before(b); b.appendChild(old);   // converte o bloco manual (título + parágrafos .ref) em bloco automático
+    let n = b.nextElementSibling; while(n && n.classList.contains('ref')){ const x = n.nextElementSibling; b.appendChild(n); n = x; }
+    return b;
+  }
+  function bibInner(title){
+    const it = refs().map(r=>{ const h = fmtRef(r); return {h, k:h.replace(/<[^>]+>/g, '')}; }).sort((a, b)=>a.k.localeCompare(b.k, 'pt'));
+    return '<h1 class="sn">' + esc(title || 'REFERÊNCIAS') + '</h1>' + it.map(i=>'<p class="ref">' + i.h + '</p>').join('');
+  }
+  function citUpdate(){
+    const m = new Map(refs().map(r=>[r.id, r]));
+    page.querySelectorAll('span.cit').forEach(sp=>{
+      const r = m.get(sp.dataset.ref);
+      if(!r){ sp.classList.add('missing'); sp.title = 'Fonte não encontrada: ela foi excluída da lista'; return; }
+      sp.classList.remove('missing'); sp.removeAttribute('title');
+      const t = cite(r, sp.dataset.narr === '1', sp.dataset.pg || '');
+      if(sp.textContent !== t) sp.textContent = t;
+    });
+  }
+  function bibUpdate(){
+    ensureIds(); citUpdate();
+    const b = bibFind();
+    if(b){
+      if(!refs().length) b.remove();
+      else{ const h = b.querySelector('h1'); b.innerHTML = bibInner(h ? h.textContent.trim() : ''); }
+    }
+    changed();
+  }
   function renderRefs(){
+    ensureIds();
     const ul = $('rList'); ul.innerHTML = '';
     refs().forEach((r,i)=>{
       const li = document.createElement('li'), sp = document.createElement('span');
       sp.innerHTML = fmtRef(r); li.appendChild(sp);
       [['(AUTOR, ano)', false], ['Autor (ano)', true]].forEach(([lbl, narr])=>{
         const b = document.createElement('button'); b.textContent = lbl; b.title = 'Inserir citação no texto';
-        b.onclick = ()=>{ const pg = prompt('Página (opcional, ex.: 15):', '') || ''; $('refDlg').close(); restore(); exec('insertText', cite(r, narr, pg.trim())); };
+        b.onclick = ()=>{
+          const pg = (prompt('Página (opcional, ex.: 15):', '') || '').trim(); $('refDlg').close(); restore(); persist();
+          exec('insertHTML', '<span class="cit" data-new="1" data-ref="' + r.id + '" data-narr="' + (narr ? 1 : 0) + '"' + (pg ? ' data-pg="' + esc(pg).replace(/"/g, '&quot;') + '"' : '') + ' contenteditable="false">' + esc(cite(r, narr, pg)) + '</span>&#8203;');
+          const mk = page.querySelector('span.cit[data-new]');
+          if(mk){ mk.removeAttribute('data-new'); tuckMark(mk); caretAfter(mk); changed(); }
+        };
         li.appendChild(b);
       });
+      const ed = document.createElement('button'); ed.textContent = '✎'; ed.title = 'Editar referência';
+      ed.onclick = ()=>{
+        refEdit = i; $('rType').value = r.type; renderFields();
+        $('rFields').querySelectorAll('input').forEach(inp=>{ inp.value = r.f[inp.dataset.k] || ''; });
+        $('rAdd').textContent = 'Salvar alterações'; $('rCancelEdit').hidden = false;
+      };
+      li.appendChild(ed);
       const x = document.createElement('button'); x.textContent = '✕'; x.title = 'Excluir referência';
-      x.onclick = ()=>{ refs().splice(i, 1); persist(); renderRefs(); };
+      x.onclick = ()=>{ if(refEdit !== null) endEdit(); refs().splice(i, 1); persist(); renderRefs(); bibUpdate(); };
       li.appendChild(x); ul.appendChild(li);
     });
   }
-  $('btnRefs').addEventListener('click', ()=>{ renderFields(); renderRefs(); $('refDlg').showModal(); });
+  function endEdit(){ refEdit = null; $('rAdd').textContent = 'Adicionar à lista'; $('rCancelEdit').hidden = true; }
+  $('rCancelEdit').addEventListener('click', ()=>{ endEdit(); renderFields(); });
+  $('btnRefUpd').addEventListener('mousedown', e=>e.preventDefault());
+  $('btnRefUpd').addEventListener('click', ()=>{
+    if(!refs().length && !page.querySelector('.biblio,span.cit')){ alert('Nenhuma fonte cadastrada. Use o botão Referências para cadastrar.'); return; }
+    bibUpdate();
+  });
+  $('btnRefs').addEventListener('click', ()=>{ endEdit(); renderFields(); renderRefs(); $('refDlg').showModal(); });
   $('rType').addEventListener('change', renderFields);
-  $('rClose').addEventListener('click', ()=>$('refDlg').close());
+  $('rClose').addEventListener('click', ()=>{ endEdit(); $('refDlg').close(); });
   $('rAdd').addEventListener('click', ()=>{
     const f = {}; $('rFields').querySelectorAll('input').forEach(i=>f[i.dataset.k] = i.value.trim());
     if(!f.aut || !f.tit){ alert('Preencha pelo menos o autor e o título.'); return; }
-    refs().push({type:$('rType').value, f}); persist(); renderFields(); renderRefs();
+    if(refEdit !== null){ const old = refs()[refEdit]; refs()[refEdit] = {id:old && old.id, type:$('rType').value, f}; endEdit(); }
+    else refs().push({type:$('rType').value, f});
+    ensureIds(); persist(); renderFields(); renderRefs(); bibUpdate();
   });
   $('rInsert').addEventListener('click', ()=>{
-    const items = refs().map(r=>{ const h = fmtRef(r); return {h, k:h.replace(/<[^>]+>/g, '')}; }).sort((a,b)=>a.k.localeCompare(b.k, 'pt'));
-    if(!items.length) return;
-    const html = '<h1 class="sn">REFERÊNCIAS</h1>' + items.map(i=>'<p class="ref">' + i.h + '</p>').join('');
+    if(!refs().length) return;
+    ensureIds(); persist(); endEdit();
     $('refDlg').close();
-    const old = [...page.querySelectorAll('h1.sn')].find(h=>/^refer[eê]ncias$/i.test(h.textContent.trim()));
-    if(old){
-      let n = old.nextElementSibling;
-      while(n && n.classList.contains('ref')){ const x = n.nextElementSibling; n.remove(); n = x; }
-      old.outerHTML = html; changed();
-    }else{ restore(); exec('insertHTML', html); }
+    if(bibFind()){ bibUpdate(); return; }
+    restore(); exec('insertHTML', bibInner());
+    bibFind(); changed();                // vira um bloco que se atualiza sozinho quando as fontes mudam
   });
 
   // ---------- Réguas (horizontal e vertical, estilo clássico) ----------
@@ -7540,7 +7910,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const s = $('pgSize'); if(!s) return;
     const pg = pgOf(), d = store.docs[store.current], e = effMar(), c = v=>v / CMPX;
     s.value = pg.size; $('pgOri').value = pg.land ? 'l' : 'p'; $('pgCols').value = String(pg.cols);
-    { const dd = store.docs[store.current]; $('lnMode').value = dd && dd.ln ? dd.ln : ''; }
+    { const dd = store.docs[store.current]; $('lnMode').value = dd && dd.ln ? dd.ln : ''; $('pgHyph').value = dd && dd.hyph ? 'auto' : ''; }
     let k = 'custom';
     if(!d || !d.mar) k = 'padrao';
     else for(const n in PG_MAR){ const v = PG_MAR[n]; if(Math.abs(c(e.t) - v[0]) < .03 && Math.abs(c(e.r) - v[1]) < .03 && Math.abs(c(e.b) - v[2]) < .03 && Math.abs(c(e.l) - v[3]) < .03){ k = n; break; } }
@@ -7573,6 +7943,61 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     pgSet({size:$('pgDlgSize').value, land, cols:parseInt($('pgDlgCols').value, 10)});
     $('pgDlg').close();
   }
+
+  // ---------- Layout: quebras, hifenização, recuos e espaçamento sincronizados com o cursor ----------
+  $('pgHyph').addEventListener('change', e=>{
+    const d = store.docs[store.current]; if(!d) return;
+    if(e.target.value) d.hyph = 1; else delete d.hyph;
+    persist(); applyMar(); changed();
+  });
+  $('pgBrk').addEventListener('change', e=>{
+    const v = e.target.value; e.target.selectedIndex = 0; restore();
+    if(v === 'page') $('btnPb').click();
+    else if(v === 'col'){
+      if(pgOf().cols < 2 && !confirm('O documento está com uma coluna só; a quebra de coluna só tem efeito com duas ou mais colunas (Layout > Colunas). Inserir mesmo assim?')) return;
+      exec('insertHTML', '<p><br></p><div class="colb" contenteditable="false"></div><p><br></p>');
+    }
+    else if(v === 'line') exec('insertLineBreak');
+  });
+  (function(){
+    const iL = $('lyIndL'), iR = $('lyIndR'), sB = $('spB'), sA = $('spA'); let tm = null;
+    const NOBLK = 'td,th,.fnotes,.endnotes,.hf';
+    function curBlock(){
+      const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return null;
+      const el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
+      const b = el && el.closest ? el.closest('p,h1,h2,h3,h4,h5,h6,blockquote,div:not(.pb):not(.biblio):not(.tbx):not(.sum)') : null;
+      return b && page.contains(b) && b !== page && !b.closest(NOBLK) ? b : null;
+    }
+    function sync(){
+      const act = document.activeElement; if(act === iL || act === iR || act === sB || act === sA) return;
+      const b = curBlock(); if(!b) return;
+      const cs = getComputedStyle(b), rtl = b.dir === 'rtl', cm = v=>String(Math.round(parseFloat(v) / CMPX * 100) / 100);
+      const l = cm(rtl ? cs.marginRight : cs.marginLeft), r = cm(rtl ? cs.marginLeft : cs.marginRight);
+      if(iL.value !== l) iL.value = l; if(iR.value !== r) iR.value = r;
+      [[sB, b.style.marginTop, cs.marginTop], [sA, b.style.marginBottom, cs.marginBottom]].forEach(([sel, inl, comp])=>{
+        let v = '';
+        if(!inl) v = 'auto';
+        else{ const pt = Math.round(parseFloat(comp) * 0.75); if([...sel.options].some(o=>o.value === String(pt))) v = String(pt); }
+        if(sel.value !== v) sel.value = v;
+      });
+    }
+    document.addEventListener('selectionchange', ()=>{ clearTimeout(tm); tm = setTimeout(sync, 80); });
+    [sB, sA].forEach(x=>x.addEventListener('mousedown', sync, true));
+    function aplicarRecuo(side, input){
+      const n = parseFloat(String(input.value).replace(',', '.'));
+      if(!(n >= 0 && n <= 20)) { sync(); return; }
+      restore();
+      blocksInSel().filter(b=>!/^(TD|TH)$/.test(b.tagName)).forEach(b=>{
+        const rtl = b.dir === 'rtl', prop = (side === 'L') !== rtl ? 'marginLeft' : 'marginRight';
+        b.style[prop] = n ? n + 'cm' : '';
+        if(!b.getAttribute('style')) b.removeAttribute('style');
+      });
+      changed();
+    }
+    iL.addEventListener('change', ()=>aplicarRecuo('L', iL));
+    iR.addEventListener('change', ()=>aplicarRecuo('R', iR));
+  })();
+
   $('pgOk').addEventListener('click', pgDlgApply);
   $('pgDlg').addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); pgDlgApply(); } });
   pgSync();
