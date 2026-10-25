@@ -4958,22 +4958,25 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const F = 'font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;';
     const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
     const box = (w, h, ml)=>'<table style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left">&nbsp;</td></tr></tbody></table>';
+    // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
+    const big = (w, h, ml)=>'<table style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left">&nbsp;</td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
     const html =
       '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">Relatório Informativo</p>' +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left">01 – Identificação:</p>' +
-      '<table style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><tbody>' +
+      '<table style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><colgroup><col style="width:333px"><col style="width:71px"><col style="width:212px"></colgroup><tbody>' +
         '<tr>' + c(616, 36, 'Nome:', 3) + '</tr>' +
         '<tr>' + c(404, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
         '<tr>' + c(333, 36, 'Endereço:') + c(283, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
       hd('02 – Demanda:', 28) + box(616, 37, 5) +
       hd('03 – Composição Familiar:', 28) + box(616, 37, 5) +
-      hd('04 – Situação Apresentada:', 28) + box(616, 350, 5) + box(616, 238, 5) +
-      hd('05 – Providências Socioassistenciais:', 33) + box(616, 139, 5) +
-      '<p style="' + F + 'line-height:1.5;margin:31px 0 0 319px;text-align:left">Boa Vista – RR, {{DATA}}</p>' +
-      ('<p style="' + F + 'line-height:1.5;margin:0"><br></p>').repeat(3) +
-      '<p style="' + F + 'font-weight:bold;font-style:italic;line-height:1.5;width:329px;margin:0 0 0 295px;padding-top:3px;border-top:1px solid #000;text-align:right">(Assinado eletronicamente)</p>' +
-      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:329px;margin:0 0 0 295px;text-align:right">Técnico de Referência</p>';
+      hd('04 – Condições Habitacionais:', 28) + box(616, 90, 5) +
+      hd('05 – Situação Apresentada:', 28) + big(616, 370, 5) +
+      hd('06 – Providências Socioassistenciais:', 28) + box(616, 139, 5) +
+      '<p style="' + F + 'line-height:1.5;margin:31px 0 0 319px;text-align:left;break-after:avoid">Boa Vista – RR, {{DATA}}</p>' +
+      ('<p style="' + F + 'line-height:1.5;margin:0;break-after:avoid"><br></p>').repeat(3) +
+      '<p style="' + F + 'font-weight:bold;font-style:italic;line-height:1.5;width:326px;margin:0 0 0 295px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">(Assinado eletronicamente)</p>' +
+      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 295px;text-align:right">Técnico de Referência</p>';
     return {
       title:'Relatório Informativo', html, abnt:false,
       sty:{f:'Times New Roman', hc:'', sp:'padrao'},
@@ -6919,7 +6922,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         const list = [act('📄', 'Documento em branco', 'Começa uma página nova com o formato atual', ()=>{ close(false); newDoc(); }),
           act('🎓', 'Documento ABNT', 'A4, margens 3/2/2/3 cm, Times 12, espaço 1,5', ()=>{ close(false); newDoc(); setAbnt(true, true); })];
       list.push(el('h2', {textContent:'Modelos prontos'}),
-        act('📋', 'Relatório Informativo — CRAS Cristiana Vicente Nunes', 'Cabeçalho da Prefeitura/SEMADS, quadros de Identificação, Demanda, Composição Familiar, Situação e Providências, data de hoje, assinatura e rodapé', ()=>{ close(false); newFromTemplate(tplRelatorio(), 'Relatório Informativo'); }),
+        act('📋', 'Relatório Informativo — CRAS Cristiana Vicente Nunes', 'Cabeçalho da Prefeitura/SEMADS, quadros de Identificação, Demanda, Composição Familiar, Condições Habitacionais, Situação e Providências, data de hoje, assinatura e rodapé', ()=>{ close(false); newFromTemplate(tplRelatorio(), 'Relatório Informativo'); }),
         act('📄', 'Encaminhamento — CRAS Cristiana Vicente Nunes', 'Cabeçalho da Prefeitura/SEMADS, quadro com Assunto, dados do adolescente/criança, responsável, endereço, contato e Relato, data de hoje, assinatura, página de Anexo e rodapé', ()=>{ close(false); newFromTemplate(tplEncaminhamento(), 'Encaminhamento'); }));
       list.push(el('h2', {textContent:'Meus modelos'}));
       const mine = Object.entries(store.docs).filter(([id, d])=>d.modelo).sort((a, b)=>b[1].t - a[1].t);
