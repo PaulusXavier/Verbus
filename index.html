@@ -2122,9 +2122,29 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     });
     return css;
   }
+  // A paginação tira e recoloca os espaços entre as páginas só para medir. Sem este cuidado o navegador rola a tela sozinho
+  // enquanto se digita (ex.: no quadro "05 – Situação Apresentada"). Aqui o cursor volta ao mesmo ponto da tela depois de medir.
+  function pgKeepView(){
+    const m = document.querySelector('main'); if(!m) return ()=>{};
+    const cy = ()=>{
+      const s = getSelection(); if(!s.rangeCount || !s.anchorNode || !page.contains(s.anchorNode)) return null;
+      const r = s.getRangeAt(0).cloneRange(); r.collapse(true);
+      let rc = r.getClientRects()[0];
+      if(!rc || !rc.height){ const n = r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentElement; if(!n) return null; rc = n.getBoundingClientRect(); }
+      return rc.top;
+    };
+    const y0 = cy(), st0 = m.scrollTop;
+    return ()=>{
+      const y1 = cy();
+      if(y0 != null && y1 != null){ const d = y1 - y0; if(Math.abs(d) > 1) m.scrollTop += d; }
+      else if(Math.abs(m.scrollTop - st0) > 1) m.scrollTop = st0;
+    };
+  }
   function pgMarks(){
     cancelAnimationFrame(pgRaf);
-    pgRaf = requestAnimationFrame(()=>{
+    pgRaf = requestAnimationFrame(()=>{ const keep = pgKeepView(); try{ pgRun(); }finally{ keep(); } });
+  }
+  function pgRun(){
       const sh = document.getElementById('sheet'); if(!sh || !page.isConnected) return;
       let ov = document.getElementById('pgOv');
       const pg = pgOf();
@@ -2211,7 +2231,6 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       pgClones();
       if(was !== n){ try{ hfRender(); }catch(err){} }
       try{ window.__pgUpdate && window.__pgUpdate(); }catch(err){}   // atualiza "Página x de y" (pgUpdate fica dentro de outra função)
-    });
   }
   function hfRender(){
     const hh = hfData(), n = pageCount();
