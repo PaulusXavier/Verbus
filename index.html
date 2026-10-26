@@ -500,6 +500,9 @@ header .actions{display:none}
 .pgGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px}
 .pgGrid label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:13px}
 dialog input[type=number]{height:30px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit;padding:0 8px;width:100%}
+#tblDrawOv,#tblHint{position:fixed;z-index:1000;pointer-events:none;display:none}#tblDrawOv{border:2px dashed #1769c2;background:#1769c21c;box-sizing:border-box}#tblHint{left:50%;top:8px;transform:translateX(-50%);background:#16395f;color:#fff;padding:7px 12px;border-radius:4px;font:13px Arial;box-shadow:0 2px 8px #0004;white-space:nowrap}.tbl-draw{cursor:crosshair!important}.tbl-erase{cursor:pointer!important}#tDraw.on,#tErase.on{background:#dce9f8;border-color:#1769c2}#page.tbl-draw,#page.tbl-erase{user-select:none}
+.tPropTabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 12px}.tPropTabs button{padding:5px 9px;border:0;border-bottom:2px solid transparent;background:transparent;color:inherit;cursor:pointer}.tPropTabs button[aria-selected="true"]{border-color:var(--accent);font-weight:700}.tPropTabs+section{min-height:110px}
+#tblReorderHandle{position:fixed;z-index:9999;width:22px;height:22px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);box-shadow:0 1px 4px #0003;cursor:grab;font-size:15px;line-height:18px;touch-action:none}#tblReorderHandle.dragging{cursor:grabbing;background:var(--accent-soft)}
 </style>
 <style id="pgStyle"></style>
 <style id="word16">
@@ -1142,6 +1145,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </div><div class="gl">Modo</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-tabela" data-tab="tabela" aria-labelledby="tab-tabela" hidden>
+    <div class="group" role="group" aria-label="Desenhar tabela"><div class="gb cols">
+      <button type="button" class="rb sm" id="tDraw" title="Ative e arraste sobre células para traçar uma linha divisória; em área vazia, arraste para criar uma tabela">✎ <span>Desenhar Tabela</span></button>
+      <button type="button" class="rb sm" id="tErase" title="Ative e clique/arraste sobre uma linha divisória para unir as células">⌫ <span>Borracha</span></button>
+    </div><div class="gl">Desenhar</div></div>
+    <div class="group" role="group" aria-label="Mover linha"><div class="gb cols">
+      <button type="button" class="rb sm" id="tRowUp" title="Mover a linha da célula atual para cima">↑ <span>Mover linha para cima</span></button>
+      <button type="button" class="rb sm" id="tRowDown" title="Mover a linha da célula atual para baixo">↓ <span>Mover linha para baixo</span></button>
+    </div><div class="gl">Mover Linha</div></div>
     <div class="group" role="group" aria-label="Tabela"><div class="gb cols">
       <div class="stack"><select id="tSel" class="tfit" title="Selecionar a célula, a coluna, a linha ou a tabela inteira onde está o cursor" aria-label="Selecionar"><option value="" selected disabled hidden>Selecionar</option><option value="cell">Selecionar Célula</option><option value="col">Selecionar Coluna</option><option value="row">Selecionar Linha</option><option value="tbl">Selecionar Tabela</option></select>
         <select id="tDel" class="tfit" title="Excluir célula, coluna, linha ou tabela" aria-label="Excluir"><option value="" selected disabled hidden>Excluir ▾</option><option value="cellL">Excluir Célula (deslocar para a esquerda)</option><option value="cellU">Excluir Célula (deslocar para cima)</option><option value="colD">Excluir Coluna</option><option value="rowD">Excluir Linha</option><option value="tblD">Excluir Tabela</option></select>
@@ -1153,6 +1164,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <div class="stack"><button type="button" class="rb sm" data-t="rowD" title="Excluir a linha da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="6.2" width="11" height="3.6" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Linha</span></button><button type="button" class="rb sm" data-t="colD" title="Excluir a coluna da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="6.2" y="2.5" width="3.6" height="11" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Coluna</span></button><button type="button" class="rb sm" data-t="tblD" title="Excluir a tabela inteira"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="#e45a4f" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Tabela</span></button></div>
     </div><div class="gl">Linhas e Colunas</div></div>
     <div class="group" role="group" aria-label="Mesclar"><div class="gb cols"><div class="stack"><button type="button" class="rb sm" data-t="merge" title="Mesclar as células selecionadas (arraste o mouse sobre elas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="#2b79c9" fill-opacity=".25" stroke="#777"/><path d="M5.5 8h5M8.6 6.2L10.5 8l-1.9 1.8M7.4 6.2L5.5 8l1.9 1.8" stroke="#2b79c9" fill="none"/></svg><span>Mesclar Células</span></button><button type="button" class="rb sm" data-t="split" title="Dividir a célula (ou desfazer a mesclagem)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="none" stroke="#777"/><path d="M8 3.5v9" stroke="#777"/><path d="M3.8 8h2.6M5.4 6.8L6.5 8 5.4 9.2M12.2 8H9.6M10.6 6.8L9.5 8l1.1 1.2" stroke="#2b79c9" fill="none"/></svg><span>Dividir Células</span></button></div></div><div class="gl">Mesclar</div></div>
+    <div class="group" role="group" aria-label="Direção do texto"><div class="gb cols"><div class="stack">
+      <button type="button" class="rb sm" id="tTextDir" title="Alterna entre texto horizontal e vertical (90°)">↻ <span>Direção do Texto</span></button>
+    </div></div><div class="gl">Texto</div></div>
     <div class="group" role="group" aria-label="Tamanho da Célula"><div class="gb cols">
       <div class="stack" style="gap:4px;padding-top:2px">
         <label class="pc tsz" title="Altura da linha da célula atual, em cm">Altura <input type="number" id="tCellH" min="0.3" max="40" step="0.1" aria-label="Altura da linha (cm)"> cm</label>
@@ -1179,6 +1193,19 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       </div>
       <label class="pc" title="Cor da linha da borda" style="align-self:flex-start;margin-top:3px">Cor da Caneta <input type="color" id="tBdC" value="#000000"></label>
     </div><div class="gl">Bordas</div></div>
+    <div class="group" role="group" aria-label="Dados da tabela"><div class="gb cols">
+      <div class="stack">
+        <button type="button" class="rb sm" id="tSortOpen" title="Ordena as linhas pela coluna selecionada">A→Z <span>Classificar</span></button>
+        <button type="button" class="rb sm" id="tRepeatHeader" title="Alterna a repetição da primeira linha na impressão">▤ <span>Repetir linha de título</span></button>
+      </div>
+      <div class="stack">
+        <button type="button" class="rb sm" id="tSum" title="Insere uma soma automática dos valores numéricos acima na coluna atual">Σ <span>Soma</span></button>
+        <button type="button" class="rb sm" id="tAvg" title="Insere a média dos valores numéricos acima na coluna atual">x̄ <span>Média</span></button>
+        <button type="button" class="rb sm" id="tCount" title="Conta valores numéricos acima na coluna atual"># <span>Contagem</span></button>
+      </div>
+      <div class="stack"><button type="button" class="rb sm" id="tPropOpen" title="Propriedades da Tabela: largura, linha, coluna, célula e acessibilidade">⚙ <span>Propriedades da Tabela…</span></button></div>
+      <div class="stack"><button type="button" class="rb sm" id="tNestOpen" title="Inserir uma tabela dentro da célula atual">▦ <span>Tabela Aninhada…</span></button></div>
+    </div><div class="gl">Dados</div></div>
     <div class="group" role="group" aria-label="Formatar Tabela"><div class="gb cols">
       <div class="stack"><button type="button" class="rb sm" data-t="header" title="Liga/desliga a linha de título (repete nas páginas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="3.7" fill="#2b79c9" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M2.5 6.2h11M2.5 9.8h11M8 6.2v7.3" stroke="#aaa" fill="none"/></svg><span>Linha de Título</span></button>
         <select id="tBord" class="tfit" title="Bordas da tabela" aria-label="Bordas"><option value="" selected disabled hidden>Predefinidas</option><option value="bAll">Todas as bordas</option><option value="bThick">Bordas grossas (2 pt)</option><option value="bOuter">Somente externas</option><option value="bDash">Pontilhadas</option><option value="bNone">Sem bordas</option></select>
@@ -1191,6 +1218,37 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   </div>
 </div>
 
+<dialog id="tNestDlg" aria-labelledby="tNestTitle">
+  <h3 id="tNestTitle">Inserir Tabela Aninhada</h3>
+  <p>A nova tabela será inserida na célula atual.</p>
+  <div class="fdGrid"><label>Linhas<input id="tNestRows" type="number" min="1" max="20" value="2"></label><label>Colunas<input id="tNestCols" type="number" min="1" max="12" value="2"></label></div>
+  <p id="tNestMsg" role="alert" style="color:#b42318;min-height:1.2em"></p>
+  <div class="dlgrow"><button type="button" id="tNestCancel">Cancelar</button><button type="button" id="tNestApply">Inserir</button></div>
+</dialog>
+<dialog id="tSortDlg" aria-labelledby="tSortTitle">
+  <h3 id="tSortTitle">Classificar Tabela</h3>
+  <div class="fdGrid">
+    <label>Coluna<select id="tSortCol"></select></label>
+    <label>Tipo<select id="tSortType"><option value="text">Texto (A→Z)</option><option value="number">Número</option></select></label>
+    <label>Ordem<select id="tSortDir"><option value="asc">Crescente</option><option value="desc">Decrescente</option></select></label>
+    <label><span><input type="checkbox" id="tSortHead"> A tabela tem linha de cabeçalho</span></label>
+  </div>
+  <p id="tSortMsg" role="alert" style="color:#b42318;min-height:1.2em"></p>
+  <div class="dlgrow"><button type="button" id="tSortCancel">Cancelar</button><button type="button" id="tSortApply">Classificar</button></div>
+</dialog>
+<dialog id="tPropDlg" aria-labelledby="tPropTitle">
+  <h3 id="tPropTitle">Propriedades da Tabela</h3>
+  <div class="tPropTabs" role="tablist" aria-label="Propriedades da tabela">
+    <button type="button" data-prop-tab="table" aria-selected="true">Tabela</button><button type="button" data-prop-tab="row" aria-selected="false">Linha</button><button type="button" data-prop-tab="col" aria-selected="false">Coluna</button><button type="button" data-prop-tab="cell" aria-selected="false">Célula</button><button type="button" data-prop-tab="alt" aria-selected="false">Texto Alternativo</button>
+  </div>
+  <section data-prop-panel="table"><div class="fdGrid"><label>Largura preferida<input id="tpWidth" type="number" min="0" step="0.1"></label><label>Unidade<select id="tpWidthUnit"><option value="cm">cm</option><option value="%">%</option><option value="px">px</option></select></label><label>Alinhamento<select id="tpAlign"><option value="left">Esquerda</option><option value="center">Centralizada</option><option value="right">Direita</option></select></label></div></section>
+  <section data-prop-panel="row" hidden><div class="fdGrid"><label>Linha atual: quebra entre páginas<select id="tpRowBreak"><option value="avoid">Não permitir</option><option value="auto">Permitir</option></select></label></div></section>
+  <section data-prop-panel="col" hidden><div class="fdGrid"><label>Largura da coluna atual<input id="tpColWidth" type="number" min="0" step="0.1"></label><label>Unidade<select id="tpColUnit"><option value="cm">cm</option><option value="%">%</option><option value="px">px</option></select></label></div></section>
+  <section data-prop-panel="cell" hidden><div class="fdGrid"><label>Margens internas da célula (cm)<input id="tpCellPad" type="number" min="0" step="0.05"></label><label>Espaço entre células (cm)<input id="tpCellGap" type="number" min="0" step="0.05"></label><label>Direção do texto<select id="tpTextDir"><option value="horizontal-tb">Horizontal</option><option value="vertical-rl">Vertical (90°)</option></select></label></div></section>
+  <section data-prop-panel="alt" hidden><div class="fdGrid"><label class="full">Título acessível da tabela<input id="tpAltTitle" type="text" maxlength="300"></label><label class="full">Descrição da tabela<textarea id="tpAltDesc" rows="3" maxlength="1000"></textarea></label></div></section>
+  <p id="tpPropMsg" role="alert" style="color:#b42318;min-height:1.2em"></p>
+  <div class="dlgrow"><button type="button" id="tpPropCancel">Cancelar</button><button type="button" id="tpPropApply">Aplicar</button></div>
+</dialog>
 <div id="findbar" hidden>
   <input type="text" id="findIn" placeholder="Localizar" aria-label="Localizar">
   <input type="text" id="replIn" placeholder="Substituir por" aria-label="Substituir por">
@@ -1268,6 +1326,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 
 <div id="imgbar" hidden>
   <strong>Imagem</strong>
+  <label>Texto alternativo <input type="text" id="imAlt" maxlength="500" aria-label="Texto alternativo da imagem" placeholder="Descreva a imagem" title="Descrição para leitores de tela; deixe vazio para imagem decorativa"></label>
   <label>Disposição <select id="imWrap" title="Como a imagem se encaixa no texto"></select></label>
   <span class="ab" id="imAlign" title="Alinhar na página">
     <button data-ia="left" title="Alinhar à esquerda" aria-label="Alinhar à esquerda">⇤</button>
@@ -2342,7 +2401,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     L.forEach(it=>{
       seen.add(it.id);
       let el = document.querySelector('.himg[data-id="' + it.id + '"]');
-      if(!el){ el = document.createElement('img'); el.className = 'himg'; el.dataset.id = it.id; el.draggable = false; el.alt = ''; }
+      if(!el){ el = document.createElement('img'); el.className = 'himg'; el.dataset.id = it.id; el.draggable = false; el.alt = it.alt || ''; }
       if(el.getAttribute('src') !== it.src) el.src = it.src;
       const host = it.z === 'front' ? F : B; if(el.parentNode !== host) host.appendChild(el);
       el.style.left = it.x + 'px'; el.style.top = it.y + 'px'; el.style.width = it.w + 'px'; el.style.height = it.h + 'px';
@@ -2512,9 +2571,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function anchorXml(it, rid, n){
     const E = v=>Math.round(v * 9525), cx = E(it.w), cy = E(it.h);
     const alpha = it.op ? '<a:alphaModFix amt="' + Math.round((100 - it.op) * 1000) + '"/>' : '';
+    const descr = it.alt ? ' descr="' + String(it.alt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') + '"' : '';
     return '<w:r><w:drawing><wp:anchor distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="' + (it.z === 'front' ? 251659264 + n : 1024 + n) + '" behindDoc="' + (it.z === 'front' ? 0 : 1) + '" locked="0" layoutInCell="1" allowOverlap="1">' +
       '<wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>' + E(it.x) + '</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>' + E(it.y) + '</wp:posOffset></wp:positionV>' +
-      '<wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="' + (900 + n) + '" name="Imagem ' + (n + 1) + '"/><wp:cNvGraphicFramePr/>' +
+      '<wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="' + (900 + n) + '" name="Imagem ' + (n + 1) + '"' + descr + '/><wp:cNvGraphicFramePr/>' +
       '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
       '<pic:nvPicPr><pic:cNvPr id="' + (900 + n) + '" name="verba' + n + '"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + rid + '">' + alpha + '</a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill>' +
       '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>';
@@ -2615,13 +2675,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     t.removeAttribute('data-new');
     if(style && window.__tsApply) window.__tsApply(t, style, new Set(opts || ['h', 'r']));
     changed();
+    return t;
   }
   function insertTable(rows, cols, style){
     if(!(rows > 0 && cols > 0)) return;
     let h = '<table data-new="1"><tbody>';
     for(let r=0;r<rows;r++){ h += '<tr>' + '<td><br></td>'.repeat(cols) + '</tr>'; }
     h += '</tbody></table><p><br></p>';
-    insertTableHtml(h, style);
+    return insertTableHtml(h, style);
   }
   (function(){
     const btn = document.getElementById('btnTable'), GC = 10, GR = 8;
@@ -3233,8 +3294,19 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     });
     return {g, pos};
   }
-  function mergeCells(){
-    const cells = selCells();
+  function moveTableRow(table, from, to){
+    const rows=[...table.rows], row=rows[from], target=rows[to];
+    if(!row||!target||from===to||row.parentElement!==target.parentElement)return false;
+    const before=tSnap(); row.parentElement.insertBefore(row,from<to?target.nextSibling:target); tCommit(before); changed(); return true;
+  }
+  function moveTableColumn(table, from, to){
+    const rows=[...table.rows]; if(from===to||from<0||to<0||!rows.length)return false;
+    if(rows.some(r=>[...r.cells].some(c=>(c.rowSpan||1)>1||(c.colSpan||1)>1)||r.cells.length!==rows[0].cells.length))return false;
+    if(from>=rows[0].cells.length||to>=rows[0].cells.length)return false;
+    const before=tSnap(); rows.forEach(r=>{const cells=[...r.cells],moving=cells[from],target=cells[to];if(from<to)r.insertBefore(moving,target.nextSibling);else r.insertBefore(moving,target)});const cg=table.querySelector(':scope > colgroup');if(cg&&cg.children.length===rows[0].cells.length){const cols=[...cg.children],moving=cols[from],target=cols[to];if(from<to)cg.insertBefore(moving,target.nextSibling);else cg.insertBefore(moving,target)}tCommit(before);changed();return true;
+  }
+  function mergeCells(list){
+    const cells = list || selCells();
     if(cells.length < 2){ alert('Selecione duas ou mais células (arraste o mouse sobre elas) para mesclar.'); return false; }
     const table = cells[0].closest('table'); const {g, pos} = gridOf(table);
     let r0 = 1e9, c0 = 1e9, r1 = -1, c1 = -1;
@@ -3564,6 +3636,41 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         run(b.dataset.t);
       });
     });
+    // Dados e propriedades de tabela
+    const sortDlg=$('tSortDlg'), propDlg=$('tPropDlg');let sortTarget=null, propTarget=null, propCell=null;
+    function tableOfCursor(){const c=inTable();return c&&c.closest('table')}
+    function parseTableNumber(v){let x=String(v||'').trim().replace(/[^0-9,.-]/g,'');if(!x)return null;if(x.includes(','))x=x.replace(/\./g,'').replace(',','.');const n=Number(x);return Number.isFinite(n)?n:null}
+    function cellValue(G,row,col){const c=G.g[row]&&G.g[row][col];return c?(c.innerText||c.textContent||'').trim():''}
+    function formulaValue(table,cell,kind){const G=gridOf(table),q=G.pos.get(cell);if(!q||q.r===0)return null;const vals=[],seen=new Set();for(let r=0;r<q.r;r++){const c=G.g[r]&&G.g[r][q.c];if(!c||c===cell||seen.has(c))continue;seen.add(c);const n=parseTableNumber(c.innerText||c.textContent);if(n!==null)vals.push(n)}if(kind==='COUNT_ABOVE')return vals.length;if(!vals.length)return 0;return kind==='AVG_ABOVE'?vals.reduce((a,b)=>a+b,0)/vals.length:vals.reduce((a,b)=>a+b,0)}
+    function formatFormula(n){return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:4}).format(n)}
+    function recalcFormulaCell(cell){const f=cell.dataset.formula;if(!f)return false;const n=formulaValue(cell.closest('table'),cell,f);if(n===null)return false;const text=formatFormula(n);if(cell.textContent!==text){cell.textContent=text;return true}return false}
+    function recalcTableFormulas(table){let any=false;table.querySelectorAll('td[data-formula],th[data-formula]').forEach(c=>{if(c.closest('table')===table)any=recalcFormulaCell(c)||any});return any}
+    function addFormula(kind){const c=inTable(),table=c&&c.closest('table');if(!c)return;const before=tSnap(),n=formulaValue(table,c,kind);if(n===null){alert('Selecione uma célula abaixo dos valores a calcular.');return}c.dataset.formula=kind;c.contentEditable='false';c.textContent=formatFormula(n);tCommit(before);changed()}
+    $('tSum').addEventListener('mousedown',e=>e.preventDefault());$('tAvg').addEventListener('mousedown',e=>e.preventDefault());$('tCount').addEventListener('mousedown',e=>e.preventDefault());
+    $('tSum').onclick=()=>addFormula('SUM_ABOVE');$('tAvg').onclick=()=>addFormula('AVG_ABOVE');$('tCount').onclick=()=>addFormula('COUNT_ABOVE');
+    page.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-formula]'))return;setTimeout(()=>{let any=false;page.querySelectorAll('table').forEach(t=>any=recalcTableFormulas(t)||any);if(any)changed()},0)});
+    $('tSortOpen').addEventListener('mousedown',e=>e.preventDefault());$('tSortCancel').onclick=()=>sortDlg.close();
+    $('tSortOpen').onclick=()=>{const t=sortTarget=tableOfCursor();if(!t){alert('Clique em uma célula da tabela que deseja classificar.');return}const n=Math.max(0,...gridOf(t).g.map(r=>r.length)),sel=$('tSortCol');sel.innerHTML='';for(let i=0;i<n;i++)sel.add(new Option('Coluna '+(i+1),String(i)));$('tSortHead').checked=!!(t.tHead&&t.tHead.rows.length);$('tSortMsg').textContent='';sortDlg.showModal()};
+    $('tSortApply').onclick=()=>{const t=sortTarget;if(!t||!t.isConnected)return;const col=+$('tSortCol').value, numeric=$('tSortType').value==='number', desc=$('tSortDir').value==='desc',hasHead=$('tSortHead').checked,G=gridOf(t);const bodies=[...t.tBodies];if(!bodies.length){$('tSortMsg').textContent='A tabela não contém linhas de dados.';return}const rows=bodies.flatMap(b=>[...b.rows]);if(rows.some(r=>[...r.cells].some(c=>c.rowSpan>1||c.colSpan>1))){$('tSortMsg').textContent='Para evitar danificar a grade, desfaça as mesclagens antes de classificar.';return}const before=tSnap(),coll=new Intl.Collator('pt-BR',{numeric:true,sensitivity:'base'});let offset=[...t.rows].findIndex(r=>r.parentElement===bodies[0]);for(const body of bodies){let data=[...body.rows];if(hasHead&&!t.tHead&&body===bodies[0]&&data.length)data=data.slice(1);const base=[...t.rows].findIndex(r=>r===data[0]);data=data.map((r,i)=>({r,i,key:cellValue(G,base+i,col)}));data.sort((a,b)=>{let d;if(numeric){const x=parseTableNumber(a.key),y=parseTableNumber(b.key);if(x===null||y===null){if(x===null&&y!==null)return 1;if(y===null&&x!==null)return -1;d=0}else d=x-y}else d=coll.compare(a.key,b.key);return (desc?-d:d)||a.i-b.i});data.forEach(x=>body.appendChild(x.r))}recalcTableFormulas(t);tCommit(before);changed();sortDlg.close()};
+    $('tRepeatHeader').addEventListener('mousedown',e=>e.preventDefault());$('tRepeatHeader').onclick=()=>{const t=tableOfCursor();if(!t){alert('Clique dentro da tabela primeiro.');return}const before=tSnap();if(t.dataset.repeatTitle==='1'){delete t.dataset.repeatTitle;if(t.tHead){const rows=[...t.tHead.rows],body=t.tBodies[0]||t.createTBody();rows.reverse().forEach(r=>body.insertBefore(r,body.firstChild));t.tHead.remove()}}else{let row=t.tHead&&t.tHead.rows[0];if(!row){const body=t.tBodies[0];row=body&&body.rows[0];if(row){const h=t.createTHead();h.appendChild(row)}}if(!row){alert('A tabela não tem linha para repetir.');return}t.dataset.repeatTitle='1';t.tHead.style.display='table-header-group'}tCommit(before);changed()};
+    $('tTextDir').addEventListener('mousedown',e=>e.preventDefault());$('tTextDir').onclick=()=>{const c=inTable();if(!c){alert('Clique dentro da célula que deseja formatar.');return}const before=tSnap(),v=c.style.writingMode==='vertical-rl';c.style.writingMode=v?'horizontal-tb':'vertical-rl';c.style.textOrientation=v?'':'mixed';tCommit(before);changed()};
+    // Dialogo de propriedades tabulado
+    $('tPropOpen').addEventListener('mousedown',e=>e.preventDefault());
+    document.querySelectorAll('#tPropDlg [data-prop-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#tPropDlg [data-prop-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));document.querySelectorAll('#tPropDlg [data-prop-panel]').forEach(x=>x.hidden=x.dataset.propPanel!==b.dataset.propTab)}));
+    $('tpPropCancel').onclick=()=>propDlg.close();
+    $('tPropOpen').onclick=()=>{const c=inTable(),t=c&&c.closest('table');if(!t){alert('Clique dentro da tabela para abrir as propriedades.');return}propTarget=t;propCell=c;const w=t.style.width||'',m=w.match(/^\s*([\d.]+)\s*(%|px|cm)?/i);$('tpWidth').value=m?m[1]:((t.getBoundingClientRect().width/CMPX).toFixed(2));$('tpWidthUnit').value=m&&m[2]?m[2].toLowerCase():'cm';$('tpAlign').value=t.style.marginLeft==='auto'?(t.style.marginRight==='0px'?'right':'center'):'left';const row=c.parentElement;$('tpRowBreak').value=row.dataset.allowPageBreak==='1'?'auto':'avoid';const G=gridOf(t),q=G.pos.get(c),ws=tblCols(t);$('tpColWidth').value=q?(ws[q.c]/CMPX).toFixed(2):'';$('tpColUnit').value='cm';$('tpCellPad').value=(parseFloat(getComputedStyle(c).padding)||0)/CMPX;$('tpCellGap').value=(parseFloat(getComputedStyle(t).borderSpacing)||0)/CMPX;$('tpTextDir').value=c.style.writingMode==='vertical-rl'?'vertical-rl':'horizontal-tb';$('tpAltTitle').value=t.getAttribute('aria-label')||t.title||'';$('tpAltDesc').value=t.getAttribute('aria-description')||'';$('tpPropMsg').textContent='';document.querySelector('#tPropDlg [data-prop-tab="table"]').click();propDlg.showModal()};
+    $('tpPropApply').onclick=()=>{const t=propTarget,c=propCell;if(!t||!t.isConnected||!c||!c.isConnected)return;const v=parseFloat($('tpWidth').value),unit=$('tpWidthUnit').value;if(!(v>0)){ $('tpPropMsg').textContent='Informe uma largura preferida maior que zero.';return}const before=tSnap();t.style.width=v+unit;const al=$('tpAlign').value;t.style.marginLeft=al==='left'?'0':'auto';t.style.marginRight=al==='right'?'0':'auto';const row=c.parentElement;if($('tpRowBreak').value==='auto'){row.dataset.allowPageBreak='1';row.style.breakInside='auto';row.style.pageBreakInside='auto'}else{delete row.dataset.allowPageBreak;row.style.breakInside='avoid';row.style.pageBreakInside='avoid'}const G=gridOf(t),q=G.pos.get(c),ws=tblCols(t);if(q&&ws.length){const cv=parseFloat($('tpColWidth').value),cu=$('tpColUnit').value,room=tblCont(t);if(cv>0){const target=cu==='%'?room*cv/100:cu==='px'?cv:cv*CMPX,others=ws.reduce((a,b,i)=>a+(i===q.c?0:b),0),remain=Math.max(24,room-target);ws[q.c]=Math.min(target,room-24*(ws.length-1));if(others>0)ws.forEach((x,i)=>{if(i!==q.c)ws[i]=remain*x/others});tblApply(t,ws,room)}}const pad=parseFloat($('tpCellPad').value),gap=parseFloat($('tpCellGap').value);if(pad>=0)c.style.padding=(pad*CMPX)+'px';if(gap>=0){t.style.borderSpacing=(gap*CMPX)+'px';t.style.borderCollapse=gap>0?'separate':'collapse'}c.style.writingMode=$('tpTextDir').value;c.style.textOrientation=c.style.writingMode==='vertical-rl'?'mixed':'';const title=$('tpAltTitle').value.trim(),desc=$('tpAltDesc').value.trim();if(title){t.setAttribute('aria-label',title);t.title=title}else{t.removeAttribute('aria-label');t.removeAttribute('title')}if(desc)t.setAttribute('aria-description',desc);else t.removeAttribute('aria-description');t.style.width=v+unit;t.style.marginLeft=al==='left'?'0':'auto';t.style.marginRight=al==='right'?'0':'auto';tCommit(before);changed();propDlg.close()};
+    // Inserção direta de tabela dentro da célula atual
+    const nestDlg=$('tNestDlg');let nestTarget=null,nestRange=null;$('tNestOpen').addEventListener('mousedown',e=>e.preventDefault());$('tNestCancel').onclick=()=>{nestTarget=null;nestRange=null;nestDlg.close()};
+    $('tNestOpen').onclick=()=>{nestTarget=inTable();if(!nestTarget){alert('Clique dentro da célula onde deseja inserir a tabela aninhada.');return}const sel=getSelection();nestRange=sel.rangeCount?sel.getRangeAt(0).cloneRange():(savedRange&&savedRange.cloneRange());$('tNestMsg').textContent='';nestDlg.showModal()};
+    $('tNestApply').onclick=()=>{const c=nestTarget,nr=Math.max(1,Math.min(20,parseInt($('tNestRows').value,10)||0)),nc=Math.max(1,Math.min(12,parseInt($('tNestCols').value,10)||0));if(!c||!c.isConnected){$('tNestMsg').textContent='A célula de destino não está mais disponível.';return}if(!nr||!nc){$('tNestMsg').textContent='Informe pelo menos uma linha e uma coluna.';return}const before=tSnap(),nt=document.createElement('table');nt.className='verbus-nested-table';nt.style.width='100%';nt.style.borderCollapse='collapse';nt.style.tableLayout='auto';for(let i=0;i<nr;i++){const tr=nt.insertRow();for(let j=0;j<nc;j++){const td=tr.insertCell();td.style.border='1px solid #777';td.style.padding='4px';td.innerHTML='<br>'}}if(nestRange&&c.contains(nestRange.commonAncestorContainer)){if(!nestRange.collapsed)nestRange.deleteContents();nestRange.insertNode(nt)}else c.appendChild(nt);caretIn(nt.rows[0].cells[0]);tCommit(before);changed();nestTarget=null;nestRange=null;nestDlg.close()};
+    // Alt+Shift+seta move a linha da célula ativa, respeitando seções thead/tbody.
+    page.addEventListener('keydown',e=>{if(!(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')))return;const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement),to=from+(e.key==='ArrowUp'?-1:1);if(moveTableRow(t,from,to)){e.preventDefault();e.stopPropagation()}},true);
+    // Explicit metadata controls for repeated headings and row-level page breaks.
+    [['tRowUp', -1], ['tRowDown', 1]].forEach(([id, dir])=>{
+      const b=$(id); b.addEventListener('mousedown', e=>e.preventDefault());
+      b.addEventListener('click', ()=>{const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement);moveTableRow(t,from,from+dir)});
+    });
     // ----- Estilos de tabela prontos + opções (linha de cabeçalho, totais, tiras, colunas) -----
     const TS = {
       grade:  {n:'Grade de Tabela',            mode:'box',  b:'1px solid #000',    hbg:'',        hfg:'',     band:'#f2f2f2'},
@@ -3837,7 +3944,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 
     // ----- Mouse como no Word: selecionar linha/coluna pela margem da tabela, linha de texto pela margem da folha,
     //       Delete/Backspace em células selecionadas e menu do botão direito -----
-    let barRange = null, selDrag = null;
+    let barRange = null, selDrag = null, moveDrag = null, moveHover = null;
+    const moveHandle=document.createElement('button');moveHandle.id='tblReorderHandle';moveHandle.type='button';moveHandle.title='Arraste para trocar a ordem';moveHandle.textContent='⠿';moveHandle.setAttribute('aria-label','Alça para reordenar linha ou coluna');moveHandle.hidden=true;document.body.appendChild(moveHandle);
     function selRect(table, r0, r1, c0, c1){
       const G = gridOf(table); r1 = Math.min(r1, G.g.length - 1); c1 = Math.min(c1, ((G.g[r1] || []).length || 1) - 1); const first = (G.g[r0] || [])[c0], last = (G.g[r1] || [])[c1]; if(!first || !last) return;
       const r = document.createRange(); r.setStart(first, 0); r.setEnd(last, last.childNodes.length);
@@ -3866,7 +3974,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     function zoneAt(e){
       if(off() || !page.isContentEditable) return null;
       const el = document.elementFromPoint(e.clientX, e.clientY), P = pageLeftInfo();
-      for(const t of page.querySelectorAll('table')){
+      const tables=[...page.querySelectorAll('table')].sort((a,b)=>{const depth=t=>{let n=0;for(let p=t.parentElement;p;p=p.parentElement)if(p.tagName==='TABLE')n++;return n};return depth(b)-depth(a)});
+      for(const t of tables){
         if(t.closest('.hf')) continue;
         const r = t.getBoundingClientRect(); if(!r.width) continue;
         if(e.clientX >= P.left + 4 && e.clientX <= r.left - 3 && e.clientY >= r.top && e.clientY <= r.bottom && (el === page || t.contains(el))){
@@ -3903,12 +4012,23 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       }else if(s.modify){ s.modify('move', 'backward', 'lineboundary'); s.modify('extend', 'forward', 'lineboundary'); }
       if(s.rangeCount) savedRange = s.getRangeAt(0).cloneRange();
     }
+    function showMoveHandle(z){
+      if(!z||!['row','col'].includes(z.k)){moveHover=null;moveHandle.hidden=true;return}
+      const t=z.table,rect=t.getBoundingClientRect();let x,y;
+      if(z.k==='row'){const row=t.rows[z.i];if(!row){moveHandle.hidden=true;return}const b=row.getBoundingClientRect();x=rect.left-23;y=(b.top+b.bottom)/2-11;moveHandle.title='Arraste para reordenar esta linha';}
+      else{const G=gridOf(t),cell=(G.g[0]||[]).find(c=>c&&G.pos.get(c).c===z.i);if(!cell){moveHandle.hidden=true;return}const b=cell.getBoundingClientRect();x=(b.left+b.right)/2-11;y=rect.top-23;const merged=[...t.rows].some(r=>[...r.cells].some(c=>(c.rowSpan||1)>1||(c.colSpan||1)>1));moveHandle.title=merged?'Desfaça as células mescladas antes de reordenar colunas':'Arraste para reordenar esta coluna';}
+      moveHover=z;moveHandle.hidden=false;moveHandle.style.left=Math.max(2,x)+'px';moveHandle.style.top=Math.max(2,y)+'px';
+    }
+    function zoneForHandle(e){let z=zoneAt(e);if(z&&['row','col'].includes(z.k))return z;const el=document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest?el.closest('#page td,#page th'):null;if(!cell)return null;const t=cell.closest('table'),b=cell.getBoundingClientRect(),G=gridOf(t),q=G.pos.get(cell);if(!q)return null;if(e.clientX<=b.left+15)return {k:'row',table:t,i:q.r,n:1};if(q.r===0&&e.clientY<=b.top+14)return {k:'col',table:t,i:q.c,n:q.cs};return null}
+    moveHandle.addEventListener('pointerdown',e=>{if(e.button!==0||!moveHover)return;e.preventDefault();e.stopPropagation();moveDrag={k:moveHover.k,table:moveHover.table,from:moveHover.k==='row'?moveHover.i:moveHover.i};moveHandle.classList.add('dragging');try{moveHandle.setPointerCapture(e.pointerId)}catch(_){}});
+    document.addEventListener('pointermove',e=>{if(!moveDrag)return;const el=document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest?el.closest('#page td,#page th'):null;if(!cell||cell.closest('table')!==moveDrag.table)return;const d=moveDrag;if(d.k==='row'){const to=[...d.table.rows].indexOf(cell.parentElement);moveHandle.dataset.drop=String(to)}else{const q=gridOf(d.table).pos.get(cell);if(q)moveHandle.dataset.drop=String(q.c)}});
+    const finishMove=()=>{if(!moveDrag)return;const d=moveDrag,to=Number(moveHandle.dataset.drop);moveDrag=null;moveHandle.classList.remove('dragging');delete moveHandle.dataset.drop;if(Number.isFinite(to)){if(d.k==='row')moveTableRow(d.table,d.from,to);else moveTableColumn(d.table,d.from,to)}moveHandle.hidden=true;moveHover=null};
+    moveHandle.addEventListener('pointerup',finishMove);moveHandle.addEventListener('pointercancel',()=>{moveDrag=null;moveHandle.classList.remove('dragging');delete moveHandle.dataset.drop;moveHandle.hidden=true;moveHover=null});
     page.addEventListener('mousemove', e=>{
-      if(selDrag || drag) return;
-      const z = zoneAt(e), lb = !z && lineBarAt(e);
-      page.classList.toggle('tbl-sr', !!(z && z.k === 'row') || !!lb); page.classList.toggle('tbl-sc', !!(z && z.k === 'col')); page.classList.toggle('tbl-cl', !!(z && z.k === 'cell'));
+      if(selDrag || drag || moveDrag) return;
+      const z=zoneAt(e),lb=!z&&lineBarAt(e);page.classList.toggle('tbl-sr',!!(z&&z.k==='row')||!!lb);page.classList.toggle('tbl-sc',!!(z&&z.k==='col'));page.classList.toggle('tbl-cl',!!(z&&z.k==='cell'));showMoveHandle(zoneForHandle(e));
     });
-    page.addEventListener('mouseleave', ()=>{ page.classList.remove('tbl-sr', 'tbl-sc', 'tbl-cl'); });
+    page.addEventListener('mouseleave', e=>{page.classList.remove('tbl-sr','tbl-sc','tbl-cl');if(e.relatedTarget!==moveHandle&&!moveHandle.contains(e.relatedTarget))moveHandle.hidden=true});
     page.addEventListener('mousedown', e=>{
       if(e.button !== 0 || off() || drag || !page.isContentEditable) return;
       const z = zoneAt(e);
@@ -8079,6 +8199,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const g = geom(), fl = T.k === 'h' || isFloat(T.el);
       ov.classList.toggle('fl', fl);
       ov.style.left = g.x + 'px'; ov.style.top = g.y + 'px'; ov.style.width = g.w + 'px'; ov.style.height = g.h + 'px';
+      if(document.activeElement !== $('imAlt')) $('imAlt').value = T.k === 'h' ? (T.it.alt || '') : (T.el.getAttribute('alt') || '');
       const sel = $('imWrap'), list = T.k === 'h' ? HWRAP : BWRAP, cur = T.k === 'h' ? (T.it.z === 'front' ? 'front' : 'back') : wrapOf(T.el);
       const sig = list.map(x=>x[0]).join();
       if(sel.dataset.sig !== sig){ sel.innerHTML = list.map(x=>'<option value="' + x[0] + '">' + x[1] + '</option>').join(''); sel.dataset.sig = sig; }
@@ -8120,6 +8241,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       else{ T.el.remove(); changed(); }
       select(null);
     }
+    $('imAlt').addEventListener('input', ()=>{
+      if(!T) return;
+      if(T.k === 'h'){ T.it.alt=$('imAlt').value; persist(); }
+      else{ T.el.setAttribute('alt',$('imAlt').value); changed(); }
+    });
     $('imDel').addEventListener('click', del);
     $('imClose').addEventListener('click', ()=>select(null));
     bar.querySelectorAll('button').forEach(b=>b.addEventListener('mousedown', e=>e.preventDefault()));
@@ -8921,8 +9047,39 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     page.addEventListener('input', e=>{ if(multi && !replaying && /^(insertText|insertParagraph|insertFromPaste|delete)/.test(e.inputType || '')) clearMulti(); });
   })();
 
+  // Ferramentas de desenho de tabelas e borracha
+  (function(){
+    const overlay=document.createElement('div'), hint=document.createElement('div'); overlay.id='tblDrawOv';hint.id='tblHint';document.body.append(overlay,hint);
+    let mode='', start=null, last=null, target=null;
+    const messages={draw:'Desenhar Tabela: arraste dentro de uma tabela para dividir; em área vazia, arraste para criar. Esc cancela.',erase:'Borracha: arraste sobre uma divisória para unir células. Esc sai.'};
+    function activate(m){mode=mode===m?'':m;start=last=target=null;overlay.style.display='none';page.classList.toggle('tbl-draw',mode==='draw');page.classList.toggle('tbl-erase',mode==='erase');$('tDraw').classList.toggle('on',mode==='draw');$('tErase').classList.toggle('on',mode==='erase');hint.textContent=mode?messages[mode]:'';hint.style.display=mode?'block':'none'}
+    $('tDraw').addEventListener('mousedown',e=>e.preventDefault());$('tErase').addEventListener('mousedown',e=>e.preventDefault());$('tDraw').onclick=()=>activate('draw');$('tErase').onclick=()=>activate('erase');
+    document.addEventListener('keydown',e=>{if(mode&&e.key==='Escape'){e.preventDefault();activate('')}} ,true);
+    function cellAtPoint(x,y){const el=document.elementFromPoint(x,y);return el&&el.closest?el.closest('#page td,#page th'):null}
+    function gridLine(table,axis,p){const G=gridOf(table), rows=[...table.rows], scale=tblScale(table); if(axis==='v'){const xs=[];for(const c of G.pos.keys()){const r=c.getBoundingClientRect();const q=G.pos.get(c);xs.push({x:r.left,q:q.c},{x:r.right,q:q.c+q.cs})}xs.sort((a,b)=>Math.abs(a.x-p)-Math.abs(b.x-p));return xs[0]&&xs[0].q}const ys=[];rows.forEach((tr,i)=>{const r=tr.getBoundingClientRect();ys.push({y:r.top,q:i},{y:r.bottom,q:i+1})});ys.sort((a,b)=>Math.abs(a.y-p)-Math.abs(b.y-p));return ys[0]&&ys[0].q}
+    function splitVertical(table,k){let G=gridOf(table),n=Math.max(...G.g.map(r=>r.length));if(k<=0||k>=n)return false;const before=tblSnap(table);insCol(table,G,k,n);if(before)tblAdjust(table,before,'ins'+k);return true}
+    function drawBoundary(table,axis,x,y){const c=cellAtPoint(x,y);if(!c||c.closest('table')!==table)return null;const G=gridOf(table),q=G.pos.get(c);if(!q)return null;return axis==='v'?q.c+Math.max(1,Math.ceil(q.cs/2)):q.r+Math.max(1,Math.ceil(q.rs/2))}
+    function splitHorizontal(table,k){
+      const G=gridOf(table),oldRows=[...table.rows];if(k<=0||k>=oldRows.length)return false;
+      const width=Math.max(...G.g.map(r=>r.length)),tr=table.insertRow(k),spanning=[];
+      for(const [cell,q] of G.pos){if(q.r<k&&q.r+q.rs>k){const lower=newCellLike(cell);lower.rowSpan=q.r+q.rs-k;if(lower.rowSpan===1)lower.removeAttribute('rowspan');cell.rowSpan=k-q.r;if(cell.rowSpan===1)cell.removeAttribute('rowspan');let before=null;for(const x of [...tr.cells]){const z=gridOf(table).pos.get(x);if(z&&z.c>q.c){before=x;break}}tr.insertBefore(lower,before);spanning.push(cell)}}
+      let now=gridOf(table);for(let c=0;c<width;c++){if(now.g[k]&&now.g[k][c])continue;const ref=G.g[k]&&G.g[k][c]||G.g[k-1]&&G.g[k-1][c];if(!ref)continue;const n=newCellLike(ref);let before=null;for(const x of [...tr.cells]){const z=now.pos.get(x);if(z&&z.c>c){before=x;break}}tr.insertBefore(n,before);now=gridOf(table)}return true
+    }
+    function makeTable(a,b){const rect={left:Math.min(a.x,b.x),right:Math.max(a.x,b.x),top:Math.min(a.y,b.y),bottom:Math.max(a.y,b.y)};if(rect.right-rect.left<35||rect.bottom-rect.top<24)return;const scale=tblScale(page),cw=Math.max(30,Math.round(70*scale)),rh=Math.max(22,Math.round(28*scale)),cols=Math.max(1,Math.min(12,Math.round((rect.right-rect.left)/cw))),rows=Math.max(1,Math.min(30,Math.round((rect.bottom-rect.top)/rh)));const range=document.caretRangeFromPoint?document.caretRangeFromPoint(a.x,a.y):(document.caretPositionFromPoint?(()=>{const q=document.caretPositionFromPoint(a.x,a.y);if(!q)return null;const r=document.createRange();r.setStart(q.offsetNode,q.offset);r.collapse(true);return r})():null);if(!range||!page.contains(range.startContainer))return;const sel=getSelection();sel.removeAllRanges();sel.addRange(range);savedRange=range.cloneRange();const t=insertTable(rows,cols);if(t){t.style.width=Math.max(80,rect.right-rect.left)+'px';t.style.tableLayout='fixed';t.querySelectorAll('td').forEach(c=>c.style.height=Math.max(20,(rect.bottom-rect.top)/rows)+'px');changed()}}
+    page.addEventListener('pointerdown',e=>{if(!mode||e.button!==0||document.body.classList.contains('hfedit'))return;const c=cellAtPoint(e.clientX,e.clientY);if(mode==='erase'&&!c)return;e.preventDefault();e.stopImmediatePropagation();start=last={x:e.clientX,y:e.clientY};target=c&&c.closest('table');page.setPointerCapture&&page.setPointerCapture(e.pointerId);overlay.style.display='block';overlay.style.left=start.x+'px';overlay.style.top=start.y+'px';overlay.style.width='1px';overlay.style.height='1px'},true);
+    page.addEventListener('pointermove',e=>{if(!start)return;last={x:e.clientX,y:e.clientY};overlay.style.left=Math.min(start.x,last.x)+'px';overlay.style.top=Math.min(start.y,last.y)+'px';overlay.style.width=Math.max(1,Math.abs(last.x-start.x))+'px';overlay.style.height=Math.max(1,Math.abs(last.y-start.y))+'px'},true);
+    document.addEventListener('pointerup',e=>{if(!start)return;const a=start,b={x:e.clientX,y:e.clientY},t=target;start=null;overlay.style.display='none';if(t&&a.x!==b.x||t&&a.y!==b.y){const vertical=Math.abs(b.x-a.x)<Math.abs(b.y-a.y);if(mode==='draw'){const midX=(a.x+b.x)/2,midY=(a.y+b.y)/2,k=drawBoundary(t,vertical?'v':'h',midX,midY);const ok=k!=null&&(vertical?splitVertical(t,k):splitHorizontal(t,k));if(ok)changed()}else eraseLine(t,a,b,vertical)}else if(!t&&mode==='draw')makeTable(a,b)},true);
+    function eraseLine(table,a,b,vertical){
+      let did=false;
+      if(vertical){const k=gridLine(table,'v',(a.x+b.x)/2),G=gridOf(table),r0=Math.min(a.y,b.y),r1=Math.max(a.y,b.y),seen=new Set();if(k<=0)return;for(let r=0;r<G.g.length;r++){const cell=G.g[r][k-1],other=G.g[r][k];if(!cell||!other||cell===other||seen.has(cell)||seen.has(other))continue;const box=cell.getBoundingClientRect();if(box.bottom<r0||box.top>r1)continue;seen.add(cell);seen.add(other);if(mergeCells([cell,other]))did=true;}}
+      else{const k=gridLine(table,'h',(a.y+b.y)/2),G=gridOf(table),c0=Math.min(a.x,b.x),c1=Math.max(a.x,b.x),seen=new Set();if(k<=0)return;for(let c=0;c<(G.g[k-1]||[]).length;c++){const cell=G.g[k-1][c],other=(G.g[k]||[])[c];if(!cell||!other||cell===other||seen.has(cell)||seen.has(other))continue;const box=cell.getBoundingClientRect();if(box.right<c0||box.left>c1)continue;seen.add(cell);seen.add(other);if(mergeCells([cell,other]))did=true;}}
+      if(did)changed()
+    }
+  })();
+
   load().then(updateCount, updateCount);
 })();
+
 </script>
 </body>
 </html>
