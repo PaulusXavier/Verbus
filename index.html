@@ -3095,6 +3095,13 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     e.target.value = '';
   });
 
+  // Texto digitado direto na folha vazia vira parágrafo <p> (senão fica sem espaçamento e sem estilo)
+  page.addEventListener('input', ()=>{
+    const s = getSelection();
+    if(s.rangeCount && s.isCollapsed && s.anchorNode && s.anchorNode.nodeType === 3 && s.anchorNode.parentNode === page){
+      try{ document.execCommand('formatBlock', false, 'p'); }catch(_){}
+    }
+  });
   page.addEventListener('input', changed);
   title.addEventListener('input', changed);
   page.addEventListener('keyup', refresh);
@@ -6457,8 +6464,31 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     // Régua vertical: 0 na margem superior, cm para baixo (e para cima dentro da margem); números girados
     function drawV(){
-      const k = H + '|' + pad.t + '|' + pad.b; if(k === vkey) return; vkey = k;
+      const ps = (typeof pgState !== 'undefined' && pgState && pgState.shifted && pgState.P > 0 && pgState.starts.length > 1) ? pgState : null;
+      const k = H + '|' + pad.t + '|' + pad.b + '|' + (ps ? ps.P + 'x' + ps.starts.length : '1'); if(k === vkey) return; vkey = k;
       vsvg.setAttribute('viewBox', '0 0 12 ' + H);
+      if(ps){   // várias páginas: a régua recomeça do 0 em cada folha, como no Word
+        const PH = ps.H, n = ps.starts.length;
+        let h = '<rect width="12" height="' + H + '" fill="' + MARGIN + '" fill-opacity=".0"/>', d = '';
+        for(let q = 0; q < n; q++){
+          const y0 = q * ps.P, bodyTop = y0 + pad.t, bodyBot = y0 + PH - pad.b;
+          h += '<rect y="' + f1(y0) + '" width="12" height="' + PH + '" fill="#fff"/>' +
+               '<rect y="' + f1(y0) + '" width="12" height="' + pad.t + '" fill="' + MARGIN + '"/>' +
+               '<rect y="' + f1(bodyBot) + '" width="12" height="' + pad.b + '" fill="' + MARGIN + '"/>';
+          for(let j = -Math.floor(pad.t / Q); bodyTop + j * Q < bodyBot; j++){
+            const y = bodyTop + j * Q; if(y < y0 + 1) continue;
+            if(j % 4 === 0){ if(j !== 0) h += '<text transform="translate(9.2 ' + f1(y) + ') rotate(-90)" text-anchor="middle" font-size="9" fill="' + INK + '" font-family="Segoe UI,Arial,sans-serif">' + Math.abs(j / 4) + '</text>'; }
+            else d += (j % 2 === 0 ? 'M3.5 ' + (f1(y) + .5) + 'H8.5' : 'M5.5 ' + (f1(y) + .5) + 'H6.5');
+          }
+          for(let j = 1; bodyBot + j * Q < y0 + PH - 1; j++){
+            const y = bodyBot + j * Q;
+            if(j % 4 === 0) h += '<text transform="translate(9.2 ' + f1(y) + ') rotate(-90)" text-anchor="middle" font-size="9" fill="' + INK + '" font-family="Segoe UI,Arial,sans-serif">' + (j / 4) + '</text>';
+            else d += (j % 2 === 0 ? 'M3.5 ' + (f1(y) + .5) + 'H8.5' : 'M5.5 ' + (f1(y) + .5) + 'H6.5');
+          }
+        }
+        vsvg.innerHTML = h + '<path d="' + d + '" stroke="' + TICK + '" stroke-width="1" fill="none"/>';
+        return;
+      }
       const bodyEnd = H - pad.b;
       let h = '<rect width="12" height="' + H + '" fill="#fff"/>' +
         '<rect width="12" height="' + pad.t + '" fill="' + MARGIN + '"/>' +
