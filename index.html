@@ -786,7 +786,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 #toolbar .tsz{display:flex;justify-content:space-between;gap:4px;width:130px}
 #toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
 #toolbar select.tfit{width:100%;height:22px}
-@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}}
+@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}#page table[data-flow]{border-collapse:separate !important;border-spacing:0}#page table[data-flow] td{-webkit-box-decoration-break:clone;box-decoration-break:clone}}
 
 /* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
 @media (max-width:700px){
@@ -2181,6 +2181,13 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const imgs = [], sz = [], ps = [];
     if(Lb){ imgs.push(g(Lb)); sz.push(Lb.w + 'px 100%'); ps.push('left top'); }
     if(Rb){ imgs.push(g(Rb)); sz.push(Rb.w + 'px 100%'); ps.push('right top'); }
+    // Fecha o quadro onde a página termina (borda de baixo) e reabre no começo da página seguinte (borda de cima), como no Word
+    const Tb = side(cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor), Bb = side(cs.borderBottomWidth, cs.borderBottomStyle, cs.borderBottomColor);
+    const hl = (o, y0, y1)=>'linear-gradient(to bottom,transparent ' + y0.toFixed(1) + 'px,' + o.col + ' ' + y0.toFixed(1) + 'px,' + o.col + ' ' + y1.toFixed(1) + 'px,transparent ' + y1.toFixed(1) + 'px)';
+    gaps.forEach(([a, b])=>{
+      if(Bb){ imgs.push(hl(Bb, a - Bb.w, a)); sz.push('100% 100%'); ps.push('0 0'); }
+      if(Tb){ imgs.push(hl(Tb, b, b + Tb.w)); sz.push('100% 100%'); ps.push('0 0'); }
+    });
     if(imgs.length) css += sel + '{border-left-color:transparent !important;border-right-color:transparent !important;background-image:' + imgs.join(',') + ' !important;background-size:' + sz.join(',') + ' !important;background-position:' + ps.join(',') + ' !important;background-repeat:no-repeat !important;background-origin:border-box !important}';
     return css;
   }
@@ -5102,23 +5109,23 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function tplRelatorio(){
     // Baseado no Modelo_Pronto.docx do CRAS, com texto em Times New Roman 12, espaçamento 1,5: cabeçalho e rodapé em imagem, 5 campos e assinatura. Medidas em px (96 por polegada).
     const F = 'font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;';
-    const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:22px 0 6px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
-    const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:5px 9px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
+    const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
+    const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
     // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
-    const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:5px 9px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
-    const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 9px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
+    const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
+    const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
     const html =
       '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">Relatório Informativo</p>' +
-      '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:12px 0 6px 0;text-align:left;break-after:avoid">01 – Identificação:</p>' +
-      '<table data-sec="1" style="border-collapse:collapse;table-layout:fixed;width:624px;margin:0"><colgroup><col style="width:340px"><col style="width:72px"><col style="width:212px"></colgroup><tbody>' +
-        '<tr>' + c(624, 36, 'Nome:', 3) + '</tr>' +
-        '<tr>' + c(412, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
-        '<tr>' + c(340, 36, 'Endereço:') + c(284, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
-      hd('02 – Demanda:', 0) + box(624, 48, 0) +
-      hd('03 – Composição Familiar:', 0) + box(624, 48, 0) +
-      hd('04 – Condições Habitacionais:', 0) + box(624, 90, 0) +
-      hd('05 – Situação Apresentada:', 0) + big(624, 360, 0) +
-      hd('06 – Providências Socioassistenciais:', 0) + box(624, 130, 0) +
+      '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left;break-after:avoid">01 – Identificação:</p>' +
+      '<table data-sec="1" style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><colgroup><col style="width:333px"><col style="width:71px"><col style="width:212px"></colgroup><tbody>' +
+        '<tr>' + c(616, 36, 'Nome:', 3) + '</tr>' +
+        '<tr>' + c(404, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
+        '<tr>' + c(333, 36, 'Endereço:') + c(283, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
+      hd('02 – Demanda:', 28) + box(616, 37, 5) +
+      hd('03 – Composição Familiar:', 28) + box(616, 37, 5) +
+      hd('04 – Condições Habitacionais:', 28) + box(616, 90, 5) +
+      hd('05 – Situação Apresentada:', 28) + big(616, 370, 5) +
+      hd('06 – Providências Socioassistenciais:', 28) + box(616, 139, 5) +
       '<p style="' + F + 'line-height:1.5;margin:31px 0 0 319px;text-align:left;break-after:avoid">Boa Vista – RR, {{DATA}}</p>' +
       ('<p style="' + F + 'line-height:1.5;margin:0;break-after:avoid"><br></p>').repeat(3) +
       '<p style="' + F + 'font-weight:bold;font-style:italic;line-height:1.5;width:326px;margin:0 0 0 295px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">(Assinado eletronicamente)</p>' +
@@ -5138,20 +5145,20 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const B = '1px solid #000';
     const L = t=>'<b><u>' + t + '</u></b>';
     const SP = '&nbsp;';   // espaço fora do negrito/sublinhado: o que for digitado depois do rótulo sai em texto normal
-    // grade de 2 colunas: 285 + 329 = 614 px (a 2ª precisa de ≥ 293 px para "CRAS/CRISTIANA VICENTE NUNES" não quebrar) (Encaminhamento/Idade/Bairro começam na 2ª coluna)
+    // grade de 2 colunas: 285 + 321 = 606 px (a 2ª precisa de ≥ 293 px para "CRAS/CRISTIANA VICENTE NUNES" não quebrar) (Encaminhamento/Idade/Bairro começam na 2ª coluna)
     const td = (span, w, inner, h, o)=>{
       o = o || {};
-      return '<td colspan="' + span + '" style="' + F + 'width:' + w + 'px;height:' + h + 'px;padding:' + (o.top ? '6px 11px' : '0 11px') + ';vertical-align:' + (o.top ? 'top' : 'middle') + ';line-height:1.2;text-align:left;border-style:none;' +
+      return '<td colspan="' + span + '" style="' + F + 'width:' + w + 'px;height:' + h + 'px;padding:' + (o.pad || '5px 11px 0') + ';vertical-align:top;line-height:1.2;text-align:left;border-style:none;' +
         (o.l ? 'border-left:' + B + ';' : '') + (o.r ? 'border-right:' + B + ';' : '') + (o.t ? 'border-top:' + B + ';' : '') + (o.b ? 'border-bottom:' + B + ';' : '') + '">' + inner + '</td>';
     };
     // linha com um campo que ocupa a largura toda
-    const full = (inner, h, o, flow)=>'<tr' + (flow ? ' data-flow="1"' : '') + '>' + td(2, 614, inner, h, Object.assign({l:1, r:1, b:1}, o)) + '</tr>';
+    const full = (inner, h, o, flow)=>'<tr' + (flow ? ' data-flow="1"' : '') + '>' + td(2, 606, inner, h, Object.assign({l:1, r:1}, o)) + '</tr>';
     // linha com dois campos, um em cada coluna
-    const two = (a, b, h, o)=>'<tr>' + td(1, 285, a, h, Object.assign({l:1, b:1}, o)) + td(1, 329, b, h, Object.assign({l:1, r:1, b:1}, o)) + '</tr>';
+    const two = (a, b, h, o)=>'<tr>' + td(1, 285, a, h, Object.assign({l:1}, o)) + td(1, 321, b, h, Object.assign({r:1}, o)) + '</tr>';
     const html =
-      '<table style="border-collapse:collapse;table-layout:fixed;width:614px;margin:41px 0 0 0"><tbody>' +
+      '<table style="border-collapse:collapse;table-layout:fixed;width:606px;margin:41px 0 0 4px"><tbody>' +
         two('<b>Encaminhamento:</b>' + SP, '<b>CRAS/CRISTIANA VICENTE NUNES</b>', 40, {t:1}) +
-        full(L('Assunto:') + SP, 56, {top:1}) +
+        full(L('Assunto:') + SP, 56) +
         full(L('Nome do adolescente/criança:') + SP, 36) +
         two(L('Data de nascimento:') + SP, '<b>Idade:</b>' + SP, 32) +
         full(L('CPF:') + SP, 32) +
@@ -5159,10 +5166,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         full(L('Responsável Familiar') + '<b>:</b>' + SP, 32) +
         full(L('CPF:') + SP, 32) +
         two(L('Endereço') + '<b>:</b>' + SP, '<b>Bairro:</b>' + SP, 32) +
-        full(L('Contato') + '<b>:</b>' + SP, 52, {top:1}) +
-        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270, {top:1}, 1) +
-        full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36, {b:0}) +
-        full('&nbsp;', 40, {b:0}) +
+        full(L('Contato') + '<b>:</b>' + SP, 52) +
+        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270, null, 1) +
+        full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
+        full('&nbsp;', 40) +
         full('<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">____________________________</p>' +
              '<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">Técnico de Referência</p>', 70, {b:1}) +
       '</tbody></table>' +
@@ -5263,9 +5270,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       e.preventDefault(); window.__insImgFile(img); return;
     }
     const h = cd.getData('text/html'); if(!h) return;
-    e.preventDefault();
-    exec('insertHTML', cleanPasted(h));
+    e.preventDefault();      // colar sempre como texto sem formatação (para manter a formatação: botão Opções de Colagem ou Colar > Manter formatação de origem)
+    exec('insertText', htmlToPlain(h, cd.getData('text/plain')));
   });
+  function htmlToPlain(h, t){
+    if(t) return t.replace(/\r/g, '');
+    const d = new DOMParser().parseFromString(h, 'text/html');
+    return (d.body.innerText || d.body.textContent || '').trim();
+  }
   function cleanPasted(h){
     const doc = new DOMParser().parseFromString(h, 'text/html');
     doc.querySelectorAll('script,style,meta,link,iframe,object,embed,title').forEach(n=>n.remove());
@@ -5281,7 +5293,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   const NOCLIP = 'O navegador bloqueou o acesso à área de transferência. Use Ctrl+V para colar.';
   $('btnCut').addEventListener('click', ()=>{ restore(); if(!document.execCommand('cut')) alert('Selecione um trecho para recortar.'); changed(); });
   $('btnCopy').addEventListener('click', ()=>{ restore(); document.execCommand('copy'); });
-  async function pasteFromClipboard(plain){
+  async function pasteFromClipboard(mode){      // sem argumento = só texto; 'keep' = mantém a formatação de origem
+    const plain = mode !== 'keep';
     restore();
     try{
       if(navigator.clipboard && navigator.clipboard.read){
@@ -5292,7 +5305,12 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
             const blob = await it.getType(img); restore(); window.__insImgFile(blob); return;
           }
           if(!plain && it.types.includes('text/html')){
-            const h = await (await it.getType('text/html')).text(); restore(); exec('insertHTML', cleanPasted(h)); if(window.__pstShow) setTimeout(()=>window.__pstShow(h, null), 0); return;
+            const h = await (await it.getType('text/html')).text(); restore(); exec('insertHTML', cleanPasted(h)); if(window.__pstShow) setTimeout(()=>window.__pstShow(h, null, 'keep'), 0); return;
+          }
+          if(plain && it.types.includes('text/html')){
+            const h = await (await it.getType('text/html')).text();
+            const t = it.types.includes('text/plain') ? await (await it.getType('text/plain')).text() : '';
+            restore(); exec('insertText', htmlToPlain(h, t)); if(window.__pstShow) setTimeout(()=>window.__pstShow(h, t, 'text'), 0); return;
           }
           if(it.types.includes('text/plain')){
             const t = await (await it.getType('text/plain')).text(); restore(); exec('insertText', t); return;
@@ -5306,7 +5324,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       catch(e2){ alert(NOCLIP); }
     }
   }
-  $('btnPaste').addEventListener('click', ()=>pasteFromClipboard(false));
+  $('btnPaste').addEventListener('click', ()=>pasteFromClipboard());
 
   // Painel da Área de Transferência: guarda o que foi copiado/recortado aqui (até 24 itens)
   const clipHist = [], clipDlg = $('clipDlg');
@@ -6985,9 +7003,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const x = Math.max(8, Math.min(innerWidth - 60, r.right || r.left)), y = Math.max(8, Math.min(innerHeight - 40, (r.bottom || r.top) + 6));
       btn.style.left = x + 'px'; btn.style.top = y + 'px';
     }
-    function mostra(h, t){
+    function mostra(h, t, mode){
       if(!h || !h.trim()) return;
-      ctx = {h, t, mode:'keep'}; pos(); btn.hidden = false; menu.hidden = true; marcar();
+      ctx = {h, t, mode:mode || 'text'}; pos(); btn.hidden = false; menu.hidden = true; marcar();
     }
     window.__pstShow = mostra;
     page.addEventListener('paste', e=>{
@@ -8700,7 +8718,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     $('pasteSp').addEventListener('change', e=>{
       const v = e.target.value; e.target.selectedIndex = 0;
-      if(v === 'keep') pasteFromClipboard(false); else if(v === 'text') pasteFromClipboard(true); else if(v === 'merge') pasteMerge();
+      if(v === 'keep') pasteFromClipboard('keep'); else if(v === 'text') pasteFromClipboard(true); else if(v === 'merge') pasteMerge();
       else if(v === 'link'){
         restore();
         (navigator.clipboard && navigator.clipboard.readText ? navigator.clipboard.readText() : Promise.reject()).then(t=>{
