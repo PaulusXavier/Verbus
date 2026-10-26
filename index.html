@@ -3294,16 +3294,30 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     });
     return {g, pos};
   }
-  function moveTableRow(table, from, to){
-    const rows=[...table.rows], row=rows[from], target=rows[to];
-    if(!row||!target||from===to||row.parentElement!==target.parentElement)return false;
-    const before=tSnap(); row.parentElement.insertBefore(row,from<to?target.nextSibling:target); tCommit(before); changed(); return true;
+  function rowBlockBounds(table,index,G=gridOf(table)){
+    const rows=[...table.rows],section=rows[index]&&rows[index].parentElement;if(!section)return null;let start=index,end=index,again=true;
+    while(again){again=false;for(let r=start;r<=end;r++){if(!rows[r]||rows[r].parentElement!==section)continue;for(const cell of new Set(G.g[r]||[])){const q=G.pos.get(cell);if(!q||rows[q.r]?.parentElement!==section)continue;const last=Math.min(rows.length-1,q.r+q.rs-1);if(q.r<=end&&last>=start&&(q.r<start||last>end)){start=Math.min(start,q.r);end=Math.max(end,last);again=true}}}}
+    return {start,end,section};
   }
-  function moveTableColumn(table, from, to){
-    const rows=[...table.rows]; if(from===to||from<0||to<0||!rows.length)return false;
-    if(rows.some(r=>[...r.cells].some(c=>(c.rowSpan||1)>1||(c.colSpan||1)>1)||r.cells.length!==rows[0].cells.length))return false;
-    if(from>=rows[0].cells.length||to>=rows[0].cells.length)return false;
-    const before=tSnap(); rows.forEach(r=>{const cells=[...r.cells],moving=cells[from],target=cells[to];if(from<to)r.insertBefore(moving,target.nextSibling);else r.insertBefore(moving,target)});const cg=table.querySelector(':scope > colgroup');if(cg&&cg.children.length===rows[0].cells.length){const cols=[...cg.children],moving=cols[from],target=cols[to];if(from<to)cg.insertBefore(moving,target.nextSibling);else cg.insertBefore(moving,target)}tCommit(before);changed();return true;
+  function moveTableRow(table,from,to,step=false){
+    const rows=[...table.rows];if(!rows[from]||!rows[to]||from===to)return false;const G=gridOf(table),src=rowBlockBounds(table,from,G);let dst=rowBlockBounds(table,to,G);if(!src||!dst)return false;
+    const down=from<to;if(dst.start>=src.start&&dst.end<=src.end){if(!step)return false;const next=down?src.end+1:src.start-1;if(next<0||next>=rows.length)return false;dst=rowBlockBounds(table,next,G);if(!dst||dst.start>=src.start&&dst.end<=src.end)return false}
+    const source=rows.slice(src.start,src.end+1),target=rows.slice(dst.start,dst.end+1);if(source.some(r=>r.parentElement!==src.section))return false;
+    const before=tSnap(),frag=document.createDocumentFragment();source.forEach(r=>frag.appendChild(r));
+    if(down){const anchor=target[target.length-1].nextSibling;dst.section.insertBefore(frag,anchor)}else dst.section.insertBefore(frag,target[0]);
+    [...table.children].filter(x=>/^(THEAD|TBODY|TFOOT)$/.test(x.tagName)&&!x.rows.length).forEach(x=>x.remove());
+    tCommit(before);changed();return true;
+  }
+  function moveTableColumn(table,from,to){
+    const rows=[...table.rows],G=gridOf(table),n=Math.max(0,...G.g.map(r=>r.length));if(from===to||from<0||to<0||from>=n||to>=n||!rows.length)return false;
+    let s=from,e=from+1,again=true;while(again){again=false;for(const [cell,q] of G.pos){if(q.c<e&&q.c+q.cs>s){const ns=Math.min(s,q.c),ne=Math.max(e,q.c+q.cs);if(ns<s||ne>e){s=ns;e=ne;again=true}}}}
+    const targetCells=[...G.pos].filter(([cell,q])=>q.c<=to&&q.c+q.cs>to).map(([cell,q])=>q);if(!targetCells.length)return false;let ts=Math.min(...targetCells.map(q=>q.c)),te=Math.max(...targetCells.map(q=>q.c+q.cs));if(ts<e&&te>s)return false;
+    const left=to<s;let boundary=left?ts:te;again=true;while(again){again=false;for(const q of G.pos.values())if(q.c<boundary&&q.c+q.cs>boundary){const next=left?q.c:q.c+q.cs;if(next!==boundary){boundary=next;again=true}}}
+    if(boundary<=s&&boundary>=s&&boundary<=e)return false;const order=Array.from({length:n},(_,i)=>i),block=order.splice(s,e-s);let dest=boundary-(s<boundary?e-s:0);dest=Math.max(0,Math.min(order.length,dest));order.splice(dest,0,...block);if(order.every((v,i)=>v===i))return false;
+    const newPos=new Map(order.map((old,i)=>[old,i])),before=tSnap();
+    rows.forEach(tr=>{const cells=[...tr.cells].map(cell=>{const q=G.pos.get(cell),cols=Array.from({length:q.cs},(_,k)=>newPos.get(q.c+k));return {cell,pos:Math.min(...cols)}}).sort((a,b)=>a.pos-b.pos);cells.forEach(x=>tr.appendChild(x.cell))});
+    const cg=table.querySelector(':scope > colgroup');if(cg&&cg.children.length===n){const cols=[...cg.children].map((col,i)=>({col,pos:newPos.get(i)})).sort((a,b)=>a.pos-b.pos);cols.forEach(x=>cg.appendChild(x.col))}
+    tCommit(before);changed();return true;
   }
   function mergeCells(list){
     const cells = list || selCells();
@@ -3651,7 +3665,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     page.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-formula]'))return;setTimeout(()=>{let any=false;page.querySelectorAll('table').forEach(t=>any=recalcTableFormulas(t)||any);if(any)changed()},0)});
     $('tSortOpen').addEventListener('mousedown',e=>e.preventDefault());$('tSortCancel').onclick=()=>sortDlg.close();
     $('tSortOpen').onclick=()=>{const t=sortTarget=tableOfCursor();if(!t){alert('Clique em uma célula da tabela que deseja classificar.');return}const n=Math.max(0,...gridOf(t).g.map(r=>r.length)),sel=$('tSortCol');sel.innerHTML='';for(let i=0;i<n;i++)sel.add(new Option('Coluna '+(i+1),String(i)));$('tSortHead').checked=!!(t.tHead&&t.tHead.rows.length);$('tSortMsg').textContent='';sortDlg.showModal()};
-    $('tSortApply').onclick=()=>{const t=sortTarget;if(!t||!t.isConnected)return;const col=+$('tSortCol').value, numeric=$('tSortType').value==='number', desc=$('tSortDir').value==='desc',hasHead=$('tSortHead').checked,G=gridOf(t);const bodies=[...t.tBodies];if(!bodies.length){$('tSortMsg').textContent='A tabela não contém linhas de dados.';return}const rows=bodies.flatMap(b=>[...b.rows]);if(rows.some(r=>[...r.cells].some(c=>c.rowSpan>1||c.colSpan>1))){$('tSortMsg').textContent='Para evitar danificar a grade, desfaça as mesclagens antes de classificar.';return}const before=tSnap(),coll=new Intl.Collator('pt-BR',{numeric:true,sensitivity:'base'});let offset=[...t.rows].findIndex(r=>r.parentElement===bodies[0]);for(const body of bodies){let data=[...body.rows];if(hasHead&&!t.tHead&&body===bodies[0]&&data.length)data=data.slice(1);const base=[...t.rows].findIndex(r=>r===data[0]);data=data.map((r,i)=>({r,i,key:cellValue(G,base+i,col)}));data.sort((a,b)=>{let d;if(numeric){const x=parseTableNumber(a.key),y=parseTableNumber(b.key);if(x===null||y===null){if(x===null&&y!==null)return 1;if(y===null&&x!==null)return -1;d=0}else d=x-y}else d=coll.compare(a.key,b.key);return (desc?-d:d)||a.i-b.i});data.forEach(x=>body.appendChild(x.r))}recalcTableFormulas(t);tCommit(before);changed();sortDlg.close()};
+    function sortRowBlocks(table,section,G){const all=[...table.rows],rows=[...section.rows];if(!rows.length)return [];const base=all.indexOf(rows[0]),blocks=[];let i=0;while(i<rows.length){let end=i,again=true;while(again){again=false;for(let j=i;j<=end;j++)for(const cell of new Set(G.g[base+j]||[])){const q=G.pos.get(cell);if(!q)continue;const a=q.r-base,z=Math.min(rows.length-1,q.r+q.rs-1-base);if(a<=end&&z>=i&&z>end){end=z;again=true}}}end=Math.min(end,rows.length-1);blocks.push({rows:rows.slice(i,end+1),i});i=end+1}return blocks}
+    $('tSortApply').onclick=()=>{const t=sortTarget;if(!t||!t.isConnected)return;const col=+$('tSortCol').value,numeric=$('tSortType').value==='number',desc=$('tSortDir').value==='desc',hasHead=$('tSortHead').checked,G=gridOf(t),bodies=[...t.tBodies];if(!bodies.length){$('tSortMsg').textContent='A tabela não contém linhas de dados.';return}const before=tSnap(),coll=new Intl.Collator('pt-BR',{numeric:true,sensitivity:'base'});bodies.forEach((body,bi)=>{const blocks=sortRowBlocks(t,body,G);if(!blocks.length)return;const pinHeader=hasHead&&!t.tHead&&bi===0?blocks[0]:null,data=pinHeader?blocks.slice(1):blocks;const keyed=data.map((b,i)=>{const gi=[...t.rows].indexOf(b.rows[0]);return {...b,order:i,key:cellValue(G,gi,col)}});keyed.sort((a,b)=>{let d;if(numeric){const x=parseTableNumber(a.key),y=parseTableNumber(b.key);if(x===null||y===null){if(x===null&&y!==null)return 1;if(y===null&&x!==null)return -1;d=0}else d=x-y}else d=coll.compare(a.key,b.key);return (desc?-d:d)||a.order-b.order});const ordered=(pinHeader?[pinHeader]:[]).concat(keyed);ordered.forEach(group=>group.rows.forEach(row=>body.appendChild(row)))});recalcTableFormulas(t);tCommit(before);changed();sortDlg.close()};
     $('tRepeatHeader').addEventListener('mousedown',e=>e.preventDefault());$('tRepeatHeader').onclick=()=>{const t=tableOfCursor();if(!t){alert('Clique dentro da tabela primeiro.');return}const before=tSnap();if(t.dataset.repeatTitle==='1'){delete t.dataset.repeatTitle;if(t.tHead){const rows=[...t.tHead.rows],body=t.tBodies[0]||t.createTBody();rows.reverse().forEach(r=>body.insertBefore(r,body.firstChild));t.tHead.remove()}}else{let row=t.tHead&&t.tHead.rows[0];if(!row){const body=t.tBodies[0];row=body&&body.rows[0];if(row){const h=t.createTHead();h.appendChild(row)}}if(!row){alert('A tabela não tem linha para repetir.');return}t.dataset.repeatTitle='1';t.tHead.style.display='table-header-group'}tCommit(before);changed()};
     $('tTextDir').addEventListener('mousedown',e=>e.preventDefault());$('tTextDir').onclick=()=>{const c=inTable();if(!c){alert('Clique dentro da célula que deseja formatar.');return}const before=tSnap(),v=c.style.writingMode==='vertical-rl';c.style.writingMode=v?'horizontal-tb':'vertical-rl';c.style.textOrientation=v?'':'mixed';tCommit(before);changed()};
     // Dialogo de propriedades tabulado
@@ -3665,11 +3680,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     $('tNestOpen').onclick=()=>{nestTarget=inTable();if(!nestTarget){alert('Clique dentro da célula onde deseja inserir a tabela aninhada.');return}const sel=getSelection();nestRange=sel.rangeCount?sel.getRangeAt(0).cloneRange():(savedRange&&savedRange.cloneRange());$('tNestMsg').textContent='';nestDlg.showModal()};
     $('tNestApply').onclick=()=>{const c=nestTarget,nr=Math.max(1,Math.min(20,parseInt($('tNestRows').value,10)||0)),nc=Math.max(1,Math.min(12,parseInt($('tNestCols').value,10)||0));if(!c||!c.isConnected){$('tNestMsg').textContent='A célula de destino não está mais disponível.';return}if(!nr||!nc){$('tNestMsg').textContent='Informe pelo menos uma linha e uma coluna.';return}const before=tSnap(),nt=document.createElement('table');nt.className='verbus-nested-table';nt.style.width='100%';nt.style.borderCollapse='collapse';nt.style.tableLayout='auto';for(let i=0;i<nr;i++){const tr=nt.insertRow();for(let j=0;j<nc;j++){const td=tr.insertCell();td.style.border='1px solid #777';td.style.padding='4px';td.innerHTML='<br>'}}if(nestRange&&c.contains(nestRange.commonAncestorContainer)){if(!nestRange.collapsed)nestRange.deleteContents();nestRange.insertNode(nt)}else c.appendChild(nt);caretIn(nt.rows[0].cells[0]);tCommit(before);changed();nestTarget=null;nestRange=null;nestDlg.close()};
     // Alt+Shift+seta move a linha da célula ativa, respeitando seções thead/tbody.
-    page.addEventListener('keydown',e=>{if(!(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')))return;const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement),to=from+(e.key==='ArrowUp'?-1:1);if(moveTableRow(t,from,to)){e.preventDefault();e.stopPropagation()}},true);
+    page.addEventListener('keydown',e=>{if(!(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')))return;const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement),to=from+(e.key==='ArrowUp'?-1:1);if(moveTableRow(t,from,to,true)){e.preventDefault();e.stopPropagation()}},true);
     // Explicit metadata controls for repeated headings and row-level page breaks.
     [['tRowUp', -1], ['tRowDown', 1]].forEach(([id, dir])=>{
       const b=$(id); b.addEventListener('mousedown', e=>e.preventDefault());
-      b.addEventListener('click', ()=>{const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement);moveTableRow(t,from,from+dir)});
+      b.addEventListener('click', ()=>{const c=inTable();if(!c)return;const t=c.closest('table'),from=[...t.rows].indexOf(c.parentElement);moveTableRow(t,from,from+dir,true)});
     });
     // ----- Estilos de tabela prontos + opções (linha de cabeçalho, totais, tiras, colunas) -----
     const TS = {
@@ -4016,7 +4031,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       if(!z||!['row','col'].includes(z.k)){moveHover=null;moveHandle.hidden=true;return}
       const t=z.table,rect=t.getBoundingClientRect();let x,y;
       if(z.k==='row'){const row=t.rows[z.i];if(!row){moveHandle.hidden=true;return}const b=row.getBoundingClientRect();x=rect.left-23;y=(b.top+b.bottom)/2-11;moveHandle.title='Arraste para reordenar esta linha';}
-      else{const G=gridOf(t),cell=(G.g[0]||[]).find(c=>c&&G.pos.get(c).c===z.i);if(!cell){moveHandle.hidden=true;return}const b=cell.getBoundingClientRect();x=(b.left+b.right)/2-11;y=rect.top-23;const merged=[...t.rows].some(r=>[...r.cells].some(c=>(c.rowSpan||1)>1||(c.colSpan||1)>1));moveHandle.title=merged?'Desfaça as células mescladas antes de reordenar colunas':'Arraste para reordenar esta coluna';}
+      else{const G=gridOf(t),cell=(G.g[0]||[]).find(c=>c&&G.pos.get(c).c===z.i);if(!cell){moveHandle.hidden=true;return}const b=cell.getBoundingClientRect();x=(b.left+b.right)/2-11;y=rect.top-23;const merged=[...t.rows].some(r=>[...r.cells].some(c=>(c.rowSpan||1)>1||(c.colSpan||1)>1));moveHandle.title=merged?'Arraste para reordenar; colunas unidas movem-se como bloco':'Arraste para reordenar esta coluna';}
       moveHover=z;moveHandle.hidden=false;moveHandle.style.left=Math.max(2,x)+'px';moveHandle.style.top=Math.max(2,y)+'px';
     }
     function zoneForHandle(e){let z=zoneAt(e);if(z&&['row','col'].includes(z.k))return z;const el=document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest?el.closest('#page td,#page th'):null;if(!cell)return null;const t=cell.closest('table'),b=cell.getBoundingClientRect(),G=gridOf(t),q=G.pos.get(cell);if(!q)return null;if(e.clientX<=b.left+15)return {k:'row',table:t,i:q.r,n:1};if(q.r===0&&e.clientY<=b.top+14)return {k:'col',table:t,i:q.c,n:q.cs};return null}
