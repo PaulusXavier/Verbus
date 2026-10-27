@@ -2612,19 +2612,51 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   function changed(){
     try{ fnRenumber(); }catch(e){}
     try{ enRenumber(); }catch(e){}
-    updateCount();
+    updateCountSoon();
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(()=>{ save(); renderSide(); }, 500);
+    saveTimer = setTimeout(()=>{
+      const go = ()=>{ save(); if(!$('side').hidden) renderSide(); };   // salvar serializa o HTML todo (imagens inclusas): faz no tempo ocioso
+      if(window.requestIdleCallback) requestIdleCallback(go, {timeout:2500}); else go();
+    }, 600);
   }
   function updateCount(){
     try{ hfRender(); }catch(e){}
     try{ lnRender(); }catch(e){}
     try{ pgMarks(); }catch(e){}
     try{ window.__imgUpd && window.__imgUpd(); }catch(e){}
-    const t = page.innerText.trim();
-    document.getElementById('count').textContent = (t ? t.split(/\s+/).length : 0) + ' palavras';
-    document.getElementById('chars').textContent = t.length + ' caracteres · leitura ~' + Math.max(t ? 1 : 0, Math.round((t ? t.split(/\s+/).length : 0) / 200)) + ' min' + pagesTxt();
+    const st = wordStats();
+    document.getElementById('count').textContent = st.w + ' palavras';
+    document.getElementById('chars').textContent = st.c + ' caracteres · leitura ~' + Math.max(st.w ? 1 : 0, Math.round(st.w / 200)) + ' min' + pagesTxt();
   }
+  // Palavras e caracteres sem page.innerText (que força um novo layout da folha a cada chamada): percorre só os nós de texto
+  function wordStats(){
+    const WC_BLK = 'p,li,h1,h2,h3,h4,h5,h6,td,th,tr,blockquote,pre,div';
+    const WC_FILTER = {acceptNode(n){
+      if(n.nodeType === 3) return 1;
+      if(n.hasAttribute('data-hid') || n.tagName === 'SCRIPT' || n.tagName === 'STYLE') return 2;   // oculto: pula o ramo todo
+      return n.tagName === 'BR' ? 1 : 3;
+    }};
+    let w = 0, c = 0, inW = false, prev = null, lastP = null;
+    const tw = document.createTreeWalker(page, 5, WC_FILTER);   // 5 = SHOW_ELEMENT | SHOW_TEXT
+    for(let n; (n = tw.nextNode());){
+      if(n.nodeType === 1){ inW = false; if(c) c++; continue; }   // <br>: nova linha
+      const p = n.parentNode;
+      if(p !== lastP){
+        lastP = p;
+        const b = p.closest ? p.closest(WC_BLK) : null;
+        if(b !== prev){ prev = b; inW = false; if(c) c++; }
+      }
+      const t = n.data; if(!t) continue;
+      if(!/[^\s\u200b]/.test(t)){ if(inW) c++; inW = false; continue; }   // só espaço: separa palavras
+      c += t.replace(/\s+/g, ' ').length;
+      let first = true;
+      for(const m of t.matchAll(/[^\s\u200b]+/g)){ if(!(first && m.index === 0 && inW)) w++; first = false; }
+      inW = /[^\s\u200b]$/.test(t);
+    }
+    return {w, c};
+  }
+  var ucT = 0;
+  function updateCountSoon(){ clearTimeout(ucT); ucT = setTimeout(updateCount, 350); }   // cabeçalho/rodapé, paginação, contagem: só depois que a digitação dá uma pausa
 
   // ---------- Comandos de formatação ----------
   // ---------- Desfazer/refazer das operações em tabelas (mover, redimensionar, inserir linha/coluna, estilos): o desfazer nativo não enxerga mudanças feitas direto no DOM ----------
@@ -2670,7 +2702,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   document.addEventListener('selectionchange', ()=>{
     const s = getSelection();
     if(s.rangeCount && page.contains(s.anchorNode)) savedRange = s.getRangeAt(0).cloneRange();
-    refresh();
+    refreshSoon();
   });
   function restore(){
     page.focus();
@@ -3020,7 +3052,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   })();
 
   // Realça os botões ativos (negrito, itálico, etc.)
+  var rfT = 0;
+  function refreshSoon(){ clearTimeout(rfT); rfT = setTimeout(refresh, 80); }   // seleção/tecla/mouse disparam isso várias vezes: queryCommandState é caro
   function refresh(){
+    clearTimeout(rfT);
     { const ae = document.activeElement;
       if(ae && ae.closest && ae.closest('dialog')) return; }   // foco dentro de um diálogo: não mexe nos botões da faixa
     document.querySelectorAll('[data-cmd]').forEach(b=>{
@@ -3126,8 +3161,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   });
   page.addEventListener('input', changed);
   title.addEventListener('input', changed);
-  page.addEventListener('keyup', refresh);
-  page.addEventListener('mouseup', refresh);
+  page.addEventListener('keyup', refreshSoon);
+  page.addEventListener('mouseup', refreshSoon);
 
   // ================= Funções extras =================
   const $ = id => document.getElementById(id);
@@ -3691,7 +3726,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     function addFormula(kind){const c=inTable(),table=c&&c.closest('table');if(!c)return;const before=tSnap(),n=formulaValue(table,c,kind);if(n===null){alert('Selecione uma célula abaixo dos valores a calcular.');return}c.dataset.formula=kind;c.contentEditable='false';c.textContent=formatFormula(n);tCommit(before);changed()}
     $('tSum').addEventListener('mousedown',e=>e.preventDefault());$('tAvg').addEventListener('mousedown',e=>e.preventDefault());$('tCount').addEventListener('mousedown',e=>e.preventDefault());
     $('tSum').onclick=()=>addFormula('SUM_ABOVE');$('tAvg').onclick=()=>addFormula('AVG_ABOVE');$('tCount').onclick=()=>addFormula('COUNT_ABOVE');
-    page.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-formula]'))return;setTimeout(()=>{let any=false;page.querySelectorAll('table').forEach(t=>any=recalcTableFormulas(t)||any);if(any)changed()},0)});
+    let fmT=0;page.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-formula]'))return;clearTimeout(fmT);fmT=setTimeout(()=>{let any=false;page.querySelectorAll('table').forEach(t=>any=recalcTableFormulas(t)||any);if(any)changed()},400)});
     $('tSortOpen').addEventListener('mousedown',e=>e.preventDefault());$('tSortCancel').onclick=()=>sortDlg.close();
     $('tSortOpen').onclick=()=>{const t=sortTarget=tableOfCursor();if(!t){alert('Clique em uma célula da tabela que deseja classificar.');return}const n=Math.max(0,...gridOf(t).g.map(r=>r.length)),sel=$('tSortCol');sel.innerHTML='';for(let i=0;i<n;i++)sel.add(new Option('Coluna '+(i+1),String(i)));$('tSortHead').checked=!!(t.tHead&&t.tHead.rows.length);$('tSortMsg').textContent='';sortDlg.showModal()};
     function sortRowBlocks(table,section,G){const all=[...table.rows],rows=[...section.rows];if(!rows.length)return [];const base=all.indexOf(rows[0]),blocks=[];let i=0;while(i<rows.length){let end=i,again=true;while(again){again=false;for(let j=i;j<=end;j++)for(const cell of new Set(G.g[base+j]||[])){const q=G.pos.get(cell);if(!q)continue;const a=q.r-base,z=Math.min(rows.length-1,q.r+q.rs-1-base);if(a<=end&&z>=i&&z>end){end=z;again=true}}}end=Math.min(end,rows.length-1);blocks.push({rows:rows.slice(i,end+1),i});i=end+1}return blocks}
@@ -4588,12 +4623,12 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   function spAdd(w){
     try{ localStorage.setItem('verbus:dicUser', JSON.stringify([...new Set(spUser().concat(w))])); }catch(_){}
-    spOk.clear(); return spLoad().then(sp=>{ sp.add(w); spOk.clear(); liveSoon(); });
+    spOk.clear(); return spLoad().then(sp=>{ sp.add(w); spOk.clear(); liveSoon(true); });
   }
   const spStrip = x=>x.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
   const rvCmp = (a, b)=>(a.node === b.node ? a.start - b.start : (a.node.compareDocumentPosition(b.node) & 4 ? -1 : 1));
-  function rvOrto(sp, noSug, only){
-    const out = [], memo = spOk, tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
+  function rvOrto(sp, noSug, only, root){   // root: varre só os textos que pertencem a esse bloco (verificação ao vivo)
+    const out = [], memo = spOk, tw = document.createTreeWalker(root || page, NodeFilter.SHOW_TEXT, root ? {acceptNode:n=>lvBlock(n) === root ? 1 : 2} : null);
     const rx = /(?<![\p{L}\p{N}@\/._-])\p{L}+(?:-\p{L}+)*(?![\p{L}\p{N}@\/_]|\.\p{L})/gu;
     for(let n = only || tw.nextNode(); n; n = only ? null : tw.nextNode()){
       if(n.parentNode.closest('.fnsep,script,style,a[href],code,pre')) continue;
@@ -4603,7 +4638,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(w.length < 2 || w === w.toUpperCase() || spIgnore.has(w)) continue;                                   // siglas
         if(w[0] !== w[0].toLowerCase() && !/(^|[.!?…]\s+)$/.test(t.slice(0, m.index))) continue; // nomes próprios no meio da frase
         let ok = memo.get(w);
-        if(ok === undefined){ ok = sp.correct(w) || w.split('-').every(x=>sp.correct(x)); memo.set(w, ok); }
+        if(ok === undefined){ ok = sp.correct(w) || (w.includes('-') && w.split('-').every(x=>sp.correct(x))); memo.set(w, ok); }
         if(ok) continue;
         const sug = noSug ? [] : sp.suggest(w).slice(0, 5).sort((a, b)=>(spStrip(b) === spStrip(w)) - (spStrip(a) === spStrip(w))).slice(0, 4);   // mesma palavra com acento corrigido vem primeiro
         out.push({node:n, start:m.index, len:w.length, rep:sug[0] || null, sug, kind:'orto', label:'Ortografia: “' + w + '”', text:w});
@@ -4702,23 +4737,48 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 
   // ---------- Como no Word: sublinhado ondulado vermelho ao digitar + clique direito com sugestões ----------
   let spReady = null, liveOn = false, liveT = 0;
-  function liveSoon(){ clearTimeout(liveT); liveT = setTimeout(liveRun, 350); }
+  // Verificação incremental: guarda os trechos errados por bloco (parágrafo, item, célula…) e só refaz os blocos que mudaram
+  const LV_SEL = 'p,li,h1,h2,h3,h4,h5,h6,td,th,blockquote,pre,div';
+  const lvMap = new Map(), lvDirty = new Set();
+  let lvHl = null, lvCaretBlk = null;
+  function lvBlock(n){ const e = n && (n.nodeType === 1 ? n : n.parentElement), b = e && e.closest ? e.closest(LV_SEL) : null; return b && b !== page && page.contains(b) ? b : page; }
+  function lvAll(){ lvDirty.clear(); lvDirty.add(page); page.querySelectorAll(LV_SEL).forEach(b=>lvDirty.add(b)); }
+  function liveSoon(full){ if(full === true) lvAll(); clearTimeout(liveT); liveT = setTimeout(liveRun, 350); }
   function liveNative(on){ [page, ...document.querySelectorAll('.hfb')].forEach(el=>{ el.spellcheck = on; }); }
+  function lvScan(b, caret, off){
+    const old = lvMap.get(b); if(old && lvHl) old.forEach(r=>lvHl.delete(r));
+    if(b !== page && !b.isConnected){ lvMap.delete(b); return; }
+    let found;
+    if(b === page){ found = []; page.childNodes.forEach(n=>{ if(n.nodeType === 3) found.push(...rvOrto(spReady, true, n)); }); }   // texto solto direto na folha
+    else found = rvOrto(spReady, true, null, b);
+    const rs = found.filter(o=>!(o.node === caret && off >= o.start && off <= o.start + o.len))   // não marca a palavra que ainda está sendo digitada
+      .map(o=>{ const r = document.createRange(); r.setStart(o.node, o.start); r.setEnd(o.node, o.start + o.len); return r; });
+    lvMap.set(b, rs); if(lvHl) rs.forEach(r=>lvHl.add(r));
+  }
   function liveRun(){
     if(!liveOn) return;
+    if(!lvHl){ lvHl = new Highlight(); CSS.highlights.set('vspell', lvHl); }
+    lvMap.forEach((rs, b)=>{ if(b !== page && !b.isConnected){ rs.forEach(r=>lvHl.delete(r)); lvMap.delete(b); } });   // blocos apagados
     const s = getSelection(), caret = s.rangeCount && s.isCollapsed ? s.anchorNode : null, off = s.anchorOffset;
-    const rs = rvOrto(spReady, true).filter(o=>!(o.node === caret && off >= o.start && off <= o.start + o.len))   // não marca a palavra que ainda está sendo digitada
-      .map(o=>{ const r = document.createRange(); r.setStart(o.node, o.start); r.setEnd(o.node, o.start + o.len); return r; });
-    CSS.highlights.set('vspell', new Highlight(...rs));
+    const cb = caret && page.contains(caret) ? lvBlock(caret) : null;
+    if(lvCaretBlk && lvCaretBlk !== cb) lvDirty.add(lvCaretBlk);   // o bloco que o cursor deixou volta a marcar a palavra que estava aberta
+    lvCaretBlk = cb;
+    const t0 = performance.now();
+    if(cb){ lvDirty.delete(cb); lvScan(cb, caret, off); }
+    for(const b of lvDirty){
+      lvDirty.delete(b); lvScan(b, caret, off);
+      if(lvDirty.size && performance.now() - t0 > 14){ clearTimeout(liveT); liveT = setTimeout(liveRun, 40); break; }   // fatia o trabalho para não travar a digitação
+    }
   }
   async function liveStart(){
     liveOn = false; try{ CSS.highlights.delete('vspell'); }catch(e){}
+    lvMap.clear(); lvDirty.clear(); lvHl = null; lvCaretBlk = null;
     let on = true; try{ on = localStorage.getItem('verba:spell') !== '0'; }catch(e){}
     if(!on || !window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
     const lang = spLang();
     if(!lang){ liveNative(on); return; }
     try{ const sp = await spLoad(); if(lang !== spLang()) return; spReady = sp; }catch(e){ return; }   // sem dicionário: continua o corretor do navegador
-    liveOn = true; liveNative(false); liveRun();
+    liveOn = true; liveNative(false); lvAll(); liveRun();
   }
   window.__vsMenu = ()=>{      // itens no topo do menu do botão direito quando a palavra está errada
     const s = getSelection(), r = liveOn && s.rangeCount ? s.getRangeAt(0) : null, n = r && r.startContainer;
@@ -4732,7 +4792,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       liveSoon();
     };
     return (o.sug.length ? o.sug.map(sg=>({t:sg, fn:fix(sg)})) : [{t:'(sem sugestões)', dis:true}]).concat([{sep:1},
-      {t:'Ignorar tudo', fn:()=>{ spIgnore.add(o.text); liveSoon(); }}, {t:'Adicionar ao dicionário', fn:()=>spAdd(o.text)}, {sep:1}]);
+      {t:'Ignorar tudo', fn:()=>{ spIgnore.add(o.text); liveSoon(true); }}, {t:'Adicionar ao dicionário', fn:()=>spAdd(o.text)}, {sep:1}]);
   };
   // Autocorreção ao digitar (como no Word): acentos esquecidos e letra maiúscula depois de ponto final — Ctrl+Z desfaz
   const AUTO_ABBR = new Set('etc ex pág págs sr sra srs dr dra av tel obs art arts inc ltda cia prof profa cap fig vol ed org aprox'.split(' '));
@@ -4765,10 +4825,28 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   });
   $('revSpell').addEventListener('change', liveStart);
   $('revLang').addEventListener('change', ()=>{ spOk.clear(); liveStart(); });
-  new MutationObserver(liveSoon).observe(page, {childList:true, subtree:true, characterData:true});
+  new MutationObserver(recs=>{
+    if(!liveOn) return;
+    for(const r of recs){
+      if(!(r.type === 'childList' && r.target === page)) lvDirty.add(lvBlock(r.target));
+      r.addedNodes.forEach(n=>{
+        if(n.nodeType === 1){ lvDirty.add(lvBlock(n)); n.querySelectorAll(LV_SEL).forEach(x=>lvDirty.add(x)); }
+        else if(n.nodeType === 3) lvDirty.add(lvBlock(n));
+      });
+    }
+    liveSoon();
+  }).observe(page, {childList:true, subtree:true, characterData:true});
   document.addEventListener('selectionchange', ()=>{ if(liveOn) liveSoon(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'F7'){ e.preventDefault(); $('btnRev').click(); } });
-  setTimeout(liveStart, 1500);
+  // O dicionário (nspell) é montado na thread principal: espera o navegador ficar ocioso e a digitação parar
+  let lvLastKey = 0;
+  page.addEventListener('keydown', ()=>{ lvLastKey = Date.now(); }, {passive:true});
+  function liveBoot(){
+    if(Date.now() - lvLastKey < 2500) return setTimeout(liveBoot, 1500);
+    if(window.requestIdleCallback) requestIdleCallback(()=>{ if(Date.now() - lvLastKey < 2500) setTimeout(liveBoot, 1500); else liveStart(); }, {timeout:15000});
+    else setTimeout(liveStart, 0);
+  }
+  setTimeout(liveBoot, 3000);
 
   // Sinônimos (base local "sinonimos-local", baixada só na primeira vez)
   let synDb = null;
@@ -5533,7 +5611,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   $('tabDocs').addEventListener('click', ()=>tab(true));
   $('tabOut').addEventListener('click', ()=>{ tab(false); renderSide(); });
-  $('btnSide').addEventListener('click', ()=>{ $('side').hidden = !$('side').hidden; });
+  $('btnSide').addEventListener('click', ()=>{ $('side').hidden = !$('side').hidden; if(!$('side').hidden) renderSide(); });
   $('side').hidden = true;
 
   // Lista de tarefas
@@ -6843,7 +6921,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       page.querySelectorAll('.tb.tbc').forEach(t=>{ const b = t.closest(BLK); if(b) set.add(b); });
       set.forEach(tabLayout);
     }
-    window.__tabsSoon = ()=>{ if(!tabRaf) tabRaf = requestAnimationFrame(tabsAll); };
+    window.__tabsSoon = ()=>{ if(!tabRaf) tabRaf = setTimeout(tabsAll, 150); };
     function renderTabs(){
       ruler.querySelectorAll('.ts').forEach(n=>n.remove());
       const st = state(); if(!st.b) return;
@@ -8664,9 +8742,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         document.querySelectorAll('#qat [data-cmd=redo]').forEach(b=>b.classList.toggle('dis', !document.queryCommandEnabled('redo')));
       }catch(e){}
     }
-    document.addEventListener('selectionchange', sync);
-    page.addEventListener('input', sync);
-    document.addEventListener('click', ()=>setTimeout(sync, 0));
+    let syT = 0; const syncSoon = ()=>{ clearTimeout(syT); syT = setTimeout(sync, 120); };
+    document.addEventListener('selectionchange', syncSoon);
+    page.addEventListener('input', syncSoon);
+    document.addEventListener('click', syncSoon);
     sync();
 
     // título do documento: largura acompanha o texto (navegadores sem field-sizing)
@@ -8747,8 +8826,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       }catch(e){}
     }
     window.__pgUpdate = pgUpdate;
-    document.addEventListener('selectionchange', pgUpdate);
-    page.addEventListener('input', ()=>setTimeout(pgUpdate, 0));
+    let pgUT = 0; const pgUpdateSoon = ()=>{ clearTimeout(pgUT); pgUT = setTimeout(pgUpdate, 120); };
+    document.addEventListener('selectionchange', pgUpdateSoon);
+    page.addEventListener('input', pgUpdateSoon);
     setTimeout(pgUpdate, 400); setTimeout(pgUpdate, 1500);
 
     // idioma na barra de status
