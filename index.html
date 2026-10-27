@@ -118,8 +118,7 @@ main{flex:1;overflow:auto;padding:24px 36px 48px}
 footer{background:var(--bar);border-top:1px solid var(--line);color:var(--muted);
   padding:5px 16px;display:flex;gap:16px;font-size:12px}
 footer span:last-child{margin-left:auto}
-@media (max-width:700px){ main{padding:0 12px 48px} #page{padding:32px 20px;min-height:80vh} }
-@media (max-width:700px){ #page table{width:100% !important;max-width:100%;table-layout:auto !important;margin-left:0 !important;margin-right:0 !important} .himg,.himgc{display:none !important} }
+@media (max-width:700px){ main{padding:0 4px 48px} }   /* celular: a folha inteira (A4, margens, páginas) encolhida para caber na largura, como no Word */
 @media print{
   header,#tabs,#toolbar,footer{display:none}
   body{background:#fff;display:block}
@@ -130,6 +129,8 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="light"]{--bg:#e6e6e6;--bar:#f7f8fa;--ink:#1f2933;--muted:#5f6b7a;--line:#c9d0d8;--accent:#1d5fd1;--accent-soft:#dce8fb;--pgedge:#c6c6c6}
 ::highlight(vfind){background:#ffe36e;color:#000}
 ::highlight(vsim){background:#9ec5fa;color:#000}
+::highlight(vspell){text-decoration:underline wavy #d93025;text-decoration-skip-ink:none}
+@media print{::highlight(vspell){text-decoration:none}}
 @media print{::highlight(vsim){background:transparent;color:inherit}}
 @media print{::highlight(vfind){background:transparent;color:inherit}}
 @media print{html,body,main,#work,#sheet{background:#fff !important}#clipDlg,#symDlg,#fmenu,#cpal,#minibar,#gotoDlg{display:none !important}#page{caret-color:transparent}}
@@ -205,8 +206,9 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="dark"] #pgOv .pgb.end{border-top-color:#4a525e}
 :root[data-theme="dark"] #pgOv .pgb.end span{background:#262b32;color:#98a3b0;border-color:#3b434d}
 body.hfedit #pgOv{display:none}
-#pgOv .pgg{position:absolute;left:-3px;right:-3px;background:var(--bg);box-shadow:inset 0 7px 6px -6px rgba(0,0,0,.4),inset 0 -7px 6px -6px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
-#pgOv .pgg span{font:600 11px/16px var(--uifont,system-ui,sans-serif);color:var(--muted);background:var(--bar);border:1px solid var(--line);border-radius:11px;padding:0 12px}
+#pgOv .pgg{position:absolute;left:-3px;right:-3px;background:var(--bg);box-shadow:inset 0 9px 7px -7px rgba(0,0,0,.45),inset 0 -9px 7px -7px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+#pgOv .pgg span{display:none}
+#pgOv .pgg span.x{font:600 11px/16px var(--uifont,system-ui,sans-serif);color:var(--muted);background:var(--bar);border:1px solid var(--line);border-radius:11px;padding:0 12px}
 .himgc{position:absolute;max-width:none;user-select:none;pointer-events:none}
 .hfc[data-k=h]{top:var(--hty)} .hfc[data-k=f]{bottom:var(--hby)}
 body.hfedit .himgc,body.hfedit .hfc{display:none}
@@ -272,7 +274,6 @@ dialog button:hover{background:var(--accent-soft)}
 /* Réguas (estilo clássico) */
 main{padding-top:0}
 #sheet{position:relative;width:var(--pw,21cm);max-width:none;margin:14px auto 0}
-@media (max-width:700px){#sheet:not(.abnt){width:100%}}
 #sheet.abnt{width:var(--pw,21cm);max-width:none}
 #rulerWrap{position:sticky;top:0;z-index:5;background:var(--bg);margin:0 -36px;padding:10px 36px 12px}
 #rulerWrap[hidden]{display:none}
@@ -612,6 +613,12 @@ body.tsel #page ::selection{background:transparent}
 #page .cf-date,#page .cf-sel{cursor:pointer;user-select:none}
 #page .cf[data-empty]{color:#7a8794}
 #page .cf-sel::after{content:" ▾";font-size:.8em;color:#567}
+#page .sbk{position:relative;height:0;margin:8px 0;border-top:1px dashed #8a97a8;user-select:none;cursor:default;break-after:auto}
+#page .sbk::after{content:"Quebra de Seção (Próxima Página)";position:absolute;left:50%;top:-8px;transform:translateX(-50%);background:var(--paper);color:#5f6b7a;padding:0 8px;font:11px/15px var(--uifont,system-ui,sans-serif);white-space:nowrap}
+#page .sbk[data-t="cont"]::after{content:"Quebra de Seção (Contínua)"}
+#page .sbk[data-t="even"]::after{content:"Quebra de Seção (Página Par)"}
+#page .sbk[data-t="odd"]::after{content:"Quebra de Seção (Página Ímpar)"}
+@media print{#page .sbk{border:0;margin:0}#page .sbk::after{display:none}#page .sbk[data-t="next"]{break-after:page}#page .sbk[data-t="odd"],#page .sbk[data-t="even"]{break-after:page}}
 #page .colb{border-top:2px dotted #b9c3cf;height:0;margin:0;break-after:column;page-break-after:auto}
 @media print{#page .colb{border:0}}
 #page .tbx{box-sizing:border-box;position:relative;break-inside:avoid;page-break-inside:avoid}
@@ -1043,7 +1050,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <select id="pgOri" title="Orientação da página"><option value="p">Retrato</option><option value="l">Paisagem</option></select>
       <select id="pgSize" title="Tamanho do papel"><option value="a4">A4 (21 × 29,7 cm)</option><option value="carta">Carta (21,6 × 27,9 cm)</option><option value="oficio">Ofício (21,6 × 35,6 cm)</option><option value="a5">A5 (14,8 × 21 cm)</option><option value="a3">A3 (29,7 × 42 cm)</option></select>
       <select id="pgCols" title="Colunas do texto"><option value="1">Uma coluna</option><option value="2">Duas colunas</option><option value="3">Três colunas</option></select>
-      <select id="pgBrk" title="Quebras: de página, de coluna (precisa de duas ou mais colunas) ou quebra de texto (nova linha no mesmo parágrafo)"><option value="" selected disabled hidden>Quebras</option><option value="page">Quebra de página</option><option value="col">Quebra de coluna</option><option value="line">Quebra de texto (linha)</option></select>
+      <select id="pgBrk" title="Quebras: de página, de coluna (precisa de duas ou mais colunas) ou quebra de texto (nova linha no mesmo parágrafo)"><option value="" selected disabled hidden>Quebras</option><option value="page">Quebra de página</option><option value="col">Quebra de coluna</option><option value="line">Quebra de texto (linha)</option><optgroup label="Quebras de seção"><option value="sec-next">Seção: próxima página</option><option value="sec-cont">Seção: contínua</option><option value="sec-even">Seção: página par</option><option value="sec-odd">Seção: página ímpar</option></optgroup></select>
       <select id="pgHyph" title="Hifenização: divide palavras longas no fim da linha. Vale na tela e na impressão; depende do idioma do navegador. Para um parágrafo só: Parágrafo > Não hifenizar"><option value="">Hifenização: nenhuma</option><option value="auto">Hifenização: automática</option></select>
       <button id="btnPgDlg" title="Configurar página: margens, papel, orientação e colunas" aria-label="Configurar página">⚙</button>
     </div><div class="gl">Configurar Página</div></div>
@@ -1653,9 +1660,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <h3>Revisão</h3>
   <div class="dlgrow" style="justify-content:flex-start;gap:12px;flex-wrap:wrap;margin:0 0 8px">
     <label><input type="checkbox" id="revSpell" checked> Marcar erros de ortografia ao digitar</label>
+    <label><input type="checkbox" id="revAuto" checked> Corrigir erros comuns ao digitar (como o Word)</label>
     <label>Idioma <select id="revLang"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en-US">English (US)</option><option value="es">Español</option><option value="fr">Français</option><option value="it">Italiano</option></select></label>
   </div>
-  <p id="revHint" style="margin:0 0 8px;color:var(--muted);font-size:13px">A marcação em vermelho usa o corretor do seu navegador (funciona offline). Abaixo, o Verbus procura problemas que o corretor não pega.</p>
+  <p id="revHint" style="margin:0 0 8px;color:var(--muted);font-size:13px">A marcação em vermelho usa o corretor do seu navegador (funciona offline). Ao clicar em “Verificar documento”, o Verbus também confere cada palavra com o dicionário de português (baixado na primeira vez e guardado para uso offline) e procura problemas que o corretor não pega.</p>
   <div class="dlgrow" style="justify-content:flex-start;margin:0 0 6px"><button id="revScan">Verificar documento</button><button id="revFixAll">Corrigir todos</button><span id="revStat" style="color:var(--muted)"></span></div>
   <ul id="revList"></ul>
   <div class="dlgrow"><button id="revClose">Fechar</button></div>
@@ -1971,9 +1979,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     try{ window.__applySty && window.__applySty(); }catch(e){}
     try{ window.__stOvr && window.__stOvr(); }catch(e){}
     const d = store.docs[store.current], m = d && d.mar;
-    const mob = matchMedia('(max-width:700px)').matches;
     ['t','r','b','l'].forEach(k=>{
-      if(m && m[k] != null && !mob) page.style.setProperty('--m' + k, m[k] + 'px');
+      if(m && m[k] != null) page.style.setProperty('--m' + k, m[k] + 'px');
       else page.style.removeProperty('--m' + k);
     });
     if(d && d.hyph){ page.style.hyphens = 'auto'; page.lang = 'pt-BR'; } else { page.style.hyphens = ''; page.removeAttribute('lang'); }
@@ -2113,17 +2120,30 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
   // Quebras de página: mesma conta da pré-visualização de impressão (um bloco que não cabe vai inteiro para a página seguinte;
   // título com "manter com o próximo" não fica sozinho no fim da página)
+  const sbkBlank = new WeakMap();   // quebra de seção par/ímpar → precisa de uma página em branco (o Chrome não insere sozinho ao imprimir)
+  addEventListener('beforeprint', ()=>{
+    page.querySelectorAll('.sbk[data-t="odd"],.sbk[data-t="even"]').forEach(k=>{
+      if(!sbkBlank.get(k)) return;
+      const b = document.createElement('div'); b.className = 'sbkb'; b.setAttribute('contenteditable', 'false'); b.style.cssText = 'height:1px;break-after:page'; k.after(b);
+    });
+  });
+  addEventListener('afterprint', ()=>{ page.querySelectorAll('.sbkb').forEach(b=>b.remove()); });
   function pgPlan(kids, use0, rectOf, splitOf){
-    const starts = [0], tops = []; let ps = 0, brk = false;
+    const starts = [0], tops = []; let ps = 0, brk = false, brkT = '', brkEl = null;
     const U = ()=>typeof use0 === 'function' ? use0(starts.length - 1) : use0;   // capacidade da página atual (menor quando há notas de rodapé)
     const next = y=>{ starts.push(y); ps = y; };
     const keep = k=>((k.style && (k.style.breakAfter || k.style.pageBreakAfter)) === 'avoid');
     kids.forEach((k, i)=>{
-      if(k.classList.contains('pb')){ brk = true; tops[i] = null; return; }
+      if(k.classList.contains('pb')){ brk = true; brkT = ''; tops[i] = null; return; }
+      if(k.classList.contains('sbk')){ tops[i] = null; if(k.dataset.t !== 'cont'){ brk = true; brkT = k.dataset.t || 'next'; brkEl = k; sbkBlank.set(k, 0); } return; }   // quebra de seção: contínua não muda de página; par/ímpar podem abrir uma página em branco
       const r = rectOf(k); if(!r){ tops[i] = null; return; }
       const top = r.top, bot = r.bot; tops[i] = top;
       const chain = ()=>{ let j = i, t = top; while(j > 0 && keep(kids[j - 1]) && tops[j - 1] != null && tops[j - 1] > ps + 1){ j--; t = tops[j]; } return t; };
-      if(brk){ brk = false; if(top > ps + 1) next(top); }
+      if(brk){
+        brk = false; if(top > ps + 1) next(top);
+        if((brkT === 'odd' && starts.length % 2 === 0) || (brkT === 'even' && starts.length % 2 === 1)){ next(top); if(brkEl) sbkBlank.set(brkEl, 1); }   // página em branco para cair em página ímpar/par
+        brkT = '';
+      }
       if(bot - ps > U() + 1){
         // quadro "data-flow" (modelos): começa onde houver pelo menos ~3 linhas de espaço e continua na página seguinte
         const flow = k.hasAttribute && k.hasAttribute('data-flow') && ps + U() - top >= 90;
@@ -2152,7 +2172,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     return Math.max(1, Math.ceil((page.offsetHeight - m.t - m.b) / use - 0.02));
   }
   // ---------- Folhas separadas na tela: espaço cinza entre as páginas, margens, cabeçalho e rodapé em cada uma ----------
-  const PG_GAP = 22;                      // espaço (px) entre uma folha e a seguinte
+  const PG_GAP = 30;                      // espaço (px) entre uma folha e a seguinte
   let pgShiftEl = null;
   function pgShiftSet(css){
     if(!pgShiftEl){ pgShiftEl = document.createElement('style'); pgShiftEl.id = 'pgShift'; document.head.appendChild(pgShiftEl); }
@@ -2300,7 +2320,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       };
       // Notas de rodapé como no Word: cada nota fica no pé da página onde está o número, e o texto da página ganha menos espaço
       const fnBx = fnBox(false), fnMk = [...page.querySelectorAll('sup.fn')].filter(m=>!m.closest('.fnotes'));
-      if(fnBx && fnMk.length && !matchMedia('(max-width:700px)').matches){
+      if(fnBx && fnMk.length){
         kids = kids0.filter(k=>k !== fnBx);
         const hOf = new Map(); fnBx.querySelectorAll('p.fnote').forEach(nn=>{ if(!hOf.has(nn.dataset.id)) hOf.set(nn.dataset.id, nn.getBoundingClientRect().height / sc); });
         const mk = fnMk.map(m=>{ let k = m; while(k && k.parentNode !== page) k = k.parentNode; return {id:m.dataset.id, k}; });
@@ -2325,9 +2345,10 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         let css = '';
         const bands = new Map();
         for(let p = 1; p < n; p++){
+          let blank = 0; while(p + 1 < n && starts[p + 1] === starts[p] && !sp.has(starts[p])){ p++; blank++; }   // páginas em branco (seção par/ímpar) entram no mesmo espaço
           if(sp.has(starts[p])){ const o = sp.get(starts[p]); if(!bands.has(o.k)) bands.set(o.k, []); bands.get(o.k).push({y:starts[p], end:o.end, extra:P - (starts[p] - starts[p - 1])}); continue; }
           const i = firstAt(starts[p]), k = ku[i], prev = ku[i - 1], r = R.get(k), pv = prev && R.get(prev);
-          const nat = pv ? Math.max(0, r.top - pv.bot) : 0, extra = P - (starts[p] - starts[p - 1]);
+          const nat = pv ? Math.max(0, r.top - pv.bot) : 0, extra = P - (starts[p] - starts[p - 1]) + blank * P;
           if(k.tagName === 'TR' && k.rowIndex > 0) css += pgRowCss(k, extra, starts[p - 1] + use - r.top);
           else{ const el = k.tagName === 'TR' ? k.closest('table') : k; css += '#page>:nth-child(' + ([...page.children].indexOf(el) + 1) + '){margin-top:' + (nat + extra).toFixed(2) + 'px !important}'; }
         }
@@ -2524,6 +2545,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       el.setAttribute('width', w.replace('px', ''));
     });
     c.querySelectorAll('.pb').forEach(q=>{ const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'page-break-before:always;mso-break-type:page-break'); q.replaceWith(br); });   // quebra de página (sem isso o ANEXO e outras quebras se perdiam no .doc/.docx/.html)
+    c.querySelectorAll('.sbk').forEach(q=>{ if(q.dataset.t === 'cont'){ q.remove(); return; } const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'page-break-before:always;mso-break-type:page-break'); q.replaceWith(br); });   // seção: no .doc/.docx vira quebra de página
     c.querySelectorAll('.colb').forEach(q=>{ const br = document.createElement('br'); br.setAttribute('clear', 'all'); br.setAttribute('style', 'mso-break-type:column-break'); q.replaceWith(br); });
     c.querySelectorAll('span.cit').forEach(f=>{ f.removeAttribute('contenteditable'); f.removeAttribute('data-ref'); f.removeAttribute('data-narr'); f.removeAttribute('data-pg'); f.removeAttribute('class'); });
     flattenLists(c); diagToMso(c);
@@ -3124,7 +3146,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     const s = getSelection(); if(!s.rangeCount) return;
     const r = s.getRangeAt(0); let hit = false;
-    page.querySelectorAll('p,h1,h2,h3,li,blockquote,div:not(.pb)').forEach(b=>{
+    page.querySelectorAll('p,h1,h2,h3,li,blockquote,div:not(.pb):not(.sbk)').forEach(b=>{
       if(r.intersectsNode(b)){ b.style.lineHeight = v; delete b.dataset.lh; hit = true; }
     });
     if(!hit) page.style.lineHeight = v;
@@ -4246,7 +4268,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(r && page.contains(r.startContainer)){ const s = getSelection(); s.removeAllRanges(); s.addRange(r); savedRange = r.cloneRange(); }
       }
       const cell = img ? null : cellAt(e.target) || (savedRange ? cellAt(savedRange.startContainer) : null);
-      ctxOpen(x, y, ctxItems(cell && page.contains(cell) ? cell : null, img));
+      ctxOpen(x, y, (!img && window.__vsMenu ? window.__vsMenu() : []).concat(ctxItems(cell && page.contains(cell) ? cell : null, img)));
     });
   })();
 
@@ -4546,6 +4568,49 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(orig[0] !== orig[0].toLowerCase()) return rep[0].toUpperCase() + rep.slice(1);
     return rep;
   }
+  // ---------- Dicionário de português (Hunspell/VERO via nspell) ----------
+  // Baixado na primeira vez; o service worker guarda os arquivos (uso offline) e os atualiza em segundo plano.
+  const DIC_BASE = {'pt-BR':'https://cdn.jsdelivr.net/npm/dictionary-pt-br/', 'pt-PT':'https://cdn.jsdelivr.net/npm/dictionary-pt/'};
+  const DIC_EXTRA = 'condicionalidade condicionalidades socioassistencial socioassistenciais socioeducativo socioeducativa socioeducativos socioeducativas intersetorial intersetoriais intersetorialidade pix emoji emojis podcast podcasts selfie selfies online offline smartphone smartphones wifi';
+  const spMem = {}, spOk = new Map(), spIgnore = new Set();
+  const spLang = ()=>{ let l = 'pt-BR'; try{ l = localStorage.getItem('verba:lang') || l; }catch(e){} return DIC_BASE[l] ? l : null; };   // outros idiomas: só o corretor do navegador
+  const spUser = ()=>{ try{ return JSON.parse(localStorage.getItem('verbus:dicUser') || '[]'); }catch(e){ return []; } };
+  function spLoad(){
+    const lang = spLang(); if(!lang) return Promise.reject(new Error('sem dicionário'));
+    if(!spMem[lang]) spMem[lang] = (async()=>{
+      const get = f=>fetch(DIC_BASE[lang] + f).then(r=>{ if(!r.ok) throw new Error(f); return r.text(); });
+      const [mod, aff, dic] = await Promise.all([import('https://cdn.jsdelivr.net/npm/nspell@2.1.5/+esm'), get('index.aff'), get('index.dic')]);
+      const sp = mod.default(aff, dic);
+      DIC_EXTRA.split(' ').concat(spUser()).forEach(w=>sp.add(w));
+      return sp;
+    })().catch(e=>{ delete spMem[lang]; throw e; });
+    return spMem[lang];
+  }
+  function spAdd(w){
+    try{ localStorage.setItem('verbus:dicUser', JSON.stringify([...new Set(spUser().concat(w))])); }catch(_){}
+    spOk.clear(); return spLoad().then(sp=>{ sp.add(w); spOk.clear(); liveSoon(); });
+  }
+  const spStrip = x=>x.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  const rvCmp = (a, b)=>(a.node === b.node ? a.start - b.start : (a.node.compareDocumentPosition(b.node) & 4 ? -1 : 1));
+  function rvOrto(sp, noSug, only){
+    const out = [], memo = spOk, tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
+    const rx = /(?<![\p{L}\p{N}@\/._-])\p{L}+(?:-\p{L}+)*(?![\p{L}\p{N}@\/_]|\.\p{L})/gu;
+    for(let n = only || tw.nextNode(); n; n = only ? null : tw.nextNode()){
+      if(n.parentNode.closest('.fnsep,script,style,a[href],code,pre')) continue;
+      const t = n.data; let m; rx.lastIndex = 0;
+      while((m = rx.exec(t))){
+        const w = m[0];
+        if(w.length < 2 || w === w.toUpperCase() || spIgnore.has(w)) continue;                                   // siglas
+        if(w[0] !== w[0].toLowerCase() && !/(^|[.!?…]\s+)$/.test(t.slice(0, m.index))) continue; // nomes próprios no meio da frase
+        let ok = memo.get(w);
+        if(ok === undefined){ ok = sp.correct(w) || w.split('-').every(x=>sp.correct(x)); memo.set(w, ok); }
+        if(ok) continue;
+        const sug = noSug ? [] : sp.suggest(w).slice(0, 5).sort((a, b)=>(spStrip(b) === spStrip(w)) - (spStrip(a) === spStrip(w))).slice(0, 4);   // mesma palavra com acento corrigido vem primeiro
+        out.push({node:n, start:m.index, len:w.length, rep:sug[0] || null, sug, kind:'orto', label:'Ortografia: “' + w + '”', text:w});
+      }
+    }
+    return out;
+  }
   function rvScan(){
     const found = [], tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
     let n;
@@ -4573,7 +4638,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(rep) add('acc', m.index, w.length, matchCase(w, rep), 'Acentuação: “' + w + '” → “' + matchCase(w, rep) + '”');
       }
     }
-    found.sort((a, b)=>(a.node === b.node ? a.start - b.start : (a.node.compareDocumentPosition(b.node) & 4 ? -1 : 1)));
+    found.sort(rvCmp);
     return found;
   }
   let rvItems = [];
@@ -4582,7 +4647,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     rvItems.forEach((it, i)=>{
       const li = document.createElement('li');
       const ctx = it.node.data.slice(Math.max(0, it.start - 18), it.start + it.len + 18).replace(/\s+/g, ' ');
-      li.innerHTML = '<span class="k"><b></b><small></small></span><button data-a="go">Ir</button><button data-a="fix">Corrigir</button><button data-a="ign">Ignorar</button>';
+      li.innerHTML = '<span class="k"><b></b><small></small></span><button data-a="go">Ir</button>' + (it.kind === 'orto' ? it.sug.map((x, j)=>'<button data-a="sug" data-j="' + j + '"></button>').join('') + '<button data-a="add">Adicionar ao dicionário</button>' : '<button data-a="fix">Corrigir</button>') + '<button data-a="ign">Ignorar</button>';
+      li.querySelectorAll('[data-a=sug]').forEach(b=>{ b.textContent = it.sug[+b.dataset.j]; });
       li.querySelector('b').textContent = it.label; li.querySelector('small').textContent = '…' + ctx + '…';
       li.dataset.i = i; ul.appendChild(li);
     });
@@ -4599,14 +4665,23 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     page.focus(); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
     (it.node.parentElement || page).scrollIntoView({block:'center'});
   }
-  function rvRescan(){ rvItems = rvScan(); rvRender(); }
+  async function rvRescan(){
+    rvItems = rvScan(); rvRender();
+    if(!spLang()) return;   // idioma sem dicionário próprio
+    $('revStat').textContent = 'Carregando o dicionário de português…';
+    try{
+      const sp = await spLoad(), base = rvItems;
+      rvItems = base.concat(rvOrto(sp).filter(o=>!base.some(a=>a.node === o.node && a.start === o.start))).sort(rvCmp);
+      rvRender();
+    }catch(e){ rvRender(); $('revStat').textContent += ' (Não consegui baixar o dicionário agora — conecte-se à internet uma vez.)'; }
+  }
   $('btnRev').addEventListener('mousedown', e=>e.preventDefault());
   $('btnRev').addEventListener('click', ()=>{ rvRescan(); $('revDlg').showModal(); });
   $('revScan').addEventListener('click', rvRescan);
   $('revClose').addEventListener('click', ()=>$('revDlg').close());
   $('revFixAll').addEventListener('click', ()=>{
     // do fim para o começo em cada trecho de texto, pulando itens que se sobrepõem
-    const byNode = new Map(); rvItems.forEach(it=>{ if(!byNode.has(it.node)) byNode.set(it.node, []); byNode.get(it.node).push(it); });
+    const byNode = new Map(); rvItems.forEach(it=>{ if(it.kind === 'orto') return; if(!byNode.has(it.node)) byNode.set(it.node, []); byNode.get(it.node).push(it); });
     byNode.forEach(list=>{
       let limit = Infinity;
       list.sort((x, y)=>y.start - x.start).forEach(it=>{ if(it.start + it.len <= limit){ rvFix(it); limit = it.start; } });
@@ -4618,8 +4693,82 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const li = b.closest('li'), it = rvItems[+li.dataset.i]; if(!it) return;
     if(b.dataset.a === 'go'){ $('revDlg').close(); rvGo(it); return; }
     if(b.dataset.a === 'fix'){ rvFix(it); changed(); rvRescan(); return; }
+    if(b.dataset.a === 'sug'){ it.rep = it.sug[+b.dataset.j]; rvFix(it); changed(); rvRescan(); return; }
+    if(b.dataset.a === 'add'){
+      spAdd(it.text).then(rvRescan); return;
+    }
     rvItems.splice(+li.dataset.i, 1); rvRender();
   });
+
+  // ---------- Como no Word: sublinhado ondulado vermelho ao digitar + clique direito com sugestões ----------
+  let spReady = null, liveOn = false, liveT = 0;
+  function liveSoon(){ clearTimeout(liveT); liveT = setTimeout(liveRun, 350); }
+  function liveNative(on){ [page, ...document.querySelectorAll('.hfb')].forEach(el=>{ el.spellcheck = on; }); }
+  function liveRun(){
+    if(!liveOn) return;
+    const s = getSelection(), caret = s.rangeCount && s.isCollapsed ? s.anchorNode : null, off = s.anchorOffset;
+    const rs = rvOrto(spReady, true).filter(o=>!(o.node === caret && off >= o.start && off <= o.start + o.len))   // não marca a palavra que ainda está sendo digitada
+      .map(o=>{ const r = document.createRange(); r.setStart(o.node, o.start); r.setEnd(o.node, o.start + o.len); return r; });
+    CSS.highlights.set('vspell', new Highlight(...rs));
+  }
+  async function liveStart(){
+    liveOn = false; try{ CSS.highlights.delete('vspell'); }catch(e){}
+    let on = true; try{ on = localStorage.getItem('verba:spell') !== '0'; }catch(e){}
+    if(!on || !window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+    const lang = spLang();
+    if(!lang){ liveNative(on); return; }
+    try{ const sp = await spLoad(); if(lang !== spLang()) return; spReady = sp; }catch(e){ return; }   // sem dicionário: continua o corretor do navegador
+    liveOn = true; liveNative(false); liveRun();
+  }
+  window.__vsMenu = ()=>{      // itens no topo do menu do botão direito quando a palavra está errada
+    const s = getSelection(), r = liveOn && s.rangeCount ? s.getRangeAt(0) : null, n = r && r.startContainer;
+    if(!n || n.nodeType !== 3 || !page.contains(n)) return [];
+    const o = rvOrto(spReady, false, n).find(x=>r.startOffset >= x.start && r.startOffset <= x.start + x.len);
+    if(!o) return [];
+    const fix = sg=>()=>{
+      const rr = document.createRange(); rr.setStart(o.node, o.start); rr.setEnd(o.node, o.start + o.len);
+      page.focus(); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rr);
+      if(!document.execCommand('insertText', false, sg)){ o.node.replaceData(o.start, o.len, sg); changed(); }
+      liveSoon();
+    };
+    return (o.sug.length ? o.sug.map(sg=>({t:sg, fn:fix(sg)})) : [{t:'(sem sugestões)', dis:true}]).concat([{sep:1},
+      {t:'Ignorar tudo', fn:()=>{ spIgnore.add(o.text); liveSoon(); }}, {t:'Adicionar ao dicionário', fn:()=>spAdd(o.text)}, {sep:1}]);
+  };
+  // Autocorreção ao digitar (como no Word): acentos esquecidos e letra maiúscula depois de ponto final — Ctrl+Z desfaz
+  const AUTO_ABBR = new Set('etc ex pág págs sr sra srs dr dra av tel obs art arts inc ltda cia prof profa cap fig vol ed org aprox'.split(' '));
+  function autoRep(w){
+    if(spReady && spReady.correct(w)) return null;
+    const lw = w.toLowerCase(); let r = RV_ACENTOS[lw];
+    if(!r && /[^c]cao$/.test(lw) && lw.length > 4) r = lw.replace(/cao$/, 'ção');
+    if(!r && /coes$/.test(lw) && lw.length > 5) r = lw.replace(/coes$/, 'ções');
+    return r ? matchCase(w, r) : null;
+  }
+  const revAuto = $('revAuto');
+  try{ revAuto.checked = localStorage.getItem('verbus:auto') !== '0'; }catch(_){}
+  revAuto.addEventListener('change', ()=>{ try{ localStorage.setItem('verbus:auto', revAuto.checked ? '1' : '0'); }catch(_){} });
+  page.addEventListener('input', e=>{
+    if(e.inputType !== 'insertText' || !e.data || e.data.length !== 1 || e.isComposing || !revAuto.checked || !/^pt/i.test(page.lang || 'pt') || !/[\s.,;:!?)\]”"]/.test(e.data)) return;
+    const s = getSelection(), n = s.anchorNode, off = s.anchorOffset;
+    if(!s.isCollapsed || !n || n.nodeType !== 3 || !page.contains(n) || n.parentNode.closest('a[href],code,pre,.fnsep')) return;
+    const before = n.data.slice(0, off - 1), m = /\p{L}+$/u.exec(before); if(!m) return;
+    const w = m[0], pre = before.slice(0, m.index);
+    if(/[\p{N}@\/._-]$/u.test(pre)) return;
+    let r = autoRep(w) || w;
+    if(r[0] !== r[0].toUpperCase()){
+      const c = /(\p{L}*)[.!?…]\s+$/u.exec(pre);
+      if(c && c[1].length > 1 && !AUTO_ABBR.has(c[1].toLowerCase())) r = r[0].toUpperCase() + r.slice(1);
+    }
+    if(r === w) return;
+    const rr = document.createRange(); rr.setStart(n, m.index); rr.setEnd(n, off);
+    s.removeAllRanges(); s.addRange(rr);
+    document.execCommand('insertText', false, r + e.data);
+  });
+  $('revSpell').addEventListener('change', liveStart);
+  $('revLang').addEventListener('change', ()=>{ spOk.clear(); liveStart(); });
+  new MutationObserver(liveSoon).observe(page, {childList:true, subtree:true, characterData:true});
+  document.addEventListener('selectionchange', ()=>{ if(liveOn) liveSoon(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'F7'){ e.preventDefault(); $('btnRev').click(); } });
+  setTimeout(liveStart, 1500);
 
   // Sinônimos (base local "sinonimos-local", baixada só na primeira vez)
   let synDb = null;
@@ -4718,7 +4867,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const segs = []; let txt = '', prev = null;
     const w = document.createTreeWalker(page, NodeFilter.SHOW_TEXT); let n;
     while((n = w.nextNode())){
-      const pe = n.parentElement; if(!pe || pe.closest('.pb')) continue;
+      const pe = n.parentElement; if(!pe || pe.closest('.pb,.sbk')) continue;
       if(!n.data.trim() && (pe === page || pe.matches('ul,ol,table,tbody,thead,tfoot,tr'))) continue;
       if(!n.data) continue;
       const blk = pe.closest(FBLK) || page;
@@ -7507,7 +7656,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
           const styles = [...document.querySelectorAll('style')].filter(x=>x.id !== 'pgShift' && x.id !== 'fnPos').map(x=>x.outerHTML).join('');
           const over = '<style>html,body{margin:0;padding:0;background:transparent !important;height:auto !important;overflow:hidden;display:block}' +
             '#page{zoom:1 !important;position:static !important;width:' + cw + 'px !important;max-width:none !important;min-height:0 !important;padding:0 !important;margin:0 !important;box-shadow:none !important;background:transparent !important;color:#111;caret-color:transparent;isolation:auto}' +
-            '#page [data-hid]{display:none !important}#page .pb{border:0 !important;margin:0 !important}' +
+            '#page [data-hid]{display:none !important}#page .pb{border:0 !important;margin:0 !important}#page .sbk{border:0 !important;margin:0 !important}#page .sbk::after{display:none !important}' +
             (cols > 1 ? '#page{column-count:' + cols + ' !important;column-gap:' + gap + 'px !important;column-fill:auto !important;height:' + use + 'px !important}' : '') + '</style>';
           const html = '<!DOCTYPE html><html lang="pt-BR" data-theme="light"><head><meta charset="utf-8">' + styles + over + '</head><body><div id="page" class="' + page.className.replace(/"/g, '') + '" style="' + (page.getAttribute('style') || '').replace(/"/g, '&quot;') + '">' + page.innerHTML + '</div></body></html>';
           lastHtml = html;
@@ -8451,6 +8600,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       exec('insertHTML', '<p><br></p><div class="colb" contenteditable="false"></div><p><br></p>');
     }
     else if(v === 'line') exec('insertLineBreak');
+    else if(/^sec-/.test(v)) exec('insertHTML', '<div class="sbk" data-t="' + v.slice(4) + '" contenteditable="false"></div><p><br></p>');
   });
   (function(){
     const iL = $('lyIndL'), iR = $('lyIndR'), sB = $('spB'), sA = $('spA'); let tm = null;
@@ -8458,7 +8608,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     function curBlock(){
       const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return null;
       const el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
-      const b = el && el.closest ? el.closest('p,h1,h2,h3,h4,h5,h6,blockquote,div:not(.pb):not(.biblio):not(.tbx):not(.sum)') : null;
+      const b = el && el.closest ? el.closest('p,h1,h2,h3,h4,h5,h6,blockquote,div:not(.pb):not(.sbk):not(.biblio):not(.tbx):not(.sum)') : null;
       return b && page.contains(b) && b !== page && !b.closest(NOBLK) ? b : null;
     }
     function sync(){
@@ -8537,6 +8687,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     // zoom (barra de status)
     const toPct = v=>v <= 50 ? 10 + v / 50 * 90 : 100 + (v - 50) / 50 * 400;
     const toVal = p=>p <= 100 ? (p - 10) / 90 * 50 : 50 + (p - 100) / 400 * 50;
+    let autoZ = false; const narrow = ()=>innerWidth <= 700;
+    const fitPct = ()=>Math.max(10, Math.floor((main.clientWidth - 8) / (pgOf().w * CMPX) * 100));   // largura da página = largura da tela
     function curPct(){ return Math.round((parseFloat(sheet.style.zoom) || 1) * 100); }
     function setZoom(p){
       p = Math.max(10, Math.min(500, Math.round(p)));
@@ -8550,16 +8702,30 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     zsel.addEventListener('change', ()=>{
       const p = curPct(); pctBtn.textContent = p + '%'; slide.value = toVal(p);
-      try{ localStorage.setItem('verba:zoom', String(p)); }catch(e){}
+      try{ localStorage.setItem('verba:zoom', String(p)); if(narrow() && !autoZ) localStorage.setItem('verbus:zoomMob', String(p)); }catch(e){}
       placeV(); pgUpdate(); pgMarks();
     });
     slide.addEventListener('input', ()=>setZoom(toPct(parseFloat(slide.value))));
     $('zOut').addEventListener('click', ()=>setZoom(Math.ceil(curPct() / 10) * 10 - 10));
     $('zIn').addEventListener('click', ()=>setZoom(Math.floor(curPct() / 10) * 10 + 10));
-    pctBtn.addEventListener('click', ()=>setZoom(100));
+    pctBtn.addEventListener('click', ()=>setZoom(narrow() ? fitPct() : 100));
+    // pinça com dois dedos para ampliar/reduzir a folha (celular), como no Word
+    main.style.touchAction = 'pan-x pan-y';
+    let pd = 0, pz = 100;
+    const pdist = t=>Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    main.addEventListener('touchstart', e=>{ if(e.touches.length === 2){ pd = pdist(e.touches); pz = curPct(); } }, {passive:true});
+    main.addEventListener('touchmove', e=>{ if(e.touches.length === 2 && pd){ e.preventDefault(); setZoom(pz * pdist(e.touches) / pd); } }, {passive:false});
+    main.addEventListener('touchend', ()=>{ pd = 0; }, {passive:true});
     let z0 = innerWidth >= 1000 ? 110 : 100;
     try{ const sv = parseInt(localStorage.getItem('verba:zoom'), 10); if(sv >= 10 && sv <= 500 && (innerWidth >= 1000 || sv <= 100)) z0 = sv; }catch(e){}
-    setZoom(z0);
+    if(narrow()){ z0 = fitPct(); try{ const sv = parseInt(localStorage.getItem('verbus:zoomMob'), 10); if(sv >= 10 && sv <= 500) z0 = sv; }catch(e){} autoZ = true; }
+    setZoom(z0); autoZ = false;
+    let lastW = innerWidth;
+    addEventListener('resize', ()=>{      // girar o celular: reajusta à largura, a não ser que a pessoa tenha escolhido um zoom
+      if(innerWidth === lastW) return; lastW = innerWidth;
+      let m = null; try{ m = localStorage.getItem('verbus:zoomMob'); }catch(e){}
+      if(narrow() && !m){ autoZ = true; setZoom(fitPct()); autoZ = false; }
+    });
 
     // "Página x de y"
     function pgUpdate(){
