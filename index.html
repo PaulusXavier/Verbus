@@ -262,15 +262,38 @@ dialog{background:var(--bar);color:var(--ink);border:1px solid var(--line);borde
 dialog::backdrop{background:rgba(0,0,0,.45)}
 dialog h3{margin:0 0 10px}
 dialog select,dialog input[type=text]{height:30px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit;padding:0 8px}
-#rFields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
-#rFields input{width:100%}
+#refDlg{width:min(720px,94vw);padding:0;overflow:hidden}
+#refDlg[open]{display:flex;flex-direction:column}
+#refDlg .rhead{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--accent);color:#fff}
+#refDlg .rhead h3{margin:0;font-size:16px;flex:1}
+#refDlg .rhead small{opacity:.85;font-size:12px}
+#refDlg .rhead button{height:28px;width:28px;padding:0;border-color:rgba(255,255,255,.5);color:#fff;font-size:15px}
+#refDlg .rhead button:hover{background:rgba(255,255,255,.2)}
+#refDlg .rbody{padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+#refDlg .rsec{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+#refDlg .rform{border:1px solid var(--line);border-radius:8px;padding:12px;background:color-mix(in srgb,var(--accent-soft) 35%,transparent)}
+#rType{width:100%;margin-bottom:10px;font-weight:600}
+#rFields{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin:0 0 12px}
+#rFields label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;min-width:0}
+#rFields label.w{grid-column:1/-1}
+#rFields input{width:100%;font-weight:400}
+#rFields input:focus,#rType:focus{outline:2px solid var(--accent);outline-offset:-1px}
+#refDlg .dlgrow{display:flex;gap:8px;justify-content:flex-end;margin:0}
+#refDlg .rfoot{padding:12px 18px;border-top:1px solid var(--line);background:var(--bar)}
+#rAdd,#rInsert{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#rAdd:hover,#rInsert:hover{background:var(--accent);filter:brightness(1.1)}
+#rEmpty{color:var(--ink);opacity:.6;font-size:13px;text-align:center;padding:14px;border:1px dashed var(--line);border-radius:8px}
 dialog button{height:30px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:0 10px;cursor:pointer;font:inherit}
 #cntTbl{width:100%;border-collapse:collapse;margin:4px 0 10px}#cntTbl th,#cntTbl td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right}#cntTbl th:first-child,#cntTbl td:first-child{text-align:left}#cntTbl th{font-weight:600;color:var(--muted)}.cntopt{display:block;margin:4px 0 10px;cursor:pointer}
 #revList{list-style:none;margin:0;padding:0;max-height:46vh;overflow:auto}#revList li{display:flex;gap:8px;align-items:center;padding:5px 2px;border-bottom:1px solid var(--line)}#revList li span.k{flex:1;min-width:0}#revList li small{color:var(--muted);display:block}#synList{display:flex;flex-wrap:wrap;gap:6px;max-height:46vh;overflow:auto}
 dialog button:hover{background:var(--accent-soft)}
-#rList{list-style:none;padding:0;margin:10px 0}
-#rList li{display:flex;gap:6px;align-items:center;border-top:1px solid var(--line);padding:6px 0}
-#rList li span{flex:1;font-size:13px}
+#rList{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+#rList li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap}
+#rList li:hover{border-color:var(--accent)}
+#rList li .rt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:2px 8px;white-space:nowrap}
+#rList li span.rx{flex:1 1 260px;font-size:13px;line-height:1.4}
+#rList li .ra{display:flex;gap:6px;flex-wrap:wrap}
+#rList li .ra button{height:26px;font-size:12px}
 .dlgrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 /* Réguas (estilo clássico) */
 main{padding-top:0}
@@ -1130,8 +1153,11 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <button id="btnNoteShow" title="Alterna entre o texto e a sua nota: do número vai para a nota, e da nota volta para o número">Mostrar notas</button>
     </div><div class="gl">Notas</div></div>
     <div class="group" role="group" aria-label="Citações e Bibliografia"><div class="gb">
-      <button id="btnRefs" title="Referências (NBR 6023) e citações (NBR 10520): cadastrar, editar e excluir fontes, inserir citações e a lista de referências">Referências</button>
-      <button id="btnRefUpd" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar referências</button>
+      <button id="btnCite" type="button" aria-haspopup="menu" aria-expanded="false" title="Inserir citação (NBR 10520) de uma fonte cadastrada, ou adicionar uma nova fonte">Inserir Citação <i class="car"></i></button>
+      <button id="btnRefs" title="Gerenciar Fontes: cadastrar, editar e excluir fontes (NBR 6023), inserir citações e a lista de referências">Gerenciar Fontes</button>
+      <label class="refsty" title="Estilo das referências e citações">Estilo: <select id="refStyle" aria-label="Estilo das referências"><option>ABNT (NBR 6023)</option></select></label>
+      <button id="btnBib" type="button" aria-haspopup="menu" aria-expanded="false" title="Inserir a lista de Referências ou Bibliografia no texto, ordenada e atualizada sozinha">Bibliografia <i class="car"></i></button>
+      <button id="btnRefUpd" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar</button>
     </div><div class="gl">Citações e Bibliografia</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
@@ -1750,12 +1776,17 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   <div class="dlgrow"><button id="synClose">Fechar</button></div>
 </dialog>
 <dialog id="refDlg">
-  <h3>Referências (ABNT NBR 6023)</h3>
-  <select id="rType"><option value="livro">Livro</option><option value="artigo">Artigo de periódico</option><option value="site">Site ou página web</option><option value="tcc">TCC, dissertação ou tese</option></select>
-  <div id="rFields"></div>
-  <div class="dlgrow"><button id="rAdd">Adicionar à lista</button><button id="rCancelEdit" type="button" hidden>Cancelar edição</button></div>
-  <ul id="rList"></ul>
-  <div class="dlgrow"><button id="rInsert">Inserir REFERÊNCIAS no texto</button><button id="rClose">Fechar</button></div>
+  <div class="rhead"><h3>Gerenciador de Fontes <small>ABNT NBR 6023 · NBR 10520</small></h3><button id="rX" type="button" title="Fechar" aria-label="Fechar">✕</button></div>
+  <div class="rbody">
+    <div class="rform">
+      <p class="rsec" id="rFormTitle">Nova fonte</p>
+      <select id="rType" aria-label="Tipo de fonte"><option value="livro">Livro</option><option value="capitulo">Capítulo de livro</option><option value="artigo">Artigo de periódico</option><option value="site">Site ou página web</option><option value="tcc">TCC, dissertação ou tese</option><option value="legis">Legislação (lei, decreto, portaria, resolução)</option><option value="doc">Documento institucional (caderno, norma, orientação técnica)</option></select>
+      <div id="rFields"></div>
+      <div class="dlgrow"><button id="rCancelEdit" type="button" hidden>Cancelar edição</button><button id="rAdd">Adicionar à lista</button></div>
+    </div>
+    <div><p class="rsec" id="rCount">Fontes cadastradas</p><ul id="rList"></ul><div id="rEmpty" hidden>Nenhuma fonte ainda. Preencha o formulário acima e clique em “Adicionar à lista”.</div></div>
+  </div>
+  <div class="rfoot dlgrow"><button id="rClose">Fechar</button><button id="rInsert">Inserir REFERÊNCIAS no texto</button></div>
 </dialog>
 <div id="bs" hidden role="dialog" aria-modal="true" aria-label="Arquivo">
   <nav id="bsNav" aria-label="Menu Arquivo"></nav>
@@ -6851,17 +6882,27 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     livro:[['aut','Autor(es): SOBRENOME, Nome; SOBRENOME, Nome'],['tit','Título'],['sub','Subtítulo (opcional)'],['ed','Edição (ex.: 2. ed.)'],['loc','Local'],['edi','Editora'],['ano','Ano']],
     artigo:[['aut','Autor(es): SOBRENOME, Nome'],['tit','Título do artigo'],['per','Título do periódico'],['loc','Local'],['vol','Volume'],['num','Número'],['pag','Páginas (ex.: 15-30)'],['mes','Mês abreviado (ex.: out.)'],['ano','Ano']],
     site:[['aut','Autor ou instituição'],['tit','Título da página'],['site','Nome do site'],['ano','Ano'],['url','Endereço (URL)'],['acc','Acesso (ex.: 22 out. 2026)']],
-    tcc:[['aut','Autor: SOBRENOME, Nome'],['tit','Título'],['ano','Ano'],['tipo','Tipo (ex.: Trabalho de Conclusão de Curso (Graduação em Direito))'],['inst','Instituição'],['loc','Local']]
+    tcc:[['aut','Autor: SOBRENOME, Nome'],['tit','Título'],['ano','Ano'],['tipo','Tipo (ex.: Trabalho de Conclusão de Curso (Graduação em Direito))'],['inst','Instituição'],['loc','Local']],
+    capitulo:[['aut','Autor(es) do capítulo: SOBRENOME, Nome'],['tit','Título do capítulo'],['autl','Autor(es) do livro: SOBRENOME, Nome'],['titl','Título do livro'],['ed','Edição (ex.: 2. ed.)'],['loc','Local'],['edi','Editora'],['ano','Ano'],['pag','Páginas do capítulo (ex.: 15-30)']],
+    legis:[['aut','Jurisdição ou órgão (ex.: BRASIL)'],['tit','Tipo e número (ex.: Lei nº 8.742, de 7 de dezembro de 1993)'],['ementa','Ementa (opcional)'],['veic','Publicação (ex.: Diário Oficial da União)'],['loc','Local (ex.: Brasília, DF)'],['dat','Data de publicação (ex.: 8 dez. 1993)'],['ano','Ano'],['url','Endereço (URL) (opcional)'],['acc','Acesso (ex.: 22 out. 2026)']],
+    doc:[['aut','Instituição ou autor: BRASIL. Ministério ...'],['tit','Título'],['sub','Subtítulo (opcional)'],['loc','Local'],['edi','Editora ou órgão'],['ano','Ano'],['url','Endereço (URL) (opcional)'],['acc','Acesso (ex.: 22 out. 2026)']]
   };
+  const DISP = f=>f.url ? ' Disponível em: ' + f.url + '.' + (f.acc ? ' Acesso em: ' + f.acc + '.' : '') : '';
   const refs = ()=>{ const d = store.docs[store.current]; return d.refs || (d.refs = []); };
   const surn = r=>(r.f.aut || '').split(';').map(x=>x.split(',')[0].trim()).filter(Boolean);
   const cap = t=>t.toLowerCase().replace(/(^|\s)\S/g, m=>m.toUpperCase());
   function fmtRef(r){
     const f = {}; for(const k in r.f) f[k] = esc(r.f[k] || '');
     const A = (r.f.aut || '').split(';').map(x=>{ x = x.trim(); const i = x.indexOf(','); return esc(i < 0 ? x.toUpperCase() : x.slice(0,i).toUpperCase() + x.slice(i)); }).join('; ');
-    if(r.type === 'livro') return A + '. <b>' + f.tit + '</b>' + (f.sub ? ': ' + f.sub : '') + '. ' + (f.ed ? f.ed + '. ' : '') + (f.loc || '[S. l.]') + ': ' + (f.edi || '[s. n.]') + ', ' + (f.ano || '[s. d.]') + '.';
+    if(r.type === 'livro') return A + '. <b>' + f.tit + '</b>' + (f.sub ? ': ' + f.sub : '') + '. ' + (f.ed ? f.ed.replace(/\.$/, '') + '. ' : '') + (f.loc || '[S. l.]') + ': ' + (f.edi || '[s. n.]') + ', ' + (f.ano || '[s. d.]') + '.';
     if(r.type === 'artigo') return A + '. ' + f.tit + '. <b>' + f.per + '</b>, ' + (f.loc ? f.loc + ', ' : '') + (f.vol ? 'v. ' + f.vol + ', ' : '') + (f.num ? 'n. ' + f.num + ', ' : '') + (f.pag ? 'p. ' + f.pag + ', ' : '') + (f.mes ? f.mes + ' ' : '') + f.ano + '.';
     if(r.type === 'site') return A + '. ' + f.tit + '. <b>' + f.site + '</b>, ' + f.ano + '. Disponível em: ' + f.url + '. Acesso em: ' + f.acc + '.';
+    if(r.type === 'capitulo'){
+      const AL = (r.f.autl || r.f.aut || '').split(';').map(x=>{ x = x.trim(); const i = x.indexOf(','); return esc(i < 0 ? x.toUpperCase() : x.slice(0,i).toUpperCase() + x.slice(i)); }).join('; ');
+      return A + '. ' + f.tit + '. In: ' + AL + '. <b>' + f.titl + '</b>. ' + (f.ed ? f.ed.replace(/\.$/, '') + '. ' : '') + (f.loc || '[S. l.]') + ': ' + (f.edi || '[s. n.]') + ', ' + (f.ano || '[s. d.]') + (f.pag ? '. p. ' + f.pag : '') + '.';
+    }
+    if(r.type === 'legis') return A + '. ' + f.tit + '.' + (f.ementa ? ' ' + f.ementa + (/[.!?]$/.test(f.ementa) ? '' : '.') : '') + ' ' + [f.veic ? '<b>' + f.veic + '</b>' : '', f.loc, f.dat || f.ano].filter(Boolean).join(', ') + '.' + DISP(f);
+    if(r.type === 'doc') return A + '. <b>' + f.tit + '</b>' + (f.sub ? ': ' + f.sub : '') + '. ' + (f.loc || '[S. l.]') + ': ' + (f.edi || '[s. n.]') + ', ' + (f.ano || '[s. d.]') + '.' + DISP(f);
     return A + '. <b>' + f.tit + '</b>. ' + f.ano + '. ' + f.tipo + ' – ' + f.inst + ', ' + f.loc + ', ' + f.ano + '.';
   }
   function cite(r, narr, pg){
@@ -6871,7 +6912,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
                 : '(' + n.map(x=>x.toUpperCase()).join('; ') + ', ' + y + ')';
   }
   function renderFields(){
-    $('rFields').innerHTML = RT[$('rType').value].map(([k,l])=>'<input type="text" data-k="' + k + '" placeholder="' + l + '" aria-label="' + l + '">').join('');
+    const WIDE = ['aut','tit','autl','titl','ementa','url','tipo','sub'];
+    $('rFields').innerHTML = RT[$('rType').value].map(([k,l])=>{
+      let lab = l, ph = '', m = l.match(/^(.*?)\s*\((ex\.[\s\S]*)\)$/);
+      if(m){ lab = m[1]; ph = m[2]; } else if((m = l.match(/^([^:]+):\s*(.+)$/))){ lab = m[1]; ph = m[2]; }
+      return '<label class="' + (WIDE.includes(k) ? 'w' : '') + '"><span>' + esc(lab) + '</span><input type="text" data-k="' + k + '" placeholder="' + esc(ph) + '" aria-label="' + esc(l) + '"></label>';
+    }).join('');
   }
   // Bibliografia automática: a lista de REFERÊNCIAS e as citações no texto acompanham as fontes cadastradas
   let refEdit = null;
@@ -6911,8 +6957,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     ensureIds();
     const ul = $('rList'); ul.innerHTML = '';
     refs().forEach((r,i)=>{
-      const li = document.createElement('li'), sp = document.createElement('span');
-      sp.innerHTML = fmtRef(r); li.appendChild(sp);
+      const li = document.createElement('li'), sp = document.createElement('span'), tg = document.createElement('em'), ac = document.createElement('div');
+      tg.className = 'rt'; tg.style.fontStyle = 'normal'; tg.textContent = ({livro:'Livro', capitulo:'Capítulo', artigo:'Artigo', site:'Site', tcc:'TCC', legis:'Legislação', doc:'Documento'})[r.type] || r.type;
+      sp.className = 'rx'; sp.innerHTML = fmtRef(r); li.appendChild(tg); li.appendChild(sp); ac.className = 'ra'; li.appendChild(ac);
       [['(AUTOR, ano)', false], ['Autor (ano)', true]].forEach(([lbl, narr])=>{
         const b = document.createElement('button'); b.textContent = lbl; b.title = 'Inserir citação no texto';
         b.onclick = ()=>{
@@ -6921,21 +6968,23 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           const mk = page.querySelector('span.cit[data-new]');
           if(mk){ mk.removeAttribute('data-new'); tuckMark(mk); caretAfter(mk); changed(); }
         };
-        li.appendChild(b);
+        ac.appendChild(b);
       });
       const ed = document.createElement('button'); ed.textContent = '✎'; ed.title = 'Editar referência';
       ed.onclick = ()=>{
         refEdit = i; $('rType').value = r.type; renderFields();
         $('rFields').querySelectorAll('input').forEach(inp=>{ inp.value = r.f[inp.dataset.k] || ''; });
-        $('rAdd').textContent = 'Salvar alterações'; $('rCancelEdit').hidden = false;
+        $('rAdd').textContent = 'Salvar alterações'; $('rCancelEdit').hidden = false; $('rFormTitle').textContent = 'Editando fonte';
+        $('rFields').querySelector('input').focus();
       };
-      li.appendChild(ed);
+      ac.appendChild(ed);
       const x = document.createElement('button'); x.textContent = '✕'; x.title = 'Excluir referência';
       x.onclick = ()=>{ if(refEdit !== null) endEdit(); refs().splice(i, 1); persist(); renderRefs(); bibUpdate(); };
-      li.appendChild(x); ul.appendChild(li);
+      ac.appendChild(x); ul.appendChild(li);
     });
+    $('rEmpty').hidden = refs().length > 0; $('rCount').textContent = 'Fontes cadastradas (' + refs().length + ')';
   }
-  function endEdit(){ refEdit = null; $('rAdd').textContent = 'Adicionar à lista'; $('rCancelEdit').hidden = true; }
+  function endEdit(){ refEdit = null; $('rAdd').textContent = 'Adicionar à lista'; $('rCancelEdit').hidden = true; $('rFormTitle').textContent = 'Nova fonte'; }
   $('rCancelEdit').addEventListener('click', ()=>{ endEdit(); renderFields(); });
   $('btnRefUpd').addEventListener('mousedown', e=>e.preventDefault());
   $('btnRefUpd').addEventListener('click', ()=>{
@@ -6945,6 +6994,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   $('btnRefs').addEventListener('click', ()=>{ endEdit(); renderFields(); renderRefs(); $('refDlg').showModal(); });
   $('rType').addEventListener('change', renderFields);
   $('rClose').addEventListener('click', ()=>{ endEdit(); $('refDlg').close(); });
+  $('rX').addEventListener('click', ()=>$('rClose').click());
   $('rAdd').addEventListener('click', ()=>{
     const f = {}; $('rFields').querySelectorAll('input').forEach(i=>f[i.dataset.k] = i.value.trim());
     if(!f.aut || !f.tit){ alert('Preencha pelo menos o autor e o título.'); return; }
@@ -6960,6 +7010,62 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     restore(); exec('insertHTML', bibInner());
     bibFind(); changed();                // vira um bloco que se atualiza sozinho quando as fontes mudam
   });
+
+  // Inserir Citação e Bibliografia (menus no estilo do Word)
+  (function(){
+    let narr = false, askPg = false;
+    function insertCite(r, pg){
+      restore(); persist();
+      exec('insertHTML', '<span class="cit" data-new="1" data-ref="' + r.id + '" data-narr="' + (narr ? 1 : 0) + '"' + (pg ? ' data-pg="' + esc(pg).replace(/"/g, '&quot;') + '"' : '') + ' contenteditable="false">' + esc(cite(r, narr, pg)) + '</span>&#8203;');
+      const mk = page.querySelector('span.cit[data-new]');
+      if(mk){ mk.removeAttribute('data-new'); tuckMark(mk); caretAfter(mk); changed(); }
+    }
+    function insertBib(title){
+      if(!refs().length){ alert('Nenhuma fonte cadastrada. Use Gerenciar Fontes para cadastrar.'); return; }
+      ensureIds(); persist();
+      const b = bibFind();
+      if(b){ const h = b.querySelector('h1'); if(h) h.textContent = title; bibUpdate(); return; }
+      restore(); exec('insertHTML', bibInner(title)); bibFind(); changed();
+    }
+    function popMenu(btn, build){
+      let pop = null;
+      function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+      function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+      function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+      btn.addEventListener('mousedown', e=>e.preventDefault());
+      btn.addEventListener('click', ()=>{
+        if(pop){ close(); return; }
+        pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+        build().forEach(it=>{
+          if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+          const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', it.chk !== undefined ? 'menuitemcheckbox' : 'menuitem');
+          b.textContent = (it.chk !== undefined ? (it.chk ? '✓ ' : '\u2003') : '') + it.t; if(it.h) b.title = it.h;
+          b.addEventListener('click', ()=>{ close(); it.f(); }); pop.appendChild(b);
+        });
+        pop.style.maxHeight = '70vh'; pop.style.overflowY = 'auto';
+        pop.addEventListener('mousedown', e=>e.preventDefault());
+        document.body.appendChild(pop);
+        const r = btn.getBoundingClientRect();
+        pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4) + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+        document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+      });
+    }
+    popMenu($('btnCite'), ()=>{
+      ensureIds();
+      const it = refs().map(r=>({t:(surn(r).map(x=>x.toUpperCase()).join('; ') || r.f.tit) + ', ' + (r.f.ano || 's.d.') + ' — ' + (r.f.tit || ''), h:'Inserir citação desta fonte',
+        f:()=>{ const pg = askPg ? (prompt('Página (opcional, ex.: 15):', '') || '').trim() : ''; insertCite(r, pg); }}));
+      return [...it, ...(it.length ? ['-'] : []),
+        {t:'Adicionar nova fonte…', f:()=>$('btnRefs').click()},
+        {t:'Gerenciar Fontes…', f:()=>$('btnRefs').click()}, '-',
+        {t:'Citação narrativa: Autor (ano)', chk:narr, f:()=>{ narr = !narr; }},
+        {t:'Perguntar a página ao inserir', chk:askPg, f:()=>{ askPg = !askPg; }}];
+    });
+    popMenu($('btnBib'), ()=>[
+      {t:'Referências', h:'Insere a lista com o título REFERÊNCIAS', f:()=>insertBib('REFERÊNCIAS')},
+      {t:'Bibliografia', h:'Insere a lista com o título BIBLIOGRAFIA', f:()=>insertBib('BIBLIOGRAFIA')}, '-',
+      {t:'Atualizar lista', f:()=>$('btnRefUpd').click()}]);
+  })();
 
   // ---------- Réguas (horizontal e vertical, estilo clássico) ----------
   (function(){
