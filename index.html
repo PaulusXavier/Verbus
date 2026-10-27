@@ -208,6 +208,7 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="dark"] #pgOv .pgb.end span{background:#262b32;color:#98a3b0;border-color:#3b434d}
 body.hfedit #pgOv{display:none}
 #pgOv .pgg{position:absolute;left:-2px;right:-2px;background:var(--bg);box-shadow:inset 0 1px 0 var(--pgedge,#c6c6c6),inset 0 -1px 0 var(--pgedge,#c6c6c6);display:flex;align-items:center;justify-content:center}
+#pgOv .pgl{position:absolute}
 #pgOv .pgg span{display:none}
 #pgOv .pgg span.x{font:600 11px/16px var(--uifont,system-ui,sans-serif);color:var(--muted);background:var(--bar);border:1px solid var(--line);border-radius:11px;padding:0 12px}
 .himgc{position:absolute;max-width:none;user-select:none;pointer-events:none}
@@ -678,7 +679,7 @@ body.tsel #page ::selection{background:transparent}
 /* fonte / tamanho */
 #toolbar #font,#toolbar #size{-webkit-appearance:none;appearance:none;height:22px;margin:0;padding:0 14px 0 4px;border:1px solid var(--ctlb);border-radius:0;background:var(--ctl) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0h7L3.5 4z' fill='%23888'/%3E%3C/svg%3E") no-repeat right 4px center;color:var(--rink);font:12px/20px Calibri,"Carlito","Segoe UI",sans-serif;text-overflow:clip}
 #toolbar #font{width:112px}
-#toolbar #size{width:61px;margin-right:6px;border-left:0;background-image:none;padding:0 4px;font:inherit;color:inherit}
+#toolbar #size{width:61px;margin-right:6px;border-left:0;padding:0 16px 0 4px;font:inherit;color:inherit;cursor:text}
 #toolbar #font:hover,#toolbar #size:hover{border-color:#8f8f8f}
 #toolbar .group.fnt{padding:0 6px 0 4px}
 #toolbar .group.par{padding:0 6px 0 5px}
@@ -1107,7 +1108,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <select id="tbl2" title="Layout da tabela: mesclar, dividir, alinhar, bordas, cabeçalho">
       <option value="" selected disabled hidden>Layout da tabela</option>
       <optgroup label="Células">
-        <option value="merge">Mesclar células</option><option value="split">Dividir célula</option>
+        <option value="merge">Mesclar células</option><option value="split">Dividir célula</option><option value="splitTbl">Dividir tabela</option>
       </optgroup>
       <optgroup label="Alinhamento na célula">
         <option value="vTop">Alinhar ao topo</option><option value="vMid">Centralizar verticalmente</option><option value="vBot">Alinhar embaixo</option>
@@ -1230,7 +1231,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <div class="stack"><button type="button" class="rb sm" data-t="colB" title="Inserir coluna à esquerda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Esquerda</span></button><button type="button" class="rb sm" data-t="colA" title="Inserir coluna à direita"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="9.8" y="2.5" width="3.7" height="11" fill="#2b79c9" fill-opacity=".55"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Inserir à Direita</span></button><select id="tIns" class="tfit" title="Inserir célula (desloca as outras para a direita ou para baixo)" aria-label="Inserir célula"><option value="" selected disabled hidden>Inserir Célula ▾</option><option value="cellR">Inserir Célula (deslocar para a direita)</option><option value="cellD">Inserir Célula (deslocar para baixo)</option></select></div>
       <div class="stack"><button type="button" class="rb sm" data-t="rowD" title="Excluir a linha da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="6.2" width="11" height="3.6" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Linha</span></button><button type="button" class="rb sm" data-t="colD" title="Excluir a coluna da célula atual"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="6.2" y="2.5" width="3.6" height="11" fill="#e45a4f" fill-opacity=".7"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Coluna</span></button><button type="button" class="rb sm" data-t="tblD" title="Excluir a tabela inteira"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" fill="#e45a4f" fill-opacity=".6"/><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="#777"/><path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" stroke="#aaa" fill="none"/></svg><span>Excluir Tabela</span></button></div>
     </div><div class="gl">Linhas e Colunas</div></div>
-    <div class="group" role="group" aria-label="Mesclar"><div class="gb cols"><div class="stack"><button type="button" class="rb sm" data-t="merge" title="Mesclar as células selecionadas (arraste o mouse sobre elas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="#2b79c9" fill-opacity=".25" stroke="#777"/><path d="M5.5 8h5M8.6 6.2L10.5 8l-1.9 1.8M7.4 6.2L5.5 8l1.9 1.8" stroke="#2b79c9" fill="none"/></svg><span>Mesclar Células</span></button><button type="button" class="rb sm" data-t="split" title="Dividir a célula (ou desfazer a mesclagem)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="none" stroke="#777"/><path d="M8 3.5v9" stroke="#777"/><path d="M3.8 8h2.6M5.4 6.8L6.5 8 5.4 9.2M12.2 8H9.6M10.6 6.8L9.5 8l1.1 1.2" stroke="#2b79c9" fill="none"/></svg><span>Dividir Células</span></button></div></div><div class="gl">Mesclar</div></div>
+    <div class="group" role="group" aria-label="Mesclar"><div class="gb cols"><div class="stack"><button type="button" class="rb sm" data-t="merge" title="Mesclar as células selecionadas (arraste o mouse sobre elas)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="#2b79c9" fill-opacity=".25" stroke="#777"/><path d="M5.5 8h5M8.6 6.2L10.5 8l-1.9 1.8M7.4 6.2L5.5 8l1.9 1.8" stroke="#2b79c9" fill="none"/></svg><span>Mesclar Células</span></button><button type="button" class="rb sm" data-t="split" title="Dividir a célula (ou desfazer a mesclagem)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" fill="none" stroke="#777"/><path d="M8 3.5v9" stroke="#777"/><path d="M3.8 8h2.6M5.4 6.8L6.5 8 5.4 9.2M12.2 8H9.6M10.6 6.8L9.5 8l1.1 1.2" stroke="#2b79c9" fill="none"/></svg><span>Dividir Células</span></button><button type="button" class="rb sm" data-t="splitTbl" title="Dividir a tabela em duas, a partir da linha do cursor"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="1.5" width="11" height="4.5" fill="none" stroke="#777"/><rect x="2.5" y="10" width="11" height="4.5" fill="none" stroke="#777"/><path d="M1.5 8h13" stroke="#2b79c9" stroke-dasharray="2 1.5"/></svg><span>Dividir Tabela</span></button></div></div><div class="gl">Mesclar</div></div>
     <div class="group" role="group" aria-label="Direção do texto"><div class="gb cols"><div class="stack">
       <button type="button" class="rb sm" id="tTextDir" title="Alterna entre texto horizontal e vertical (90°)">↻ <span>Direção do Texto</span></button>
     </div></div><div class="gl">Texto</div></div>
@@ -1271,6 +1272,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         <button type="button" class="rb sm" id="tCount" title="Conta valores numéricos acima na coluna atual"># <span>Contagem</span></button>
       </div>
       <div class="stack"><button type="button" class="rb sm" id="tPropOpen" title="Propriedades da Tabela: largura, linha, coluna, célula e acessibilidade">⚙ <span>Propriedades da Tabela…</span></button></div>
+      <div class="stack"><button type="button" class="rb sm" id="tToText" title="Converter a tabela em texto: cada linha vira um parágrafo, com Tab entre as células">⇄ <span>Converter em Texto</span></button></div>
       <div class="stack"><button type="button" class="rb sm" id="tNestOpen" title="Inserir uma tabela dentro da célula atual">▦ <span>Tabela Aninhada…</span></button></div>
     </div><div class="gl">Dados</div></div>
     <div class="group" role="group" aria-label="Formatar Tabela"><div class="gb cols">
@@ -2352,6 +2354,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   }
   // Caixa de uma célula só que atravessa a quebra: um espaço do tamanho do rodapé + intervalo + cabeçalho é aberto antes da 1ª linha que
   // não cabe (float invisível com shape-outside no ::before da célula) e as bordas laterais somem nesse trecho. Só CSS gerado, nada é gravado.
+  let splitLines = [];
   function splitCss(k, list){
     const cell = k.tagName === 'TR' ? k.cells[0] : k.rows[0].cells[0];
     const sh = document.getElementById('sheet'), sr = sh.getBoundingClientRect(), sc = sh.offsetWidth ? sr.width / sh.offsetWidth : 1;
@@ -2375,10 +2378,11 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     if(Rb){ imgs.push(g(Rb)); sz.push(Rb.w + 'px 100%'); ps.push('right top'); }
     // Fecha o quadro onde a página termina (borda de baixo) e reabre no começo da página seguinte (borda de cima), como no Word
     const Tb = side(cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor), Bb = side(cs.borderBottomWidth, cs.borderBottomStyle, cs.borderBottomColor);
-    const hl = (o, y0, y1)=>'linear-gradient(to bottom,transparent ' + y0.toFixed(1) + 'px,' + o.col + ' ' + y0.toFixed(1) + 'px,' + o.col + ' ' + y1.toFixed(1) + 'px,transparent ' + y1.toFixed(1) + 'px)';
+    // As linhas de fechamento são elementos reais na camada #pgOv (em vez de degradês de fundo, que em alguns navegadores/zooms sumiam)
+    const cx = (cr.left - sr.left) / sc, cw = cr.width / sc, cy = (cr.top - sr.top) / sc;
     gaps.forEach(([a, b])=>{
-      if(Bb){ imgs.push(hl(Bb, a - Bb.w, a)); sz.push('100% 100%'); ps.push('0 0'); }
-      if(Tb){ imgs.push(hl(Tb, b, b + Tb.w)); sz.push('100% 100%'); ps.push('0 0'); }
+      if(Bb) splitLines.push({x:cx, w:cw, y:cy + a - Bb.w, h:Bb.w, col:Bb.col});
+      if(Tb) splitLines.push({x:cx, w:cw, y:cy + b, h:Tb.w, col:Tb.col});
     });
     if(imgs.length) css += sel + '{border-left-color:transparent !important;border-right-color:transparent !important;background-image:' + imgs.join(',') + ' !important;background-size:' + sz.join(',') + ' !important;background-position:' + ps.join(',') + ' !important;background-repeat:no-repeat !important;background-origin:border-box !important}';
     return css;
@@ -2465,11 +2469,13 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           if(k.tagName === 'TR' && k.rowIndex > 0) css += pgRowCss(k, extra, starts[p - 1] + use - r.top);
           else{ const el = k.tagName === 'TR' ? k.closest('table') : k; css += '#page>:nth-child(' + ([...page.children].indexOf(el) + 1) + '){margin-top:' + (nat + extra).toFixed(2) + 'px !important}'; }
         }
+        splitLines = [];
         bands.forEach((list, k)=>{ css += splitCss(k, list); });
         pgShiftSet('@media screen{' + css + '}');
         pgState = {starts, base, use, shifted:true, P, H, GAP:PG_GAP, et:e.t, off};
         for(let k = 0; k < n - 1; k++)
           out += '<div class="pgg" style="top:' + Math.round(off + (k + 1) * H + k * PG_GAP) + 'px;height:' + PG_GAP + 'px"><span>Fim da página ' + (k + 1) + ' · Início da página ' + (k + 2) + '</span></div>';
+        splitLines.forEach(l=>{ out += '<div class="pgl" style="left:' + l.x.toFixed(2) + 'px;width:' + l.w.toFixed(2) + 'px;top:' + l.y.toFixed(2) + 'px;height:' + l.h + 'px;background:' + l.col + '"></div>'; });
         total = n * H + (n - 1) * PG_GAP;
         out += '<div class="pgb end" style="top:' + Math.round(off + total - e.b) + 'px"><span>Fim da página ' + n + '</span></div>';
         ov.innerHTML = out;
@@ -2895,20 +2901,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         if(!t.trim()){ alert('Selecione o texto que você quer transformar em tabela (uma linha de texto por linha da tabela).'); return; }
         const d = document.getElementById('t2tDlg'); d._txt = t; document.getElementById('t2tMsg').textContent = ''; d.showModal();
       });
-      item('Converter Tabela em Texto', ()=>{
-        restore(); const c = cellOf(); if(!c){ alert('Clique dentro da tabela e tente de novo.'); return; }
-        const t = c.closest('table'), fr = document.createDocumentFragment();
-        [...t.rows].forEach(r=>{
-          const p = document.createElement('p');
-          [...r.cells].forEach((cell, i)=>{
-            if(i){ const tb = document.createElement('span'); tb.className = 'tb'; tb.textContent = '\t'; p.appendChild(tb); }
-            p.appendChild(document.createTextNode(cell.innerText.replace(/\s*\n+\s*/g, ' ').trim()));
-          });
-          if(!p.textContent) p.appendChild(document.createElement('br'));
-          fr.appendChild(p);
-        });
-        t.replaceWith(fr); changed();
-      });
+      item('Converter Tabela em Texto', ()=>window.__tblToText());
       pop.appendChild(document.createElement('hr'));
       const ql = document.createElement('div'); ql.className = 'tl'; ql.textContent = 'Tabelas Rápidas'; pop.appendChild(ql);
       QT.forEach(q=>item(q.n, ()=>insertTableHtml(q.h(), q.st, q.o)));
@@ -3717,6 +3710,38 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     for(let i = 1; i < n; i++) c.parentNode.insertBefore(newCellLike(c), c.nextSibling);
     return true;
   }
+  // Dividir tabela (como no Word): a linha do cursor vira a 1ª linha de uma nova tabela, com um parágrafo vazio entre as duas
+  function splitTable(c){
+    const table = c.closest('table'), rows = [...table.rows], tr = c.parentNode, i = rows.indexOf(tr);
+    const gap = ()=>{ const p = document.createElement('p'); p.innerHTML = '<br>'; return p; };
+    if(i <= 0){ table.parentNode.insertBefore(gap(), table); return true; }   // 1ª linha: só abre um parágrafo acima da tabela
+    for(let r = 0; r < i; r++) for(const x of rows[r].cells) if(r + x.rowSpan > i){ alert('Não dá para dividir aqui: uma célula mesclada atravessa esta linha.'); return false; }
+    const t2 = table.cloneNode(false); t2.removeAttribute('id');
+    const cg = [...table.children].find(k=>k.tagName === 'COLGROUP'); if(cg) t2.appendChild(cg.cloneNode(true));
+    const tb = document.createElement('tbody'); t2.appendChild(tb);
+    rows.slice(i).forEach(r=>tb.appendChild(r));
+    [...table.children].forEach(k=>{ if(/^(TBODY|THEAD|TFOOT)$/.test(k.tagName) && !k.rows.length) k.remove(); });
+    table.parentNode.insertBefore(t2, table.nextSibling);
+    table.parentNode.insertBefore(gap(), t2);
+    const r = document.createRange(), sl = getSelection(); r.selectNodeContents(t2.rows[0].cells[0]); r.collapse(true); sl.removeAllRanges(); sl.addRange(r);
+    return true;
+  }
+  // Converter tabela em texto: cada linha vira um parágrafo, com Tab entre as células (usado pelo menu Tabela e pela aba Layout da Tabela)
+  window.__tblToText = function(){
+    restore(); const c = cellOf(); if(!c){ alert('Clique dentro da tabela e tente de novo.'); return; }
+    const t = c.closest('table'), fr = document.createDocumentFragment();
+    [...t.rows].forEach(r=>{
+      const p = document.createElement('p');
+      [...r.cells].forEach((cell, i)=>{
+        if(i){ const tb = document.createElement('span'); tb.className = 'tb'; tb.textContent = '\t'; p.appendChild(tb); }
+        p.appendChild(document.createTextNode(cell.innerText.replace(/\s*\n+\s*/g, ' ').trim()));
+      });
+      if(!p.textContent) p.appendChild(document.createElement('br'));
+      fr.appendChild(p);
+    });
+    t.replaceWith(fr); changed();
+    setTimeout(()=>{ const tt = document.getElementById('tab-tabela'); if(tt && !(cellOf() && cellOf().closest('table'))){ tt.hidden = true; if(tt.classList.contains('on')) $('tab-inicio').click(); } }, 0);
+  };
   function setBorders(table, mode){
     const line = {bAll:'1px solid #000', bThick:'2pt solid #000', bOuter:'1px solid #000', bDash:'1px dashed #000', bNone:'none'}[mode];
     table.style.borderCollapse = 'collapse';
@@ -3733,6 +3758,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     const table = c.closest('table');
     if(a === 'merge'){ if(!mergeCells()) return; }
     else if(a === 'split'){ const tw = tblSnap(table), q0 = (gridOf(table).pos.get(c) || {c:0, cs:1, rs:1}); const was = q0.cs > 1 || q0.rs > 1; if(!splitCell()) return; if(tw && !was) tblAdjust(table, tw, 'spl' + q0.c); else if(tw) tblAdjust(table, tw, ''); }
+    else if(a === 'splitTbl'){ if(!splitTable(c)) return; }
     else if(/^v(Top|Mid|Bot)$/.test(a)){ const v = {vTop:'top', vMid:'middle', vBot:'bottom'}[a]; selCells().forEach(x=>x.style.verticalAlign = v); }
     else if(/^h(Left|Center|Right)$/.test(a)){ const v = a.slice(1).toLowerCase(); selCells().forEach(x=>x.style.textAlign = v); }
     else if(/^b(All|Thick|Outer|Dash|None)$/.test(a)) setBorders(table, a);
@@ -4027,6 +4053,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     $('tPropOpen').onclick=()=>{const c=inTable(),t=c&&c.closest('table');if(!t){alert('Clique dentro da tabela para abrir as propriedades.');return}propTarget=t;propCell=c;const w=t.style.width||'',m=w.match(/^\s*([\d.]+)\s*(%|px|cm)?/i);$('tpWidth').value=m?m[1]:((t.getBoundingClientRect().width/CMPX).toFixed(2));$('tpWidthUnit').value=m&&m[2]?m[2].toLowerCase():'cm';$('tpAlign').value=t.style.marginLeft==='auto'?(t.style.marginRight==='0px'?'right':'center'):'left';const row=c.parentElement;$('tpRowBreak').value=row.dataset.allowPageBreak==='1'?'auto':'avoid';const G=gridOf(t),q=G.pos.get(c),ws=tblCols(t);$('tpColWidth').value=q?(ws[q.c]/CMPX).toFixed(2):'';$('tpColUnit').value='cm';$('tpCellPad').value=(parseFloat(getComputedStyle(c).padding)||0)/CMPX;$('tpCellGap').value=(parseFloat(getComputedStyle(t).borderSpacing)||0)/CMPX;$('tpTextDir').value=c.style.writingMode==='vertical-rl'?'vertical-rl':'horizontal-tb';$('tpAltTitle').value=t.getAttribute('aria-label')||t.title||'';$('tpAltDesc').value=t.getAttribute('aria-description')||'';$('tpPropMsg').textContent='';document.querySelector('#tPropDlg [data-prop-tab="table"]').click();propDlg.showModal()};
     $('tpPropApply').onclick=()=>{const t=propTarget,c=propCell;if(!t||!t.isConnected||!c||!c.isConnected)return;const v=parseFloat($('tpWidth').value),unit=$('tpWidthUnit').value;if(!(v>0)){ $('tpPropMsg').textContent='Informe uma largura preferida maior que zero.';return}const before=tSnap();t.style.width=v+unit;const al=$('tpAlign').value;t.style.marginLeft=al==='left'?'0':'auto';t.style.marginRight=al==='right'?'0':'auto';const row=c.parentElement;if($('tpRowBreak').value==='auto'){row.dataset.allowPageBreak='1';row.style.breakInside='auto';row.style.pageBreakInside='auto'}else{delete row.dataset.allowPageBreak;row.style.breakInside='avoid';row.style.pageBreakInside='avoid'}const G=gridOf(t),q=G.pos.get(c),ws=tblCols(t);if(q&&ws.length){const cv=parseFloat($('tpColWidth').value),cu=$('tpColUnit').value,room=tblCont(t);if(cv>0){const target=cu==='%'?room*cv/100:cu==='px'?cv:cv*CMPX,others=ws.reduce((a,b,i)=>a+(i===q.c?0:b),0),remain=Math.max(24,room-target);ws[q.c]=Math.min(target,room-24*(ws.length-1));if(others>0)ws.forEach((x,i)=>{if(i!==q.c)ws[i]=remain*x/others});tblApply(t,ws,room)}}const pad=parseFloat($('tpCellPad').value),gap=parseFloat($('tpCellGap').value);if(pad>=0)c.style.padding=(pad*CMPX)+'px';if(gap>=0){t.style.borderSpacing=(gap*CMPX)+'px';t.style.borderCollapse=gap>0?'separate':'collapse'}c.style.writingMode=$('tpTextDir').value;c.style.textOrientation=c.style.writingMode==='vertical-rl'?'mixed':'';const title=$('tpAltTitle').value.trim(),desc=$('tpAltDesc').value.trim();if(title){t.setAttribute('aria-label',title);t.title=title}else{t.removeAttribute('aria-label');t.removeAttribute('title')}if(desc)t.setAttribute('aria-description',desc);else t.removeAttribute('aria-description');t.style.width=v+unit;t.style.marginLeft=al==='left'?'0':'auto';t.style.marginRight=al==='right'?'0':'auto';tCommit(before);changed();propDlg.close()};
     // Inserção direta de tabela dentro da célula atual
+    $('tToText').addEventListener('mousedown', e=>e.preventDefault()); $('tToText').addEventListener('click', ()=>window.__tblToText());
     const nestDlg=$('tNestDlg');let nestTarget=null,nestRange=null;$('tNestOpen').addEventListener('mousedown',e=>e.preventDefault());$('tNestCancel').onclick=()=>{nestTarget=null;nestRange=null;nestDlg.close()};
     $('tNestOpen').onclick=()=>{nestTarget=inTable();if(!nestTarget){alert('Clique dentro da célula onde deseja inserir a tabela aninhada.');return}const sel=getSelection();nestRange=sel.rangeCount?sel.getRangeAt(0).cloneRange():(savedRange&&savedRange.cloneRange());$('tNestMsg').textContent='';nestDlg.showModal()};
     $('tNestApply').onclick=()=>{const c=nestTarget,nr=Math.max(1,Math.min(20,parseInt($('tNestRows').value,10)||0)),nc=Math.max(1,Math.min(12,parseInt($('tNestCols').value,10)||0));if(!c||!c.isConnected){$('tNestMsg').textContent='A célula de destino não está mais disponível.';return}if(!nr||!nc){$('tNestMsg').textContent='Informe pelo menos uma linha e uma coluna.';return}const before=tSnap(),nt=document.createElement('table');nt.className='verbus-nested-table';nt.style.width='100%';nt.style.borderCollapse='collapse';nt.style.tableLayout='auto';for(let i=0;i<nr;i++){const tr=nt.insertRow();for(let j=0;j<nc;j++){const td=tr.insertCell();td.style.border='1px solid #777';td.style.padding='4px';td.innerHTML='<br>'}}if(nestRange&&c.contains(nestRange.commonAncestorContainer)){if(!nestRange.collapsed)nestRange.deleteContents();nestRange.insertNode(nt)}else c.appendChild(nt);caretIn(nt.rows[0].cells[0]);tCommit(before);changed();nestTarget=null;nestRange=null;nestDlg.close()};
@@ -4897,11 +4924,81 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   const spMem = {}, spOk = new Map(), spIgnore = new Set();
   const spLang = ()=>{ let l = 'pt-BR'; try{ l = localStorage.getItem('verba:lang') || l; }catch(e){} return DIC_BASE[l] ? l : null; };   // outros idiomas: só o corretor do navegador
   const spUser = ()=>{ try{ return JSON.parse(localStorage.getItem('verbus:dicUser') || '[]'); }catch(e){ return []; } };
+  // O dicionário (≈5 MB) é montado pelo nspell, que trava a tela por vários segundos. Por isso ele roda num Web Worker: a tela continua livre
+  // e as palavras são conferidas em lotes (resultado volta por mensagem). Se o Worker não funcionar, cai no modo antigo (thread principal).
+  const NSPELL_URL = 'https://cdn.jsdelivr.net/npm/nspell@2.1.5/+esm';
+  const SP_WORKER = `
+    let sp = null, lazy = [], pumping = false;
+    const okW = x=>sp.correct(x) || (x.includes('-') && x.split('-').every(y=>sp.correct(y)));
+    const sugW = x=>sp.suggest(x).slice(0, 5);
+    function pump(){
+      if(pumping) return; pumping = true;
+      const step = ()=>{ const x = lazy.shift(); if(x === undefined){ pumping = false; return; } try{ self.postMessage({t:'sug', w:x, sug:sugW(x)}); }catch(e){} setTimeout(step, 0); };
+      setTimeout(step, 0);
+    }
+    self.onmessage = async ev=>{
+      const m = ev.data;
+      try{
+        if(m.t === 'init'){ const mod = await import(m.url); sp = mod.default(m.aff, m.dic); m.extra.forEach(x=>sp.add(x)); self.postMessage({t:'ready'}); }
+        else if(m.t === 'check'){
+          const out = [];
+          m.words.forEach(x=>{ const ok = okW(x); out.push([x, ok, ok || !m.sug ? null : sugW(x)]); if(!ok && !m.sug) lazy.push(x); });
+          self.postMessage({t:'res', out}); pump();
+        }else if(m.t === 'add') sp.add(m.w);
+      }catch(e){ self.postMessage({t:'fail', e:String(e && e.message || e)}); }
+    };`;
+  function spProxy(w){
+    const res = new Map(), want = new Map(), sent = new Set(); let tm = 0, waiters = [];
+    const settle = ()=>{ if(!sent.size && !want.size){ const f = waiters; waiters = []; f.forEach(g=>g()); } };
+    const flush = ()=>{
+      tm = 0; const plain = [], withSug = [];
+      want.forEach((ns, x)=>{ if(!sent.has(x)) (ns ? withSug : plain).push(x); });
+      want.clear();
+      [plain, withSug].forEach((words, i)=>{ if(!words.length) return; words.forEach(x=>sent.add(x)); w.postMessage({t:'check', words, sug:!!i}); });
+      settle();
+    };
+    w.onmessage = ev=>{
+      const m = ev.data;
+      if(m.t === 'res'){
+        m.out.forEach(([x, ok, sug])=>{ res.set(x, {ok, sug}); sent.delete(x); });
+        spOk.clear(); if(typeof liveSoon === 'function' && liveOn) liveSoon(true); settle();
+      }else if(m.t === 'sug'){ const r = res.get(m.w); if(r) r.sug = m.sug; }
+    };
+    const px = {
+      async:true,
+      look(x, ns){                                   // undefined = ainda esperando o Worker (a conferência é refeita quando a resposta chega)
+        const r = res.get(x);
+        if(r && (r.ok || !ns || r.sug)) return r.ok;
+        if(!want.has(x) || ns) want.set(x, !!ns);
+        if(!tm) tm = setTimeout(flush, 25);
+        return r && r.ok;
+      },
+      correct(x){ const r = res.get(x); if(r) return r.ok; px.look(x); return !RV_ACENTOS[x.toLowerCase()]; },
+      suggest(x){ const r = res.get(x); return (r && r.sug) || []; },
+      add(x){ res.set(x, {ok:true, sug:null}); w.postMessage({t:'add', w:x}); },
+      idle(){ return new Promise(ok=>{ if(tm){ clearTimeout(tm); flush(); } if(sent.size || want.size) waiters.push(ok); else ok(); }); }
+    };
+    return px;
+  }
+  function spWorker(aff, dic){
+    return new Promise((ok, no)=>{
+      let w; try{ w = new Worker(URL.createObjectURL(new Blob([SP_WORKER], {type:'text/javascript'}))); }catch(e){ return no(e); }
+      const fim = setTimeout(()=>{ try{ w.terminate(); }catch(_){} no(new Error('worker demorou')); }, 120000);
+      w.onerror = e=>{ clearTimeout(fim); try{ w.terminate(); }catch(_){} no(new Error('worker')); };
+      w.onmessage = ev=>{
+        if(ev.data.t === 'ready'){ clearTimeout(fim); ok(spProxy(w)); }
+        else if(ev.data.t === 'fail'){ clearTimeout(fim); try{ w.terminate(); }catch(_){} no(new Error(ev.data.e)); }
+      };
+      w.postMessage({t:'init', url:NSPELL_URL, aff, dic, extra:DIC_EXTRA.split(' ').concat(spUser())});
+    });
+  }
   function spLoad(){
     const lang = spLang(); if(!lang) return Promise.reject(new Error('sem dicionário'));
     if(!spMem[lang]) spMem[lang] = (async()=>{
       const get = f=>fetch(DIC_BASE[lang] + f).then(r=>{ if(!r.ok) throw new Error(f); return r.text(); });
-      const [mod, aff, dic] = await Promise.all([import('https://cdn.jsdelivr.net/npm/nspell@2.1.5/+esm'), get('index.aff'), get('index.dic')]);
+      const [aff, dic] = await Promise.all([get('index.aff'), get('index.dic')]);
+      if(window.Worker){ try{ return await spWorker(aff, dic); }catch(e){ console.warn('Dicionário em segundo plano indisponível; usando a thread principal.', e); } }
+      const mod = await import(NSPELL_URL);
       const sp = mod.default(aff, dic);
       DIC_EXTRA.split(' ').concat(spUser()).forEach(w=>sp.add(w));
       return sp;
@@ -4925,7 +5022,11 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         if(w.length < 2 || w === w.toUpperCase() || spIgnore.has(w)) continue;                                   // siglas
         if(w[0] !== w[0].toLowerCase() && !/(^|[.!?…]\s+)$/.test(t.slice(0, m.index))) continue; // nomes próprios no meio da frase
         let ok = memo.get(w);
-        if(ok === undefined){ ok = sp.correct(w) || (w.includes('-') && w.split('-').every(x=>sp.correct(x))); memo.set(w, ok); }
+        if(ok === undefined){
+          if(sp.async){ ok = sp.look(w, !noSug); if(ok === undefined) continue; }   // dicionário em segundo plano: pula até o Worker responder
+          else ok = sp.correct(w) || (w.includes('-') && w.split('-').every(x=>sp.correct(x)));
+          memo.set(w, ok);
+        }
         if(ok) continue;
         const sug = noSug ? [] : sp.suggest(w).slice(0, 5).sort((a, b)=>(spStrip(b) === spStrip(w)) - (spStrip(a) === spStrip(w))).slice(0, 4);   // mesma palavra com acento corrigido vem primeiro
         out.push({node:n, start:m.index, len:w.length, rep:sug[0] || null, sug, kind:'orto', label:'Ortografia: “' + w + '”', text:w});
@@ -5000,6 +5101,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     $('revStat').textContent = 'Carregando o dicionário de português…';
     try{
       const sp = await spLoad(), base = rvItems;
+      if(sp.async){ rvOrto(sp); await sp.idle(); rvOrto(sp); await sp.idle(); }   // pede as palavras ao Worker e espera as respostas (com sugestões)
       rvItems = base.concat(rvOrto(sp).filter(o=>!base.some(a=>a.node === o.node && a.start === o.start))).sort(rvCmp);
       rvRender();
     }catch(e){ rvRender(); $('revStat').textContent += ' (Não consegui baixar o dicionário agora — conecte-se à internet uma vez.)'; }
