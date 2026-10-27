@@ -797,6 +797,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 #toolbar .tsz{display:flex;justify-content:space-between;gap:4px;width:130px}
 #toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
 #toolbar select.tfit{width:100%;height:22px}
+@media screen{body.tblgrid #page table td,body.tblgrid #page table th{outline:1px dashed rgba(110,125,150,.75);outline-offset:-1px}}
 @media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}#page table[data-flow]{border-collapse:separate !important;border-spacing:0}#page table[data-flow] td{-webkit-box-decoration-break:clone;box-decoration-break:clone}}
 
 /* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
@@ -1156,6 +1157,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     <div class="group" role="group" aria-label="Desenhar tabela"><div class="gb cols">
       <button type="button" class="rb sm" id="tDraw" title="Ative e arraste sobre células para traçar uma linha divisória; em área vazia, arraste para criar uma tabela">✎ <span>Desenhar Tabela</span></button>
       <button type="button" class="rb sm" id="tErase" title="Ative e clique/arraste sobre uma linha divisória para unir as células">⌫ <span>Borracha</span></button>
+      <button type="button" class="rb sm" id="tGrid" aria-pressed="false" title="Mostra ou esconde linhas de grade pontilhadas nas tabelas sem borda (só na tela; não saem na impressão nem no arquivo)">▦ <span>Linhas de Grade</span></button>
     </div><div class="gl">Desenhar</div></div>
     <div class="group" role="group" aria-label="Mover linha"><div class="gb cols">
       <button type="button" class="rb sm" id="tRowUp" title="Mover a linha da célula atual para cima">↑ <span>Mover linha para cima</span></button>
@@ -2148,7 +2150,12 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       }
       if(bot - ps > U() + 1){
         // quadro "data-flow" (modelos): começa onde houver pelo menos ~3 linhas de espaço e continua na página seguinte
-        const flow = k.hasAttribute && k.hasAttribute('data-flow') && ps + U() - top >= 90;
+        const hasFlow = !!(k.hasAttribute && k.hasAttribute('data-flow'));
+        let flow = hasFlow && ps + U() - top >= 90;
+        // sem espaço para ~3 linhas: o quadro (com o título da seção) começa na página seguinte e só então é dividido; antes ele caía no
+        // corte "cego" por altura, que cortava a linha ao meio e fazia o rodapé/cabeçalho invadirem o texto na tela
+        if(hasFlow && !flow && top > ps + 1){ next(chain()); flow = true; }
+      if(bot - ps > U() + 1){
         let done = false;
         if(flow && splitOf){      // quebra por linha: a 1ª linha que não cabe começa a próxima página (o espaço é aberto só por CSS, em pgRun)
           const ps0 = ps, n0 = starts.length, ys = [];
@@ -2163,6 +2170,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(done){ /* já dividido por linhas */ }
         else if(!flow && top > ps + 1 && bot - top <= U()) next(chain());
         else while(bot - ps > U() + 1) next(ps + U());
+      }
       }
     });
     return starts;
@@ -2224,7 +2232,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     let css = '';
     [...tr.cells].forEach((c, ci)=>{
       const cs = getComputedStyle(c), pt = parseFloat(cs.paddingTop) || 0;
-      const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:parseFloat(w), col} : null;
+      const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:Math.max(1, parseFloat(w)), col} : null;   // mínimo 1px: com o zoom da tela (ex.: 110%) a borda de 0,9px sumia no fundo do quadro
       const L = side(cs.borderLeftWidth, cs.borderLeftStyle, cs.borderLeftColor), Rr = side(cs.borderRightWidth, cs.borderRightStyle, cs.borderRightColor);
       const g = o=>'linear-gradient(to bottom,' + o.col + ' 0,' + o.col + ' ' + Math.max(0, room).toFixed(1) + 'px,transparent ' + Math.max(0, room).toFixed(1) + 'px,transparent ' + extra.toFixed(1) + 'px,' + o.col + ' ' + extra.toFixed(1) + 'px,' + o.col + ' 100%)';
       const imgs = [], sz = [], ps = [];
@@ -2256,7 +2264,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     poly.push('0.1px ' + hf.toFixed(2) + 'px', '0 ' + hf.toFixed(2) + 'px');
     const sel = cellSel(cell);
     let css = sel + '::before{content:"";float:left;width:100%;height:' + hf.toFixed(2) + 'px;shape-outside:polygon(' + poly.join(',') + ')}';
-    const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:parseFloat(w), col} : null;
+    const side = (w, st, col)=>(parseFloat(w) > 0 && st !== 'none' && st !== 'hidden') ? {w:Math.max(1, parseFloat(w)), col} : null;   // mínimo 1px: com o zoom da tela (ex.: 110%) a borda de 0,9px sumia no fundo do quadro
     const Lb = side(cs.borderLeftWidth, cs.borderLeftStyle, cs.borderLeftColor), Rb = side(cs.borderRightWidth, cs.borderRightStyle, cs.borderRightColor);
     const g = o=>{ const q = []; let cur = 0; gaps.forEach(([a, b])=>{ q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + b.toFixed(1) + 'px'); cur = b; }); q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' 100%'); return 'linear-gradient(to bottom,' + q.join(',') + ')'; };
     const imgs = [], sz = [], ps = [];
@@ -3073,9 +3081,31 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }
 
   // ---------- Arquivo: novo, abrir, exportar ----------
-  function fileName(ext){
-    return (title.value.trim() || 'documento').replace(/[\\/:*?"<>|]+/g,'-') + ext;
+  // Modelos do CRAS: o nome do arquivo sai "<nome preenchido> - Relatório Informativo" / "<nome do adolescente/criança> - Encaminhamento"
+  function autoName(){
+    const d = store.docs[store.current], kind = d && d.kind; if(!kind) return '';
+    const clean = t=>(t || '').replace(/[\u00a0\u200b\s]+/g, ' ').trim();
+    let nome = '', tipo = '';
+    if(kind === 'relatorio'){
+      tipo = 'Relatório Informativo';
+      const td = page.querySelector('table[data-sec] td'); nome = td ? clean(td.textContent).replace(/^Nome:\s*/i, '') : '';
+    }else if(kind === 'encaminhamento'){
+      tipo = 'Encaminhamento';
+      const td = [...page.querySelectorAll('table td')].find(c=>/^\s*Nome do adolescente\/crian/i.test(c.textContent));
+      nome = td ? clean(td.textContent).replace(/^Nome do adolescente\/crian[çc]a:\s*/i, '') : '';
+    }
+    return nome ? nome + ' - ' + tipo : '';
   }
+  function fileName(ext){
+    const t = autoName() || title.value.trim() || 'documento';
+    return t.replace(/[\\/:*?"<>|]+/g,'-') + ext;
+  }
+  // PDF pelo diálogo de impressão: o nome sugerido vem do título da aba
+  (function(){
+    let old = null;
+    window.addEventListener('beforeprint', ()=>{ const n = autoName(); if(n){ old = document.title; document.title = n; } });
+    window.addEventListener('afterprint', ()=>{ if(old != null){ document.title = old; old = null; } });
+  })();
   function hfLines(k, cls){
     const hh = hfData(), lines = [[]];
     hfRuns(hh[k]).forEach(t=>{
@@ -3727,6 +3757,13 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     function recalcTableFormulas(table){let any=false;table.querySelectorAll('td[data-formula],th[data-formula]').forEach(c=>{if(c.closest('table')===table)any=recalcFormulaCell(c)||any});return any}
     function addFormula(kind){const c=inTable(),table=c&&c.closest('table');if(!c)return;const before=tSnap(),n=formulaValue(table,c,kind);if(n===null){alert('Selecione uma célula abaixo dos valores a calcular.');return}c.dataset.formula=kind;c.contentEditable='false';c.textContent=formatFormula(n);tCommit(before);changed()}
     $('tSum').addEventListener('mousedown',e=>e.preventDefault());$('tAvg').addEventListener('mousedown',e=>e.preventDefault());$('tCount').addEventListener('mousedown',e=>e.preventDefault());
+    { // Exibir Linhas de Grade (só tela): classe no body + preferência guardada no navegador
+      const gb=$('tGrid'); let on=false; try{ on=localStorage.getItem('verbus:tblgrid')==='1'; }catch(_){}
+      const apply=()=>{ document.body.classList.toggle('tblgrid',on); gb.setAttribute('aria-pressed',on?'true':'false'); gb.classList.toggle('on',on); };
+      gb.addEventListener('mousedown',e=>e.preventDefault());
+      gb.onclick=()=>{ on=!on; try{ localStorage.setItem('verbus:tblgrid',on?'1':'0'); }catch(_){} apply(); };
+      apply();
+    }
     $('tSum').onclick=()=>addFormula('SUM_ABOVE');$('tAvg').onclick=()=>addFormula('AVG_ABOVE');$('tCount').onclick=()=>addFormula('COUNT_ABOVE');
     let fmT=0;page.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-formula]'))return;clearTimeout(fmT);fmT=setTimeout(()=>{let any=false;page.querySelectorAll('table').forEach(t=>any=recalcTableFormulas(t)||any);if(any)changed()},400)});
     $('tSortOpen').addEventListener('mousedown',e=>e.preventDefault());$('tSortCancel').onclick=()=>sortDlg.close();
@@ -5538,6 +5575,12 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
     const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
+    // Composição Familiar em grade (Nome / Parentesco / Idade / Ocupação ou renda): Tab passa de célula em célula e a última Tab cria nova linha
+    const famW = [250, 120, 64, 182];
+    const famC = (w, t, head)=>'<td style="' + F + 'width:' + w + 'px;height:' + (head ? 30 : 28) + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:' + (head ? 'center' : 'left') + (head ? ';background-color:#f2f2f2' : '') + '">' + (head ? '<b>' + t + '</b>' : '<br>') + '</td>';
+    const fam = '<table data-sec="1" style="border-collapse:collapse;table-layout:fixed;width:616px;margin:0 0 0 5px"><colgroup>' + famW.map(w=>'<col style="width:' + w + 'px">').join('') + '</colgroup><tbody>' +
+      '<tr>' + ['Nome', 'Parentesco', 'Idade', 'Ocupação / Renda'].map((t, i)=>famC(famW[i], t, true)).join('') + '</tr>' +
+      ('<tr>' + famW.map(w=>famC(w, '', false)).join('') + '</tr>').repeat(4) + '</tbody></table>';
     const html =
       '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">Relatório Informativo</p>' +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:8px 0 15px 28px;text-align:left;break-after:avoid">01 – Identificação:</p>' +
@@ -5546,7 +5589,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         '<tr>' + c(404, 36, 'Data de Nascimento:', 2) + c(212, 36, 'Idade:') + '</tr>' +
         '<tr>' + c(333, 36, 'Endereço:') + c(283, 36, 'Telefone:', 2) + '</tr></tbody></table>' +
       hd('02 – Demanda:', 28) + box(616, 37, 5) +
-      hd('03 – Composição Familiar:', 28) + box(616, 37, 5) +
+      hd('03 – Composição Familiar:', 28) + fam +
       hd('04 – Condições Habitacionais:', 28) + box(616, 90, 5) +
       hd('05 – Situação Apresentada:', 28) + big(616, 370, 5) +
       hd('06 – Providências Socioassistenciais:', 28) + box(616, 139, 5) +
@@ -5555,7 +5598,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       '<p style="' + F + 'font-weight:bold;font-style:italic;line-height:1.5;width:326px;margin:0 0 0 295px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">(Assinado eletronicamente)</p>' +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 295px;text-align:right">Técnico de Referência</p>';
     return {
-      title:'Relatório Informativo', html, abnt:false,
+      title:'Relatório Informativo', kind:'relatorio', html, abnt:false,
       sty:{f:'Times New Roman', hc:'', sp:'padrao'},
       mar:{t:176, r:56.7, b:101.3, l:113.4},
       hf:{h:'', f:'', ha:'left', fa:'left', dif:false, imgs:[
@@ -5569,7 +5612,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const B = '1px solid #000';
     const L = t=>'<b><u>' + t + '</u></b>';
     const SP = '&nbsp;';   // espaço fora do negrito/sublinhado: o que for digitado depois do rótulo sai em texto normal
-    // grade de 2 colunas: 285 + 321 = 606 px (a 2ª precisa de ≥ 293 px para "CRAS/CRISTIANA VICENTE NUNES" não quebrar) (Encaminhamento/Idade/Bairro começam na 2ª coluna)
+    // grade de 2 colunas: 285 + 321 = 606 px (a 2ª precisa de ≥ 321 px para "CRAS/CRISTIANA VICENTE NUNES" não quebrar; a largura vem da 1ª linha, por causa do table-layout fixo) (Encaminhamento/Idade/NIS/Contato começam na 2ª coluna)
     const td = (span, w, inner, h, o)=>{
       o = o || {};
       return '<td colspan="' + span + '" style="' + F + 'width:' + w + 'px;height:' + h + 'px;padding:' + (o.pad || '5px 11px 0') + ';vertical-align:top;line-height:1.2;text-align:left;border-style:none;' +
@@ -5585,12 +5628,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         full(L('Assunto:') + SP, 56) +
         full(L('Nome do adolescente/criança:') + SP, 36) +
         two(L('Data de nascimento:') + SP, '<b>Idade:</b>' + SP, 32) +
-        full(L('CPF:') + SP, 32) +
-        full(L('NIS:') + SP, 32) +
-        full(L('Responsável Familiar') + '<b>:</b>' + SP, 32) +
-        full(L('CPF:') + SP, 32) +
-        two(L('Endereço') + '<b>:</b>' + SP, '<b>Bairro:</b>' + SP, 32) +
-        full(L('Contato') + '<b>:</b>' + SP, 52) +
+        two(L('CPF:') + SP, L('NIS:') + SP, 32) +
+        full(L('Responsável Familiar:') + SP, 32) +
+        two(L('CPF:') + SP, L('Contato:') + SP, 32) +
+        full(L('Endereço:') + SP, 32) +
+        full(L('Bairro:') + SP, 32) +
         full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270, null, 1) +
         full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
         full('&nbsp;', 40) +
@@ -5600,7 +5642,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       '<div class="pb" contenteditable="false"></div>' +
       '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.2;margin:0">ANEXO</p>';
     return {
-      title:'Encaminhamento', html, abnt:false,
+      title:'Encaminhamento', kind:'encaminhamento', html, abnt:false,
       sty:{f:'Arial', hc:'', sp:'padrao'},
       mar:{t:176, r:104, b:101.3, l:75.5},
       hf:{h:'', f:'', ha:'left', fa:'left', dif:false, imgs:[
