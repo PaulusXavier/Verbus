@@ -62,11 +62,17 @@ Editor de texto de uso pessoal que roda no navegador (HTML, CSS e JavaScript pur
 - Tamanho da fonte em pontos, ditado por voz, colar texto limpo e imagens (Ctrl+V)
 - Baixa e abre .docx (usa bibliotecas da internet; o resto funciona offline)
 
+- **Guia Correspondências**: modelos de **Ofício, Memorando, Declaração, Carta e Requerimento**; partes avulsas (Local e data, Destinatário, Assunto, Vocativo, Fecho, Assinatura); **Remetente…** (nome, cargo/registro, órgão e cidade usados na assinatura, guardados no navegador); e **Mala direta** (cole a lista de uma planilha em Destinatários…, insira campos como {{Nome}} e use Gerar cartas para criar um documento com uma página por destinatário)
+
+- **Guia Desenvolvedor**: **Controles** de formulário (caixa de seleção ☐/☒, campo de texto com dica, lista suspensa e data), **Modo formulário** (bloqueia o texto e deixa editáveis só os controles), **Backup (.json)** e **Restaurar backup** (os documentos entram como novos, sem apagar os atuais) e **Código HTML** do documento aberto
+
 ## Padrão ABNT
-- **Padrão de todo documento**: Times New Roman 12 pt, espaçamento entre linhas 1,5 (base da ABNT; vale também na impressão, no PDF e no .doc/.docx)
+- **O aplicativo é baseado na ABNT**: todo documento novo (Arquivo > Novo > Documento ABNT) e todo documento aberto sai no padrão ABNT; o formato fica guardado em cada documento. Só o *Documento livre* e os modelos prontos do CRAS (que têm layout próprio) ficam fora da ABNT, e o botão ABNT liga/desliga o padrão em qualquer documento
+- **Padrão de todo documento**: ABNT já ligado ao abrir, Arial 12 pt, espaçamento entre linhas 1,5, texto justificado (base da ABNT; vale também na impressão, no PDF e no .doc/.docx)
 - **Mouse como no Word**: botão direito abre o menu (recortar/copiar/colar, fonte, parágrafo, link e, em tabela, inserir, excluir célula/linha/coluna/tabela, selecionar, mesclar, bordas, sombreamento, alinhamento); clicar na margem à esquerda da tabela seleciona a linha e na borda de cima seleciona a coluna (arraste para várias); na margem da folha, clique seleciona a linha de texto e duplo clique o parágrafo; com células selecionadas, Delete limpa o conteúdo e Backspace exclui as linhas/colunas selecionadas
-- **Páginas separadas na tela**: cada folha aparece inteira, com margens, cabeçalho e rodapé próprios, e um espaço cinza entre elas marcado "Fim da página N · Início da página N+1"; a barra de status mostra a página do cursor. Só um bloco maior que a folha inteira (um parágrafo ou tabela enorme) volta a mostrar apenas a linha tracejada
-- Botão **ABNT**: A4, margens 3/2/2/3 cm, Times 12, espaçamento 1,5, recuo de 1,25 cm, texto justificado
+- **Páginas separadas na tela**: a folha fica centralizada e, se não couber na janela, o zoom se ajusta à largura; cada folha aparece inteira, com margens, cabeçalho e rodapé próprios, e um espaço cinza entre elas marcado "Fim da página N · Início da página N+1"; a barra de status mostra a página do cursor. Só um bloco maior que a folha inteira (um parágrafo ou tabela enorme) volta a mostrar apenas a linha tracejada
+- Botão **ABNT**: A4, margens 3/2/2/3 cm, Arial 12, espaçamento 1,5, recuo de 1,25 cm, texto justificado
+- Estilo **Texto ABNT** na galeria (Página Inicial): parágrafo com recuo de 1,25 cm, justificado, espaçamento 1,5
 - Títulos numerados (1, 1.1, 1.1.1) e título sem número (RESUMO, REFERÊNCIAS)
 - Capa, folha de rosto, resumo, sumário e legendas de figura, tabela e quadro
 - Citação longa (recuo de 4 cm, fonte 10, espaço simples)
