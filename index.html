@@ -653,6 +653,37 @@ body.tsel #page ::selection{background:transparent}
 @media print{#page .tbx:focus-within{outline:0}}
 @media print{#page .cf-txt,#page .cf-date,#page .cf-sel{background:none;border-bottom:1px solid #000}#page .cf[data-empty]{color:transparent;display:inline-block;min-width:140px}#page .cf-sel::after{content:none}}
 #toolbar .rb.bigb{flex-direction:column;height:47px;width:44px;padding:0;gap:3px;justify-content:flex-start}
+#toolbar .rb.bigb.lyb{flex-direction:column;height:60px;width:auto;min-width:52px;padding:2px 5px 0;gap:2px;justify-content:flex-start;line-height:1.1}
+#toolbar .lyb .car{margin:0}
+#toolbar .lystack{align-items:stretch;min-width:132px;margin-left:4px;margin-top:0}
+#toolbar .lysm{justify-content:flex-start !important;text-align:left;width:auto}
+#toolbar .lysm span{flex:1;text-align:left}
+#toolbar .lysm .car{margin-left:auto}
+#toolbar .lyp{display:flex;flex-direction:column;gap:1px;padding:0 6px 0 4px}
+#toolbar .lyp .lt{font:12px/16px var(--uifont);color:var(--rink);height:16px}
+#toolbar .lyp .lr{display:flex;align-items:center;gap:4px;height:24px;font:12px/1 var(--uifont);color:var(--rink)}
+#toolbar .lyp .ln{display:inline-block;min-width:66px}
+#toolbar .spn{position:relative;display:inline-flex;width:76px;height:22px;box-sizing:border-box;border:1px solid var(--ctlb);background:var(--ctl)}
+#toolbar .spn:hover,#toolbar .spn:focus-within{border-color:#8f8f8f}
+#toolbar .spn input{width:100%;min-width:0;height:100%;box-sizing:border-box;border:0;outline:0;background:transparent;color:var(--rink);font:12px/1 var(--uifont);padding:0 15px 0 4px}
+#toolbar .spn .sp{position:absolute;right:0;top:0;bottom:0;width:14px;display:flex;flex-direction:column}
+#toolbar .spn .sp b{flex:1;position:relative;cursor:default}
+#toolbar .spn .sp b:hover{background:var(--rhov)}
+#toolbar .spn .sp b::after{content:"";position:absolute;left:50%;top:50%;margin:-2px 0 0 -3px;border-left:3px solid transparent;border-right:3px solid transparent}
+#toolbar .spn .sp .up::after{border-bottom:3px solid #666}
+#toolbar .spn .sp .dn::after{border-top:3px solid #666}
+#toolbar .rb.bigb.lyb.two{height:64px}
+#toolbar .lyb.two span{text-align:center;line-height:1.15}
+#toolbar .lywide{min-width:178px}
+#toolbar .lysm:disabled{color:#989898;cursor:default;background:transparent;border-color:transparent}
+#toolbar .lysm:disabled .ic{opacity:.5}
+#toolbar .lyest{display:flex;align-items:center;gap:5px;height:22px;padding:0 4px;font:12px/1 var(--uifont);color:var(--rink)}
+#toolbar .lyest select{flex:1;min-width:0;height:20px}
+#tblPop .symg{display:grid;grid-template-columns:repeat(4,34px);gap:2px;padding:2px 0}
+#tblPop .symg button{width:34px;height:30px;margin:0;padding:0;text-align:center;font-size:16px;border:1px solid var(--ctlb)}
+#tblPop .mh{padding:4px 0 2px;font-weight:600;color:var(--rmute)}
+#tblPop .ck{display:inline-block;width:16px}
+#tblPop button[aria-checked=false] .ck{visibility:hidden}
 #toolbar .rb.caronly{height:14px;width:44px;min-width:0;padding:0}
 #toolbar .pastecol{display:flex;flex-direction:column;align-items:center;width:46px;margin:0 2px 0 3px}
 #toolbar .stack{display:flex;flex-direction:column;align-items:stretch;gap:1px;width:auto;margin-top:-1px}
@@ -1010,8 +1041,10 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     <button id="btnCollapse" class="collapse" title="Recolher a Faixa de Opções (Ctrl+F1)" aria-label="Recolher a Faixa de Opções"><svg class="ic" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke="#555" stroke-width="1.4" fill="none"/></svg></button>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-inserir" data-tab="inserir" aria-labelledby="tab-inserir" hidden>
-    <div class="group" role="group" aria-label="Páginas"><div class="gb">
-      <button id="btnPb" title="Quebra de página">Quebra</button>
+    <div class="group" role="group" aria-label="Páginas"><div class="gb cols">
+      <button id="btnCover" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Folha de Rosto: insere uma capa ou uma folha de rosto (ABNT) no cursor"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff"/><path d="M20.5 3.5v4h4"/><rect x="10.5" y="10.5" width="11" height="7" fill="#f2c36b" stroke="#b58b3a"/><path d="M10.5 21.5h11M10.5 25h7" stroke="#2b79c9"/></svg><span>Folha de<br>Rosto <i class="car"></i></span></button>
+      <button id="btnBlank" type="button" class="rb bigb lyb two" title="Página em Branco: insere uma página vazia no cursor"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff"/><path d="M20.5 3.5v4h4"/><path d="M16 14v9M11.5 18.5h9" stroke="#2b79c9" stroke-width="2"/></svg><span>Página em<br>Branco</span></button>
+      <button id="btnPb" type="button" class="rb bigb lyb two" title="Quebra de Página: o texto seguinte começa na próxima página"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9.5 2.5h13v8h-13zM9.5 21.5h13v8h-13z" fill="#fff"/><path d="M4 16h24" stroke="#2b79c9" stroke-dasharray="3 2"/></svg><span>Quebra<br>de Página</span></button>
     </div><div class="gl">Páginas</div></div>
     <div class="group" role="group" aria-label="Tabelas"><div class="gb">
       <button id="btnTable" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Inserir uma tabela"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="24" height="20" fill="#fff" stroke="#777"/><rect x="4" y="5" width="24" height="5" fill="#2b79c9" fill-opacity=".75" stroke="#777"/><path d="M12 5v20M20 5v20M4 15h24M4 20h24" stroke="#999" fill="none"/></svg><span>Tabela <i class="car"></i></span></button>
@@ -1028,12 +1061,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <button id="btnLink" title="Inserir link">Link</button>
       <button data-cmd="unlink" title="Remover link">Sem link</button>
     </div><div class="gl">Links</div></div>
-    <div class="group" role="group" aria-label="Notas"><div class="gb">
-      <button id="btnFn2" type="button" class="rb bigb" title="Inserir nota de rodapé no cursor (Ctrl+Alt+F). A numeração é automática e a nota fica no pé da página, como no Word"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="18" height="26" rx="1" fill="#fff" stroke="#777"/><path d="M8 8h12M8 12h12M8 16h8" stroke="#aaa" fill="none"/><path d="M8 23h7" stroke="#777"/><path d="M8 26h12" stroke="#2b79c9"/><text x="19" y="19" font-size="10" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#2b79c9">AB</text><text x="27" y="15" font-size="8" font-weight="700" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#e45a4f">1</text></svg><span>Nota de<br>Rodapé</span></button>
-      <button id="btnEn2" type="button" class="rb bigb" title="Inserir nota de fim no cursor (Ctrl+Alt+D). Ficam reunidas no final do documento, numeradas em algarismos romanos"><span>Nota de<br>Fim</span></button>
-    </div><div class="gl">Notas</div></div>
-    <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb">
-      <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
+    <div class="group" role="group" aria-label="Cabeçalho e Rodapé"><div class="gb cols">
+      <button id="btnHdr" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Cabeçalho: editar ou remover (ou clique duas vezes na margem superior da página)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff"/><path d="M20.5 3.5v4h4"/><rect x="9.5" y="6.5" width="11" height="5" fill="#f2c36b" stroke="#b58b3a"/><path d="M10 17h12M10 21h12M10 25h7" stroke="#999"/></svg><span>Cabeçalho <i class="car"></i></span></button>
+      <button id="btnFtr" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Rodapé: editar ou remover (ou clique duas vezes na margem inferior da página)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff"/><path d="M20.5 3.5v4h4"/><path d="M10 11h12M10 15h12M10 19h7" stroke="#999"/><rect x="9.5" y="22.5" width="13" height="4" fill="#f2c36b" stroke="#b58b3a"/></svg><span>Rodapé <i class="car"></i></span></button>
+      <button id="btnPgNum" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Número de Página: escolha onde colocar e o formato"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff"/><path d="M20.5 3.5v4h4"/><path d="M10 11h12M10 15h12" stroke="#999"/><text x="12" y="26" font-size="9" font-weight="700" fill="#2b79c9" stroke="none" font-family="Segoe UI,Arial,sans-serif">#</text></svg><span>Número de<br>Página <i class="car"></i></span></button>
+      <div class="lyhid" hidden>
+        <button id="btnHF" title="Cabeçalho e rodapé (ou clique duas vezes na margem superior/inferior da página)">Cabeçalho/Rodapé</button>
       <select id="pgNum" title="Número de Página: escolha onde colocar (usa o formato escolhido ao lado)">
         <option value="" selected disabled hidden>Número de Página</option>
         <optgroup label="Início da página (cabeçalho)"><option value="h:left">Esquerda</option><option value="h:center">Centralizado</option><option value="h:right">Direita</option></optgroup>
@@ -1048,24 +1081,26 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         <option value="" selected disabled hidden>Remover</option>
         <option value="h">Remover Cabeçalho</option><option value="f">Remover Rodapé</option><option value="hf">Remover Cabeçalho e Rodapé</option>
       </select>
-    </div><div class="gl">Cabeçalho e Rodapé</div></div>
-    <div class="group" role="group" aria-label="Texto"><div class="gb">
-      <button id="btnDate" title="Inserir data de hoje">Data</button>
-      <button id="btnCode" title="Texto de código">&lt;/&gt;</button>
-      <button id="btnTask" title="Lista de tarefas">☑ Tarefas</button>
-      <button data-cmd="insertHorizontalRule" title="Linha horizontal">―</button>
-    </div><div class="gl">Texto</div></div>
-    <div class="group" role="group" aria-label="Caixa de Texto"><div class="gb">
-      <button id="btnTbx" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Caixa de texto: um quadro com borda para destacar um trecho, avisos ou barras laterais. Se houver texto selecionado, ele vai para dentro da caixa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4.5" y="6.5" width="23" height="19" rx="1.5"/><path d="M9 12h14M9 16h14M9 20h8" stroke-linecap="round"/></svg><span>Caixa <i class="car"></i></span></button>
-    </div><div class="gl">Caixa de Texto</div></div>
-    <div class="group" role="group" aria-label="Campos"><div class="gb">
-      <button id="btnCampos" type="button" class="rb bigb" aria-haspopup="menu" aria-expanded="false" title="Campos de preenchimento: caixa de seleção, texto, data e lista suspensa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="9" height="9" fill="#fff" stroke="#777"/><path d="M6 9.5l2 2 3.5-4.5" stroke="#2b79c9" stroke-width="1.6" fill="none"/><rect x="16" y="6" width="12" height="7" fill="#eef3fb" stroke="#777"/><rect x="4" y="19" width="24" height="7" fill="#eef3fb" stroke="#777"/><path d="M22 21.5l2 2 2-2" stroke="#777" fill="none"/></svg><span>Campos <i class="car"></i></span></button>
-    </div><div class="gl">Campos</div></div>
-    <div class="group" role="group" aria-label="Símbolos"><div class="gb">
       <select id="symb" title="Símbolos">
       <option value="" selected disabled hidden>Símbolos</option>
       <option>©</option><option>®</option><option>™</option><option>€</option><option>§</option><option>°</option><option>•</option><option>→</option><option>✓</option><option>≠</option><option>≤</option><option>≥</option><option>º</option><option>ª</option><option>–</option><option>—</option><option value="__mais">Mais símbolos…</option>
     </select>
+      </div>
+    </div><div class="gl">Cabeçalho e Rodapé</div></div>
+    <div class="group" role="group" aria-label="Texto"><div class="gb cols">
+      <button id="btnTbx" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Caixa de texto: um quadro com borda para destacar um trecho, avisos ou barras laterais. Se houver texto selecionado, ele vai para dentro da caixa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4.5" y="6.5" width="23" height="19" rx="1.5"/><path d="M9 12h14M9 16h14M9 20h8" stroke-linecap="round"/></svg><span>Caixa de<br>Texto <i class="car"></i></span></button>
+      <button id="btnCampos" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Campos de preenchimento: caixa de seleção, texto, data e lista suspensa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="9" height="9" fill="#fff" stroke="#777"/><path d="M6 9.5l2 2 3.5-4.5" stroke="#2b79c9" stroke-width="1.6" fill="none"/><rect x="16" y="6" width="12" height="7" fill="#eef3fb" stroke="#777"/><rect x="4" y="19" width="24" height="7" fill="#eef3fb" stroke="#777"/><path d="M22 21.5l2 2 2-2" stroke="#777" fill="none"/></svg><span>Campos <i class="car"></i></span></button>
+      <div class="stack lystack">
+        <button type="button" class="rb sm lysm" id="btnDate" title="Inserir data de hoje"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="11" rx="1" fill="#fff"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3" /><circle cx="10.5" cy="10.5" r="1.4" fill="#2b79c9" stroke="none"/></svg><span>Data e Hora</span></button>
+        <button type="button" class="rb sm lysm" data-cmd="insertHorizontalRule" title="Linha horizontal"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 8h13" stroke="#2b79c9" stroke-width="2"/><path d="M3 4h10M3 12h10" stroke="#aaa"/></svg><span>Linha Horizontal</span></button>
+      </div>
+      <div class="stack lystack">
+        <button type="button" class="rb sm lysm" id="btnCode" title="Texto de código"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5.5 4L2 8l3.5 4M10.5 4L14 8l-3.5 4" stroke="#2b79c9"/></svg><span>Código</span></button>
+        <button type="button" class="rb sm lysm" id="btnTask" title="Lista de tarefas"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2.5" width="11" height="11" rx="1.5" fill="#fff"/><path d="M4.5 8l2.2 2.2L11 5.5" stroke="#2b79c9" stroke-width="1.8"/></svg><span>Tarefas</span></button>
+      </div>
+    </div><div class="gl">Texto</div></div>
+    <div class="group" role="group" aria-label="Símbolos"><div class="gb cols">
+      <button id="btnSymb" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Símbolo: escolha um símbolo comum ou abra Mais símbolos"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="5" y="25" font-size="24" font-family="Segoe UI,Cambria,serif" fill="#2b79c9" stroke="none">Ω</text></svg><span>Símbolo <i class="car"></i></span></button>
     </div><div class="gl">Símbolos</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-design" data-tab="design" aria-labelledby="tab-design" hidden>
@@ -1078,7 +1113,17 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </div><div class="gl">Formatação do Documento</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-layout" data-tab="layout" aria-labelledby="tab-layout" hidden>
-    <div class="group wide" role="group" aria-label="Configurar Página"><div class="gb">
+    <div class="group wide" role="group" aria-label="Configurar Página"><div class="gb cols">
+      <button type="button" class="rb bigb lyb" data-lysel="pgMar" aria-haspopup="menu" aria-expanded="false" title="Margens da página"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.5 3.5h11l5 5v20h-16z" fill="#fff"/><path d="M19.5 3.5v5h5" /><path d="M11.5 11.5h10v14h-10z" stroke="#2b79c9" stroke-dasharray="2 1.6"/></svg><span>Margens</span><i class="car"></i></button>
+      <button type="button" class="rb bigb lyb" data-lysel="pgOri" aria-haspopup="menu" aria-expanded="false" title="Orientação da página: retrato ou paisagem"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="9.5" y="9.5" width="13" height="17" fill="#fff"/><path d="M4 12.5V7.5h5M4 7.5c2-3 6-4 9-3" stroke="#2b79c9"/><path d="M28 19.5v5h-5M28 24.5c-2 3-6 4-9 3" stroke="#2b79c9"/></svg><span>Orientação</span><i class="car"></i></button>
+      <button type="button" class="rb bigb lyb" data-lysel="pgSize" aria-haspopup="menu" aria-expanded="false" title="Tamanho do papel"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.5 3.5h11l5 5v20h-16z" fill="#fff"/><path d="M19.5 3.5v5h5"/><path d="M28 10.5v14M26 12.5l2-2 2 2M26 22.5l2 2 2-2" stroke="#2b79c9"/></svg><span>Tamanho</span><i class="car"></i></button>
+      <button type="button" class="rb bigb lyb" data-lysel="pgCols" aria-haspopup="menu" aria-expanded="false" title="Colunas do texto"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.5 3.5h11l5 5v20h-16z" fill="#fff"/><path d="M19.5 3.5v5h5"/><path d="M11.5 13h4.5M11.5 17h4.5M11.5 21h4.5M18 13h4M18 17h4M18 21h4" stroke="#2b79c9"/></svg><span>Colunas</span><i class="car"></i></button>
+      <div class="stack lystack">
+        <button type="button" class="rb sm lysm" data-lysel="pgBrk" aria-haspopup="menu" aria-expanded="false" title="Quebras: de página, de coluna (precisa de duas ou mais colunas), de texto ou de seção"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 2.5h10v4H3zM3 9.5h10v4H3z" fill="#fff"/><path d="M1 8h14" stroke="#2b79c9" stroke-dasharray="2 1.5"/></svg><span>Quebras</span><i class="car"></i></button>
+        <button type="button" class="rb sm lysm" data-lysel="lnMode" aria-haspopup="menu" aria-expanded="false" title="Números de linha na margem esquerda (só na tela). Para tirar de um parágrafo: Parágrafo > Suprimir números de linha"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 4h8M7 8h8M7 12h8"/><text x="0" y="5.6" font-size="4.6" fill="#2b79c9" stroke="none">1</text><text x="0" y="9.6" font-size="4.6" fill="#2b79c9" stroke="none">2</text><text x="0" y="13.6" font-size="4.6" fill="#2b79c9" stroke="none">3</text></svg><span>Números de Linha</span><i class="car"></i></button>
+        <button type="button" class="rb sm lysm" data-lysel="pgHyph" aria-haspopup="menu" aria-expanded="false" title="Hifenização: divide palavras longas no fim da linha. Vale na tela e na impressão; depende do idioma do navegador"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="0.5" y="7" font-size="7" font-family="Segoe UI,Arial,sans-serif" fill="currentColor" stroke="none">bc</text><path d="M10 5h3" stroke="#2b79c9"/><path d="M2 11.5h12" /></svg><span>Hifenização</span><i class="car"></i></button>
+      </div>
+      <div class="lyhid" hidden>
       <select id="pgMar" title="Margens">
         <option value="padrao">Margens: padrão</option><option value="estreita">Estreita (1,27 cm)</option><option value="moderada">Moderada (2,54 / 1,91 cm)</option><option value="larga">Larga (2,54 / 5,08 cm)</option><option value="abnt">ABNT (3 / 2 / 2 / 3 cm)</option><option value="custom">Personalizadas…</option>
       </select>
@@ -1087,17 +1132,19 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <select id="pgCols" title="Colunas do texto"><option value="1">Uma coluna</option><option value="2">Duas colunas</option><option value="3">Três colunas</option></select>
       <select id="pgBrk" title="Quebras: de página, de coluna (precisa de duas ou mais colunas) ou quebra de texto (nova linha no mesmo parágrafo)"><option value="" selected disabled hidden>Quebras</option><option value="page">Quebra de página</option><option value="col">Quebra de coluna</option><option value="line">Quebra de texto (linha)</option><optgroup label="Quebras de seção"><option value="sec-next">Seção: próxima página</option><option value="sec-cont">Seção: contínua</option><option value="sec-even">Seção: página par</option><option value="sec-odd">Seção: página ímpar</option></optgroup></select>
       <select id="pgHyph" title="Hifenização: divide palavras longas no fim da linha. Vale na tela e na impressão; depende do idioma do navegador. Para um parágrafo só: Parágrafo > Não hifenizar"><option value="">Hifenização: nenhuma</option><option value="auto">Hifenização: automática</option></select>
-      <button id="btnPgDlg" title="Configurar página: margens, papel, orientação e colunas" aria-label="Configurar página">⚙</button>
-    </div><div class="gl">Configurar Página</div></div>
-    <div class="group" role="group" aria-label="Números de Linha"><div class="gb">
       <select id="lnMode" title="Números de linha na margem esquerda (só na tela). Para tirar de um parágrafo: Parágrafo > Suprimir números de linha"><option value="">Números de linha: nenhum</option><option value="c">Contínuo</option><option value="p">Reiniciar a cada página</option></select>
-    </div><div class="gl">Números de Linha</div></div>
-    <div class="group" role="group" aria-label="Parágrafo"><div class="gb">
-      <label class="pc" title="Recuo à esquerda do parágrafo, em cm (como no Word)">Recuo esq.<input type="number" id="lyIndL" min="0" max="20" step="0.25" value="0" style="width:62px"> cm</label>
-      <label class="pc" title="Recuo à direita do parágrafo, em cm (como no Word)">dir.<input type="number" id="lyIndR" min="0" max="20" step="0.25" value="0" style="width:62px"> cm</label>
-      <select id="spB" title="Espaço antes do parágrafo"><option value="" selected disabled hidden>Antes</option><option value="auto">Padrão</option><option value="0">0 pt</option><option value="3">3 pt</option><option value="6">6 pt</option><option value="8">8 pt</option><option value="10">10 pt</option><option value="12">12 pt</option><option value="18">18 pt</option><option value="24">24 pt</option><option value="36">36 pt</option></select>
-      <select id="spA" title="Espaço depois do parágrafo"><option value="" selected disabled hidden>Depois</option><option value="auto">Padrão</option><option value="0">0 pt</option><option value="3">3 pt</option><option value="6">6 pt</option><option value="8">8 pt</option><option value="10">10 pt</option><option value="12">12 pt</option><option value="18">18 pt</option><option value="24">24 pt</option><option value="36">36 pt</option></select>
-    </div><div class="gl">Parágrafo</div></div>
+      </div>
+    </div><div class="gl">Configurar Página</div><button type="button" id="btnPgDlg" class="gdl" title="Configurar Página: margens, papel, orientação e colunas" aria-label="Configurar Página"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1h4M1 1v4M9 9L3.6 3.6M9 9H6M9 9V6" stroke="currentColor" stroke-width="1" fill="none"/></svg></button></div>
+    <div class="group" role="group" aria-label="Parágrafo"><div class="gb cols">
+      <div class="lyp"><div class="lt">Recuar</div>
+        <label class="lr" title="Recuo à esquerda do parágrafo, em cm (como no Word)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 3h8.5M6 6.5h8.5M6 10h8.5M6 13.5h8.5" stroke="#666"/><path d="M1 4v8M2.5 8h-0.5" stroke="#2b79c9"/><path d="M1.5 8l2.5-2v4z" fill="#2b79c9" stroke="none"/></svg><span class="ln">À Esquerda:</span><span class="spn"><input type="text" id="lyIndL" inputmode="decimal" autocomplete="off" value="0 cm" title="Recuo à esquerda, em cm" aria-label="Recuo à esquerda, em cm"><span class="sp" aria-hidden="true"><b class="up" data-for="lyIndL" data-d="1"></b><b class="dn" data-for="lyIndL" data-d="-1"></b></span></span></label>
+        <label class="lr" title="Recuo à direita do parágrafo, em cm (como no Word)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 3h8.5M1.5 6.5h8.5M1.5 10h8.5M1.5 13.5h8.5" stroke="#666"/><path d="M15 4v8" stroke="#2b79c9"/><path d="M14.5 8l-2.5-2v4z" fill="#2b79c9" stroke="none"/></svg><span class="ln">À Direita:</span><span class="spn"><input type="text" id="lyIndR" inputmode="decimal" autocomplete="off" value="0 cm" title="Recuo à direita, em cm" aria-label="Recuo à direita, em cm"><span class="sp" aria-hidden="true"><b class="up" data-for="lyIndR" data-d="1"></b><b class="dn" data-for="lyIndR" data-d="-1"></b></span></span></label>
+      </div>
+      <div class="lyp"><div class="lt">Espaçamento</div>
+        <label class="lr" title="Espaço antes do parágrafo, em pt (como no Word)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 9h12M2 12.5h12" stroke="#666"/><path d="M8 1.5v5M6 4.5l2 2 2-2" stroke="#2b79c9"/></svg><span class="ln">Antes:</span><span class="spn"><input type="text" id="spB" inputmode="decimal" autocomplete="off" value="0 pt" title="Espaço antes do parágrafo, em pt" aria-label="Espaço antes do parágrafo, em pt"><span class="sp" aria-hidden="true"><b class="up" data-for="spB" data-d="1"></b><b class="dn" data-for="spB" data-d="-1"></b></span></span></label>
+        <label class="lr" title="Espaço depois do parágrafo, em pt (como no Word)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3.5h12M2 7h12" stroke="#666"/><path d="M8 14.5v-5M6 11.5l2-2 2 2" stroke="#2b79c9"/></svg><span class="ln">Depois:</span><span class="spn"><input type="text" id="spA" inputmode="decimal" autocomplete="off" value="0 pt" title="Espaço depois do parágrafo, em pt" aria-label="Espaço depois do parágrafo, em pt"><span class="sp" aria-hidden="true"><b class="up" data-for="spA" data-d="1"></b><b class="dn" data-for="spA" data-d="-1"></b></span></span></label>
+      </div>
+    </div><div class="gl">Parágrafo</div><button type="button" class="gdl" data-dlg="parDlg" title="Parágrafo…" aria-label="Parágrafo"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1h4M1 1v4M9 9L3.6 3.6M9 9H6M9 9V6" stroke="currentColor" stroke-width="1" fill="none"/></svg></button></div>
     <div class="group" role="group" aria-label="Tabela"><div class="gb">
       <select id="tbl" title="Editar tabela (clique antes numa célula)">
       <option value="" selected disabled hidden>Editar tabela</option>
@@ -1147,18 +1194,22 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </select>
       <button id="btnNum" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button>
     </div><div class="gl">Títulos</div></div>
-    <div class="group" role="group" aria-label="Notas"><div class="gb">
-      <button id="btnFn" title="Inserir nota de rodapé (Ctrl+Alt+F): fica no pé da página">Nota de rodapé <sup>1</sup></button>
-      <button id="btnEn" title="Inserir nota de fim (Ctrl+Alt+D): fica reunida no final do documento, numerada em algarismos romanos">Nota de fim <sup>i</sup></button>
-      <button id="btnNoteNav" type="button" aria-haspopup="menu" aria-expanded="false" title="Ir para a nota de rodapé ou de fim seguinte ou anterior">Nota seguinte <i class="car"></i></button>
-      <button id="btnNoteShow" title="Alterna entre o texto e a sua nota: do número vai para a nota, e da nota volta para o número">Mostrar notas</button>
-    </div><div class="gl">Notas</div></div>
-    <div class="group" role="group" aria-label="Citações e Bibliografia"><div class="gb">
-      <button id="btnCite" type="button" aria-haspopup="menu" aria-expanded="false" title="Inserir citação (NBR 10520) de uma fonte cadastrada, ou adicionar uma nova fonte">Inserir Citação <i class="car"></i></button>
-      <button id="btnRefs" title="Gerenciar Fontes: cadastrar, editar e excluir fontes (NBR 6023), inserir citações e a lista de referências">Gerenciar Fontes</button>
-      <label class="refsty" title="Estilo das referências e citações">Estilo: <select id="refStyle" aria-label="Estilo das referências"><option>ABNT (NBR 6023)</option></select></label>
-      <button id="btnBib" type="button" aria-haspopup="menu" aria-expanded="false" title="Inserir a lista de Referências ou Bibliografia no texto, ordenada e atualizada sozinha">Bibliografia <i class="car"></i></button>
-      <button id="btnRefUpd" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar</button>
+    <div class="group" role="group" aria-label="Notas de Rodapé"><div class="gb cols">
+      <button id="btnFn" type="button" class="rb bigb lyb two" title="Inserir nota de rodapé (Ctrl+Alt+F): fica no pé da página"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="3" y="25" font-size="15" font-family="Segoe UI,Arial,sans-serif" fill="#666" stroke="none">AB</text><text x="21" y="12" font-size="10" font-family="Segoe UI,Arial,sans-serif" fill="#d13438" stroke="none">1</text></svg><span>Inserir Nota<br>de Rodapé</span></button>
+      <div class="stack lystack lywide">
+        <button id="btnEn" type="button" class="rb sm lysm" title="Inserir nota de fim (Ctrl+Alt+D): fica reunida no final do documento, numerada em algarismos romanos"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#666"/><text x="9.5" y="14.8" font-size="6" fill="#d13438" stroke="none">i</text></svg><span>Inserir Nota de Fim</span></button>
+        <button id="btnNoteNav" type="button" class="rb sm lysm" aria-haspopup="menu" aria-expanded="false" title="Ir para a nota de rodapé ou de fim seguinte ou anterior"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="0.5" y="9" font-size="8" font-family="Segoe UI,Arial,sans-serif" fill="#666" stroke="none">AB</text><text x="9.6" y="5" font-size="5" fill="#d13438" stroke="none">1</text><path d="M3 12.5h9M9.5 10l2.8 2.5-2.8 2.5" stroke="#2b79c9"/></svg><span>Próxima Nota de Rodapé</span><i class="car"></i></button>
+        <button id="btnNoteShow" type="button" class="rb sm lysm" title="Alterna entre o texto e a sua nota: do número vai para a nota, e da nota volta para o número"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff" stroke="#999"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#999"/></svg><span>Mostrar Notas</span></button>
+      </div>
+    </div><div class="gl">Notas de Rodapé</div><button type="button" id="notesDlgOpen" class="gdl" title="Notas de Rodapé e Notas de Fim…" aria-label="Notas de Rodapé e Notas de Fim"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1h4M1 1v4M9 9L3.6 3.6M9 9H6M9 9V6" stroke="currentColor" stroke-width="1" fill="none"/></svg></button></div>
+    <div class="group" role="group" aria-label="Citações e Bibliografia"><div class="gb cols">
+      <button id="btnCite" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Inserir citação (NBR 10520) de uma fonte cadastrada, ou adicionar uma nova fonte"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M12 11c-2 .5-3 2-3 4h3v3H9" stroke="#d13438"/><path d="M19 17l3 3 6-7" stroke="#2b79c9" stroke-width="2"/></svg><span>Inserir<br>Citação <i class="car"></i></span></button>
+      <div class="stack lystack lywide">
+        <button id="btnRefs" type="button" class="rb sm lysm" title="Gerenciar Fontes: cadastrar, editar e excluir fontes (NBR 6023), inserir citações e a lista de referências"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3.5h5l1 1.5h6v8H2z" fill="#fff"/><path d="M4 8.5h8" stroke="#2b79c9"/></svg><span>Gerenciar Fontes Bibliográficas</span></button>
+        <label class="refsty lyest" title="Estilo das referências e citações"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="2.5" width="12" height="11" rx="1" fill="#fff"/><path d="M4 6h7M4 9h5"/></svg><span>Estilo:</span> <select id="refStyle" aria-label="Estilo das referências"><option>ABNT (NBR 6023)</option></select></label>
+        <button id="btnBib" type="button" class="rb sm lysm" aria-haspopup="menu" aria-expanded="false" title="Inserir a lista de Referências ou Bibliografia no texto, ordenada e atualizada sozinha (o menu também tem Atualizar lista)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 2.5h4v11h-4zM7.5 2.5h4v11h-4z" fill="#fff"/><path d="M12 4l2.4 9.5" stroke="#2b79c9"/></svg><span>Bibliografia</span><i class="car"></i></button>
+      </div>
+      <div class="lyhid" hidden><button id="btnRefUpd" type="button" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar</button></div>
     </div><div class="gl">Citações e Bibliografia</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
@@ -1659,6 +1710,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   </div>
   <p id="nvMsg" style="color:var(--muted);font-size:13px;min-height:18px;margin:8px 0 0"></p>
   <div class="dlgrow"><button id="nvOk">OK</button><button id="nvCancel">Cancelar</button></div>
+</dialog>
+<dialog id="notesDlg">
+  <h3>Notas de Rodapé e Notas de Fim</h3>
+  <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="radio" name="notesKind" value="fn" checked> Nota de rodapé <span style="color:var(--muted);font-size:13px">(fim da página, numeração 1, 2, 3)</span></label>
+  <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="radio" name="notesKind" value="en"> Nota de fim <span style="color:var(--muted);font-size:13px">(fim do documento, numeração i, ii, iii)</span></label>
+  <div class="dlgrow"><button id="notesIns">Inserir</button><button id="notesNav">Mostrar notas</button><button id="notesClose">Fechar</button></div>
 </dialog>
 <dialog id="nlDlg">
   <h3>Alterar Nível da Lista</h3>
@@ -3345,18 +3402,6 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   })();
 
 
-  // Espaçamento antes/depois do parágrafo
-  [['spB','marginTop'],['spA','marginBottom']].forEach(([id, prop])=>{
-    $(id).addEventListener('change', e=>{
-      const v = e.target.value; e.target.selectedIndex = 0; restore();
-      blocksInSel().filter(b=>!/^(TD|TH)$/.test(b.tagName)).forEach(b=>{
-        b.style[prop] = v === "auto" ? "" : v + "pt";
-        if(!b.getAttribute('style')) b.removeAttribute('style');
-      });
-      changed();
-    });
-  });
-
   // Maiúsculas / minúsculas
   $('case').addEventListener('change', e=>{
     const m = e.target.value; e.target.value = '';
@@ -4693,8 +4738,6 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   }
   $('btnFn').addEventListener('mousedown', e=>e.preventDefault());
   $('btnFn').addEventListener('click', fnInsert);
-  $('btnFn2').addEventListener('mousedown', e=>e.preventDefault());
-  $('btnFn2').addEventListener('click', fnInsert);
   page.addEventListener('keydown', e=>{ if(e.ctrlKey && e.altKey && (e.key === 'f' || e.key === 'F')){ e.preventDefault(); fnInsert(); } });
   function fnJump(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1200); }
   page.addEventListener('click', e=>{
@@ -4812,9 +4855,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     if(tx){ const rg = document.createRange(); rg.selectNodeContents(tx); rg.collapse(false); page.focus(); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); }
     fnJump(nt);
   }
-  ['btnEn', 'btnEn2', 'btnNoteShow', 'btnNoteNav'].forEach(id=>{ const b = $(id); if(b) b.addEventListener('mousedown', e=>e.preventDefault()); });
+  ['btnEn', 'btnNoteShow', 'btnNoteNav'].forEach(id=>{ const b = $(id); if(b) b.addEventListener('mousedown', e=>e.preventDefault()); });
   $('btnEn').addEventListener('click', enInsert);
-  $('btnEn2').addEventListener('click', enInsert);
   $('btnNoteShow').addEventListener('click', showNotes);
   page.addEventListener('keydown', e=>{ if(e.ctrlKey && e.altKey && (e.key === 'd' || e.key === 'D')){ e.preventDefault(); enInsert(); } });
   page.addEventListener('click', e=>{
@@ -4846,6 +4888,101 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     });
   })();
 
+
+  // ---------- Referências: botão ↘ das notas e "Mostrar Notas" acinzentado quando não há notas ----------
+  (function(){
+    const dlg = $('notesDlg'), show = $('btnNoteShow'); let tm = null;
+    $('notesDlgOpen').addEventListener('click', ()=>dlg.showModal());
+    $('notesClose').addEventListener('click', ()=>dlg.close());
+    $('notesIns').addEventListener('click', ()=>{
+      const k = dlg.querySelector('input[name=notesKind]:checked').value; dlg.close();
+      $(k === 'en' ? 'btnEn' : 'btnFn').click();
+    });
+    $('notesNav').addEventListener('click', ()=>{ dlg.close(); if(!show.disabled) show.click(); });
+    function sync(){ show.disabled = !page.querySelector('sup.fn, sup.en'); }
+    new MutationObserver(()=>{ clearTimeout(tm); tm = setTimeout(sync, 120); }).observe(page, {childList:true, subtree:true, characterData:true});
+    document.addEventListener('selectionchange', ()=>{ clearTimeout(tm); tm = setTimeout(sync, 120); });
+    sync();
+  })();
+
+  // ---------- Inserir > Páginas: Folha de Rosto ▾ e Página em Branco ----------
+  (function(){
+    const btn = $('btnCover'); let pop = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    [btn, $('btnBlank'), $('btnPb')].forEach(b=>b.addEventListener('mousedown', e=>e.preventDefault()));
+    btn.addEventListener('click', ()=>{
+      if(pop){ close(); return; }
+      pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      [['Capa', 'capa'], ['Folha de rosto', 'rosto']].forEach(([t, v])=>{
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = t;
+        b.addEventListener('click', ()=>{ close(); const sl = $('abntIns'); sl.value = v; sl.dispatchEvent(new Event('change', {bubbles:true})); });
+        pop.appendChild(b);
+      });
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      const r = btn.getBoundingClientRect();
+      pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4) + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    });
+    $('btnBlank').addEventListener('click', ()=>{ restore(); exec('insertHTML', '<div class="pb" contenteditable="false"></div><p><br></p><div class="pb" contenteditable="false"></div><p><br></p>'); });
+  })();
+
+  // ---------- Inserir: Cabeçalho ▾, Rodapé ▾, Número de Página ▾ e Símbolo ▾ ----------
+  (function(){
+    let pop = null, cur = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } if(cur){ cur.setAttribute('aria-expanded', 'false'); cur = null; } document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !(cur && cur.contains(e.target))) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    // itens: '-' | {h:'Título'} | {t, f, chk} | {grid:[...], f:(c)=>{}}
+    function menu(btn, items){
+      if(cur === btn){ close(); return; }
+      close(); pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      items.forEach(it=>{
+        if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+        if(it.h){ const h = document.createElement('div'); h.className = 'mh'; h.textContent = it.h; pop.appendChild(h); return; }
+        if(it.grid){
+          const g = document.createElement('div'); g.className = 'symg';
+          it.grid.forEach(c=>{ const b = document.createElement('button'); b.type = 'button'; b.textContent = c; b.addEventListener('click', ()=>{ close(); it.f(c); }); g.appendChild(b); });
+          pop.appendChild(g); return;
+        }
+        const b = document.createElement('button'); b.type = 'button';
+        if(it.chk !== undefined){ b.setAttribute('role', 'menuitemradio'); b.setAttribute('aria-checked', it.chk ? 'true' : 'false'); b.innerHTML = '<span class="ck">✓</span>'; b.appendChild(document.createTextNode(it.t)); }
+        else{ b.setAttribute('role', 'menuitem'); b.textContent = it.t; }
+        b.addEventListener('click', ()=>{ close(); it.f(); }); pop.appendChild(b);
+      });
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      const r = btn.getBoundingClientRect();
+      pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.max(4, Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4)) + 'px';
+      cur = btn; btn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    }
+    const fire = (id, v)=>{ const sl = $(id); sl.value = v; sl.dispatchEvent(new Event('change', {bubbles:true})); };
+    ['btnHdr', 'btnFtr', 'btnPgNum', 'btnSymb'].forEach(id=>$(id).addEventListener('mousedown', e=>e.preventDefault()));
+    $('btnHdr').addEventListener('click', e=>menu(e.currentTarget, [
+      {t:'Editar Cabeçalho', f:()=>{ if(window.__hfEditing && window.__hfEditing() && window.__hfClose) window.__hfClose(); window.__hfOpen('h'); }},
+      {t:'Remover Cabeçalho', f:()=>fire('hfRm', 'h')}]));
+    $('btnFtr').addEventListener('click', e=>menu(e.currentTarget, [
+      {t:'Editar Rodapé', f:()=>{ if(window.__hfEditing && window.__hfEditing() && window.__hfClose) window.__hfClose(); window.__hfOpen('f'); }},
+      {t:'Remover Rodapé', f:()=>fire('hfRm', 'f')}]));
+    $('btnPgNum').addEventListener('click', e=>{
+      const fm = $('pgNumFmt'), ops = [];
+      ops.push({h:'Início da Página'});
+      [['Esquerda', 'h:left'], ['Centralizado', 'h:center'], ['Direita', 'h:right']].forEach(([t, v])=>ops.push({t, f:()=>fire('pgNum', v)}));
+      ops.push({h:'Final da Página'});
+      [['Esquerda', 'f:left'], ['Centralizado', 'f:center'], ['Direita', 'f:right']].forEach(([t, v])=>ops.push({t, f:()=>fire('pgNum', v)}));
+      ops.push('-', {t:'Posição Atual (no cabeçalho/rodapé aberto)', f:()=>fire('pgNum', 'cur')}, {t:'Remover Números de Página', f:()=>fire('pgNum', 'rm')}, '-', {h:'Formato do Número'});
+      [...fm.options].forEach(o=>ops.push({t:o.textContent, chk:fm.value === o.value, f:()=>{ fm.value = o.value; fm.dispatchEvent(new Event('change', {bubbles:true})); }}));
+      menu(e.currentTarget, ops);
+    });
+    $('btnSymb').addEventListener('click', e=>{
+      const sl = $('symb'), ch = [...sl.options].filter(o=>o.value && o.value !== '__mais').map(o=>o.value);
+      menu(e.currentTarget, [{grid:ch, f:c=>fire('symb', c)}, '-', {t:'Mais Símbolos…', f:()=>fire('symb', '__mais')}]);
+    });
+  })();
 
   // ---------- Contagem detalhada ----------
   let savedSelStats = null;
@@ -9206,6 +9343,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   (function(){
     const iL = $('lyIndL'), iR = $('lyIndR'), sB = $('spB'), sA = $('spA'); let tm = null;
     const NOBLK = 'td,th,.fnotes,.endnotes,.hf';
+    const num = v=>parseFloat(String(v).replace(',', '.'));
+    const fmtCm = v=>String(Math.round(num(v) * 100) / 100).replace('.', ',') + ' cm';
+    const fmtPt = v=>String(Math.round(num(v) * 10) / 10).replace('.', ',') + ' pt';
     function curBlock(){
       const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return null;
       const el = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
@@ -9217,16 +9357,13 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       const b = curBlock(); if(!b) return;
       const cs = getComputedStyle(b), rtl = b.dir === 'rtl', cm = v=>String(Math.round(parseFloat(v) / CMPX * 100) / 100);
       const l = cm(rtl ? cs.marginRight : cs.marginLeft), r = cm(rtl ? cs.marginLeft : cs.marginRight);
-      if(iL.value !== l) iL.value = l; if(iR.value !== r) iR.value = r;
-      [[sB, b.style.marginTop, cs.marginTop], [sA, b.style.marginBottom, cs.marginBottom]].forEach(([sel, inl, comp])=>{
-        let v = '';
-        if(!inl) v = 'auto';
-        else{ const pt = Math.round(parseFloat(comp) * 0.75); if([...sel.options].some(o=>o.value === String(pt))) v = String(pt); }
-        if(sel.value !== v) sel.value = v;
+      { const fl = fmtCm(l), fr = fmtCm(r); if(iL.value !== fl) iL.value = fl; if(iR.value !== fr) iR.value = fr; }
+      [[sB, cs.marginTop], [sA, cs.marginBottom]].forEach(([inp, comp])=>{
+        const v = fmtPt(parseFloat(comp) * 0.75);
+        if(inp.value !== v) inp.value = v;
       });
     }
     document.addEventListener('selectionchange', ()=>{ clearTimeout(tm); tm = setTimeout(sync, 80); });
-    [sB, sA].forEach(x=>x.addEventListener('mousedown', sync, true));
     function aplicarRecuo(side, input){
       const n = parseFloat(String(input.value).replace(',', '.'));
       if(!(n >= 0 && n <= 20)) { sync(); return; }
@@ -9238,8 +9375,76 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       });
       changed();
     }
-    iL.addEventListener('change', ()=>aplicarRecuo('L', iL));
-    iR.addEventListener('change', ()=>aplicarRecuo('R', iR));
+    iL.addEventListener('change', ()=>{ aplicarRecuo('L', iL); const n = num(iL.value); if(n >= 0 && n <= 20) iL.value = fmtCm(n); });
+    iR.addEventListener('change', ()=>{ aplicarRecuo('R', iR); const n = num(iR.value); if(n >= 0 && n <= 20) iR.value = fmtCm(n); });
+    // Espaço antes/depois do parágrafo (em pt; vazio = volta ao padrão)
+    [[sB, 'marginTop'], [sA, 'marginBottom']].forEach(([inp, prop])=>{
+      inp.addEventListener('change', ()=>{
+        const raw = String(inp.value).trim(), n = num(raw);
+        if(raw !== '' && !(n >= 0 && n <= 200)){ sync(); return; }
+        restore();
+        blocksInSel().filter(b=>!/^(TD|TH)$/.test(b.tagName)).forEach(b=>{
+          b.style[prop] = raw === '' ? '' : n + 'pt';
+          if(!b.getAttribute('style')) b.removeAttribute('style');
+        });
+        changed();
+        if(raw !== '') inp.value = fmtPt(n);
+      });
+    });
+    // Campos com botões ▲▼ e setas do teclado (Recuar: 0,25 cm; Espaçamento: 6 pt)
+    const SPIN = {lyIndL:{st:.25, mx:20, f:fmtCm}, lyIndR:{st:.25, mx:20, f:fmtCm}, spB:{st:6, mx:200, f:fmtPt}, spA:{st:6, mx:200, f:fmtPt}};
+    function spin(id, d){
+      const inp = $(id), c = SPIN[id]; let n = num(inp.value); if(!(n >= 0)) n = 0;
+      n = Math.min(c.mx, Math.max(0, Math.round((n + d * c.st) * 100) / 100));
+      inp.value = c.f(n); inp.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+    document.querySelectorAll('#tp-layout .spn .sp b').forEach(b=>{
+      b.addEventListener('mousedown', e=>{ e.preventDefault(); spin(b.dataset.for, +b.dataset.d); });
+    });
+    Object.keys(SPIN).forEach(id=>$(id).addEventListener('keydown', e=>{
+      if(e.key === 'ArrowUp' || e.key === 'ArrowDown'){ e.preventDefault(); spin(id, e.key === 'ArrowUp' ? 1 : -1); }
+    }));
+    Object.keys(SPIN).forEach(id=>$(id).addEventListener('focus', e=>e.target.select()));
+    Object.keys(SPIN).forEach(id=>$(id).addEventListener('blur', ()=>{ clearTimeout(tm); tm = setTimeout(sync, 30); }));
+  })();
+
+  // ---------- Botões da guia Layout (menus que usam as caixas de seleção ocultas) ----------
+  (function(){
+    let pop = null, cur = null;
+    function close(){ if(pop){ pop.remove(); pop = null; } if(cur){ cur.setAttribute('aria-expanded', 'false'); cur = null; } document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+    function outside(e){ if(pop && !pop.contains(e.target) && !(cur && cur.contains(e.target))) close(); }
+    function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+    const lab = t=>{ t = t.replace(/^[^:]+:\s*/, ''); return t.charAt(0).toUpperCase() + t.slice(1); };
+    function open(btn){
+      if(cur === btn){ close(); return; }
+      close(); pgSync();
+      const sel = $(btn.dataset.lysel); if(!sel) return;
+      pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+      const add = o=>{
+        if(o.disabled && o.hidden) return;
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitemradio');
+        const on = sel.value === o.value && o.value !== '' || (o.value === '' && sel.value === '' && sel.id !== 'pgBrk');
+        b.setAttribute('aria-checked', on ? 'true' : 'false');
+        b.innerHTML = '<span class="ck">✓</span>'; b.appendChild(document.createTextNode(lab(o.textContent)));
+        b.addEventListener('click', ()=>{ close(); sel.value = o.value; sel.dispatchEvent(new Event('change', {bubbles:true})); pgSync(); });
+        pop.appendChild(b);
+      };
+      [...sel.children].forEach(c=>{
+        if(c.tagName === 'OPTGROUP'){ const h = document.createElement('div'); h.className = 'mh'; h.textContent = c.label; pop.appendChild(h); [...c.children].forEach(add); }
+        else add(c);
+      });
+      pop.addEventListener('mousedown', e=>e.preventDefault());
+      document.body.appendChild(pop);
+      const r = btn.getBoundingClientRect();
+      pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px';
+      pop.style.top = Math.max(4, Math.min(r.bottom, innerHeight - pop.offsetHeight - 4)) + 'px';
+      cur = btn; btn.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+    }
+    document.querySelectorAll('#tp-layout [data-lysel]').forEach(b=>{
+      b.addEventListener('mousedown', e=>e.preventDefault());
+      b.addEventListener('click', ()=>open(b));
+    });
   })();
 
   $('pgOk').addEventListener('click', pgDlgApply);
