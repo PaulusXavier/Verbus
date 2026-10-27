@@ -130,7 +130,8 @@ footer span:last-child{margin-left:auto}
 ::highlight(vfind){background:#ffe36e;color:#000}
 ::highlight(vsim){background:#9ec5fa;color:#000}
 ::highlight(vspell){text-decoration:underline wavy #d93025;text-decoration-skip-ink:none}
-@media print{::highlight(vspell){text-decoration:none}}
+::highlight(vgram){text-decoration:underline double #2b79c9;text-decoration-skip-ink:none}
+@media print{::highlight(vspell),::highlight(vgram){text-decoration:none}}
 @media print{::highlight(vsim){background:transparent;color:inherit}}
 @media print{::highlight(vfind){background:transparent;color:inherit}}
 @media print{html,body,main,#work,#sheet{background:#fff !important}#clipDlg,#symDlg,#fmenu,#cpal,#minibar,#gotoDlg{display:none !important}#page{caret-color:transparent}}
@@ -703,7 +704,7 @@ main::-webkit-scrollbar-corner{background:#dbdbdb}
 /* --- barra de status --- */
 #statusbar{flex:none;height:22px;padding:0 0 0 7px;gap:0;display:flex;align-items:center;background:var(--rb);border-top:1px solid var(--sbline);color:var(--sbink);font:12px/1 var(--uifont)}
 #statusbar .sb{margin-right:17px;white-space:nowrap}
-#statusbar #count,#statusbar #langInfo{cursor:pointer}
+#statusbar #count,#statusbar #langInfo,#statusbar .proofic{cursor:pointer}
 #statusbar .sb:hover{color:#000}
 #statusbar .proofic{margin:0 14px 0 -4px;display:flex;align-items:center}
 #statusbar .saved{color:#8a8a8a;margin-right:17px;overflow:hidden;text-overflow:ellipsis}
@@ -1380,7 +1381,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <span id="pgInfo" class="sb">Página 1 de 1</span>
   <span id="count" class="sb" role="button" tabindex="0" title="Clique para ver a contagem detalhada">0 palavras</span>
   <span id="langInfo" class="sb" role="button" tabindex="0" title="Idioma da revisão (clique para abrir Revisão)">Português (Brasil)</span>
-  <span class="sb proofic"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="1.8" width="9" height="12" fill="#fff" stroke="#555"/><path d="M4.6 5h4.8M4.6 7.2h4.8M4.6 9.4h2.6" stroke="#777"/><path d="M8.6 11.2l1.8 1.8 3.4-4" stroke="#2b79c9" stroke-width="1.5" fill="none"/></svg></span>
+  <span id="proofIc" class="sb proofic" role="button" tabindex="0" title="Revisão (F7)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="1.8" width="9" height="12" fill="#fff" stroke="#555"/><path d="M4.6 5h4.8M4.6 7.2h4.8M4.6 9.4h2.6" stroke="#777"/><path id="proofMk" d="M8.6 11.2l1.8 1.8 3.4-4" stroke="#2b79c9" stroke-width="1.5" fill="none"/></svg></span>
   <span id="saved" class="sb saved">Salvo automaticamente neste navegador</span>
   <span class="sb pessoalsb" title="Este aplicativo é somente para uso pessoal do autor">Somente uso pessoal</span>
   <span id="chars" hidden>0 caracteres</span>
@@ -1660,6 +1661,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <h3>Revisão</h3>
   <div class="dlgrow" style="justify-content:flex-start;gap:12px;flex-wrap:wrap;margin:0 0 8px">
     <label><input type="checkbox" id="revSpell" checked> Marcar erros de ortografia ao digitar</label>
+    <label><input type="checkbox" id="revGram" checked> Marcar gramática e estilo ao digitar (palavra repetida, espaços, pontuação)</label>
     <label><input type="checkbox" id="revAuto" checked> Corrigir erros comuns ao digitar (como o Word)</label>
     <label>Idioma <select id="revLang"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en-US">English (US)</option><option value="es">Español</option><option value="fr">Français</option><option value="it">Italiano</option></select></label>
   </div>
@@ -4214,7 +4216,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       const build = (list, parent)=>list.forEach(it=>{
         if(it.sep){ parent.appendChild(document.createElement('hr')); return; }
         const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.disabled = !!it.dis;
-        const l = document.createElement('span'); l.textContent = it.t; b.appendChild(l);
+        const l = document.createElement('span'); l.textContent = it.t; if(it.b) l.style.fontWeight = '700'; b.appendChild(l);
         if(it.k){ const k = document.createElement('em'); k.textContent = it.k; b.appendChild(k); }
         if(it.sub){
           const w = document.createElement('div'); w.className = 'cm-has';
@@ -4646,12 +4648,9 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     return out;
   }
-  function rvScan(){
-    const found = [], tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
-    let n;
-    while((n = tw.nextNode())){
-      if(n.parentNode.closest('.fnsep,script,style,a[href],code,pre')) continue;
-      const t = n.data; if(!t.trim()) continue;
+  // Regras de gramática/estilo de um trecho de texto (usadas na janela de revisão e na marcação ao vivo; live = sem a regra de acentos, que a ortografia já cobre)
+  function rvGramNode(n, live){
+    const found = [], t = n.data; if(!t.trim()) return found;
       const add = (kind, start, len, rep, label)=>found.push({node:n, start, len, rep, kind, label, text:t.substr(start, len)});
       let m, rx;
       rx = /(^|[^\p{L}\p{N}])(\p{L}{2,})(\s+)\2(?![\p{L}\p{N}])/giu;           // palavra repetida
@@ -4664,6 +4663,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       while((m = rx.exec(t))){ const tok = t.slice(Math.max(0, t.lastIndexOf(' ', m.index) + 1), t.indexOf(' ', m.index) < 0 ? t.length : t.indexOf(' ', m.index)); if(/[@\/]|https?:/.test(tok)) continue; add('after', m.index, 1, m[1] + ' ', 'Falta espaço depois de “' + m[1] + '”'); }
       rx = /(?<=\p{Ll}{3})\.(?=\p{Lu}\p{Ll})/gu;
       while((m = rx.exec(t))){ const tok = t.slice(Math.max(0, t.lastIndexOf(' ', m.index) + 1), t.indexOf(' ', m.index) < 0 ? t.length : t.indexOf(' ', m.index)); if(/[@\/]|https?:|www\./i.test(tok)) continue; add('after', m.index, 1, '. ', 'Falta espaço depois do ponto'); }
+      if(!live){
       rx = /(?<![\p{L}\p{N}_-])(\p{L}+)(?![\p{L}\p{N}_-])/gu;                       // acentos esquecidos
       while((m = rx.exec(t))){
         const w = m[1], lw = w.toLowerCase();
@@ -4672,6 +4672,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         if(!rep && /coes$/.test(lw) && lw.length > 5) rep = lw.replace(/coes$/, 'ções');
         if(rep) add('acc', m.index, w.length, matchCase(w, rep), 'Acentuação: “' + w + '” → “' + matchCase(w, rep) + '”');
       }
+      }
+    return found;
+  }
+  function rvScan(){
+    const found = [], tw = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
+    let n;
+    while((n = tw.nextNode())){
+      if(n.parentNode.closest('.fnsep,script,style,a[href],code,pre')) continue;
+      found.push(...rvGramNode(n));
     }
     found.sort(rvCmp);
     return found;
@@ -4738,27 +4747,59 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   // ---------- Como no Word: sublinhado ondulado vermelho ao digitar + clique direito com sugestões ----------
   let spReady = null, liveOn = false, liveT = 0;
   // Verificação incremental: guarda os trechos errados por bloco (parágrafo, item, célula…) e só refaz os blocos que mudaram
-  const LV_SEL = 'p,li,h1,h2,h3,h4,h5,h6,td,th,blockquote,pre,div';
-  const lvMap = new Map(), lvDirty = new Set();
-  let lvHl = null, lvCaretBlk = null;
+  const LV_SEL = 'p,li,h1,h2,h3,h4,h5,h6,td,th,blockquote,pre,div', LV_SKIP = '.fnsep,script,style,a[href],code,pre';
+  const lvMap = new Map(), lvDirty = new Set(), lvOnce = new WeakMap();
+  let lvHl = null, lvGr = null, lvCaretBlk = null, lvGramOn = true;
+  try{ lvGramOn = localStorage.getItem('verbus:gram') !== '0'; }catch(e){}
+  const lvOnceHas = (n, t)=>{ const x = lvOnce.get(n); return !!x && x.has(t); };       // "Ignorar uma vez" (vale para essa palavra neste trecho de texto)
+  const lvOnceAdd = (n, t)=>{ let x = lvOnce.get(n); if(!x) lvOnce.set(n, x = new Set()); x.add(t); };
   function lvBlock(n){ const e = n && (n.nodeType === 1 ? n : n.parentElement), b = e && e.closest ? e.closest(LV_SEL) : null; return b && b !== page && page.contains(b) ? b : page; }
   function lvAll(){ lvDirty.clear(); lvDirty.add(page); page.querySelectorAll(LV_SEL).forEach(b=>lvDirty.add(b)); }
   function liveSoon(full){ if(full === true) lvAll(); clearTimeout(liveT); liveT = setTimeout(liveRun, 350); }
   function liveNative(on){ [page, ...document.querySelectorAll('.hfb')].forEach(el=>{ el.spellcheck = on; }); }
+  function lvNodes(b){
+    const out = [];
+    if(b === page){ page.childNodes.forEach(n=>{ if(n.nodeType === 3) out.push(n); }); return out; }   // texto solto direto na folha
+    const tw = document.createTreeWalker(b, NodeFilter.SHOW_TEXT, {acceptNode:n=>lvBlock(n) === b ? 1 : 2});
+    for(let n; (n = tw.nextNode());) out.push(n);
+    return out;
+  }
+  function lvDrop(ent){ ent.s.forEach(r=>lvHl && lvHl.delete(r)); ent.g.forEach(r=>lvGr && lvGr.delete(r)); }
   function lvScan(b, caret, off){
-    const old = lvMap.get(b); if(old && lvHl) old.forEach(r=>lvHl.delete(r));
+    const old = lvMap.get(b); if(old) lvDrop(old);
     if(b !== page && !b.isConnected){ lvMap.delete(b); return; }
-    let found;
-    if(b === page){ found = []; page.childNodes.forEach(n=>{ if(n.nodeType === 3) found.push(...rvOrto(spReady, true, n)); }); }   // texto solto direto na folha
-    else found = rvOrto(spReady, true, null, b);
-    const rs = found.filter(o=>!(o.node === caret && off >= o.start && off <= o.start + o.len))   // não marca a palavra que ainda está sendo digitada
-      .map(o=>{ const r = document.createRange(); r.setStart(o.node, o.start); r.setEnd(o.node, o.start + o.len); return r; });
-    lvMap.set(b, rs); if(lvHl) rs.forEach(r=>lvHl.add(r));
+    const ent = {s:[], g:[]};
+    // não marca a palavra que ainda está sendo digitada, nem o que o usuário mandou ignorar
+    const skip = o=>(o.node === caret && off >= o.start && off <= o.start + o.len) || lvOnceHas(o.node, o.text);
+    const mk = o=>{ const r = document.createRange(); r.setStart(o.node, o.start); r.setEnd(o.node, o.start + o.len); r._it = o; return r; };
+    lvNodes(b).forEach(n=>{
+      rvOrto(spReady, true, n).forEach(o=>{ if(!skip(o)) ent.s.push(mk(o)); });
+      if(lvGramOn && !n.parentNode.closest(LV_SKIP)) rvGramNode(n, true).forEach(o=>{ if(!skip(o)) ent.g.push(mk(o)); });
+    });
+    lvMap.set(b, ent); ent.s.forEach(r=>lvHl.add(r)); ent.g.forEach(r=>lvGr.add(r));
+  }
+  function lvProof(){   // ícone da barra de status: visto azul = sem problemas; X vermelho = há problemas (clique vai ao próximo)
+    const ic = document.getElementById('proofIc'), mk = document.getElementById('proofMk'); if(!ic || !mk) return;
+    if(!liveOn){ mk.setAttribute('d', 'M8.6 11.2l1.8 1.8 3.4-4'); mk.setAttribute('stroke', '#9aa0a6'); ic.title = 'Revisão (F7) — a marcação ao vivo está desligada ou carregando'; return; }
+    let ns = 0, ng = 0; lvMap.forEach(e=>{ ns += e.s.length; ng += e.g.length; });
+    const n = ns + ng;
+    mk.setAttribute('d', n ? 'M8.9 9.1l3.8 3.8M12.7 9.1l-3.8 3.8' : 'M8.6 11.2l1.8 1.8 3.4-4');
+    mk.setAttribute('stroke', n ? '#d93025' : '#2b79c9');
+    ic.title = n ? (ns ? ns + ' erro(s) de ortografia' : '') + (ns && ng ? ' · ' : '') + (ng ? ng + ' de gramática/estilo' : '') + ' — clique para ir ao próximo' : 'Nenhum erro encontrado — clique para abrir a Revisão (F7)';
+  }
+  function lvNext(){   // como clicar no ícone do Word: vai para o próximo problema depois do cursor
+    const all = []; lvMap.forEach(e=>e.s.concat(e.g).forEach(r=>{ if(r.startContainer.isConnected) all.push(r); }));
+    if(!liveOn || !all.length){ $('btnRev').click(); return; }
+    all.sort((a, b)=>a.compareBoundaryPoints(Range.START_TO_START, b));
+    const s = getSelection(), cur = s.rangeCount && page.contains(s.anchorNode) ? s.getRangeAt(0) : null;
+    const nx = (cur && all.find(r=>r.compareBoundaryPoints(Range.START_TO_START, cur) > 0)) || all[0];
+    page.focus(); s.removeAllRanges(); s.addRange(nx.cloneRange());
+    (nx.startContainer.parentElement || page).scrollIntoView({block:'center'});
   }
   function liveRun(){
     if(!liveOn) return;
-    if(!lvHl){ lvHl = new Highlight(); CSS.highlights.set('vspell', lvHl); }
-    lvMap.forEach((rs, b)=>{ if(b !== page && !b.isConnected){ rs.forEach(r=>lvHl.delete(r)); lvMap.delete(b); } });   // blocos apagados
+    if(!lvHl){ lvHl = new Highlight(); CSS.highlights.set('vspell', lvHl); lvGr = new Highlight(); CSS.highlights.set('vgram', lvGr); }
+    lvMap.forEach((ent, b)=>{ if(b !== page && !b.isConnected){ lvDrop(ent); lvMap.delete(b); } });   // blocos apagados
     const s = getSelection(), caret = s.rangeCount && s.isCollapsed ? s.anchorNode : null, off = s.anchorOffset;
     const cb = caret && page.contains(caret) ? lvBlock(caret) : null;
     if(lvCaretBlk && lvCaretBlk !== cb) lvDirty.add(lvCaretBlk);   // o bloco que o cursor deixou volta a marcar a palavra que estava aberta
@@ -4769,10 +4810,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       lvDirty.delete(b); lvScan(b, caret, off);
       if(lvDirty.size && performance.now() - t0 > 14){ clearTimeout(liveT); liveT = setTimeout(liveRun, 40); break; }   // fatia o trabalho para não travar a digitação
     }
+    if(!lvDirty.size) lvProof();
   }
   async function liveStart(){
-    liveOn = false; try{ CSS.highlights.delete('vspell'); }catch(e){}
-    lvMap.clear(); lvDirty.clear(); lvHl = null; lvCaretBlk = null;
+    liveOn = false; try{ CSS.highlights.delete('vspell'); CSS.highlights.delete('vgram'); }catch(e){}
+    lvMap.clear(); lvDirty.clear(); lvHl = lvGr = null; lvCaretBlk = null; lvProof();
     let on = true; try{ on = localStorage.getItem('verba:spell') !== '0'; }catch(e){}
     if(!on || !window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
     const lang = spLang();
@@ -4780,19 +4822,27 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     try{ const sp = await spLoad(); if(lang !== spLang()) return; spReady = sp; }catch(e){ return; }   // sem dicionário: continua o corretor do navegador
     liveOn = true; liveNative(false); lvAll(); liveRun();
   }
-  window.__vsMenu = ()=>{      // itens no topo do menu do botão direito quando a palavra está errada
+  window.__vsMenu = ()=>{      // itens no topo do menu do botão direito: sugestões em negrito, ignorar, dicionário (como no Word)
     const s = getSelection(), r = liveOn && s.rangeCount ? s.getRangeAt(0) : null, n = r && r.startContainer;
     if(!n || n.nodeType !== 3 || !page.contains(n)) return [];
-    const o = rvOrto(spReady, false, n).find(x=>r.startOffset >= x.start && r.startOffset <= x.start + x.len);
-    if(!o) return [];
-    const fix = sg=>()=>{
+    const off = r.startOffset, items = [];
+    const apply = (o, txt)=>{
       const rr = document.createRange(); rr.setStart(o.node, o.start); rr.setEnd(o.node, o.start + o.len);
       page.focus(); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rr);
-      if(!document.execCommand('insertText', false, sg)){ o.node.replaceData(o.start, o.len, sg); changed(); }
+      const ok = txt === '' ? document.execCommand('delete') : document.execCommand('insertText', false, txt);
+      if(!ok){ o.node.replaceData(o.start, o.len, txt); changed(); }
       liveSoon();
     };
-    return (o.sug.length ? o.sug.map(sg=>({t:sg, fn:fix(sg)})) : [{t:'(sem sugestões)', dis:true}]).concat([{sep:1},
-      {t:'Ignorar tudo', fn:()=>{ spIgnore.add(o.text); liveSoon(true); }}, {t:'Adicionar ao dicionário', fn:()=>spAdd(o.text)}, {sep:1}]);
+    const once = o=>({t:'Ignorar uma vez', fn:()=>{ lvOnceAdd(o.node, o.text); lvDirty.add(lvBlock(o.node)); liveSoon(); }});
+    const o = rvOrto(spReady, false, n).find(x=>off >= x.start && off <= x.start + x.len);
+    if(o) items.push(...(o.sug.length ? o.sug.map(sg=>({t:sg, b:1, fn:()=>apply(o, sg)})) : [{t:'(sem sugestões)', dis:true}]), {sep:1},
+      once(o), {t:'Ignorar tudo', fn:()=>{ spIgnore.add(o.text); liveSoon(true); }}, {t:'Adicionar ao dicionário', fn:()=>spAdd(o.text)},
+      {t:'Ortografia…', fn:()=>$('btnRev').click()}, {sep:1});
+    if(lvGramOn && !n.parentNode.closest(LV_SKIP)){
+      const g = rvGramNode(n, true).find(x=>off >= x.start && off <= x.start + x.len);
+      if(g) items.push({t:g.label, dis:true}, {t:g.rep === '' ? 'Excluir' : g.kind === 'after' ? 'Inserir espaço' : '“' + g.rep.trim() + '”', b:1, fn:()=>apply(g, g.rep)}, once(g), {sep:1});
+    }
+    return items;
   };
   // Autocorreção ao digitar (como no Word): acentos esquecidos e letra maiúscula depois de ponto final — Ctrl+Z desfaz
   const AUTO_ABBR = new Set('etc ex pág págs sr sra srs dr dra av tel obs art arts inc ltda cia prof profa cap fig vol ed org aprox'.split(' '));
@@ -4824,6 +4874,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     document.execCommand('insertText', false, r + e.data);
   });
   $('revSpell').addEventListener('change', liveStart);
+  $('revGram').checked = lvGramOn;
+  $('revGram').addEventListener('change', e=>{ lvGramOn = e.target.checked; try{ localStorage.setItem('verbus:gram', lvGramOn ? '1' : '0'); }catch(_){} if(liveOn) liveSoon(true); });
+  $('proofIc').addEventListener('mousedown', e=>e.preventDefault());
+  $('proofIc').addEventListener('click', lvNext);
+  $('proofIc').addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); lvNext(); } });
   $('revLang').addEventListener('change', ()=>{ spOk.clear(); liveStart(); });
   new MutationObserver(recs=>{
     if(!liveOn) return;
@@ -4838,15 +4893,15 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   }).observe(page, {childList:true, subtree:true, characterData:true});
   document.addEventListener('selectionchange', ()=>{ if(liveOn) liveSoon(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'F7'){ e.preventDefault(); $('btnRev').click(); } });
-  // O dicionário (nspell) é montado na thread principal: espera o navegador ficar ocioso e a digitação parar
+  // O dicionário (nspell) é montado na thread principal: começa quando o navegador está ocioso e você não está digitando
   let lvLastKey = 0;
   page.addEventListener('keydown', ()=>{ lvLastKey = Date.now(); }, {passive:true});
   function liveBoot(){
-    if(Date.now() - lvLastKey < 2500) return setTimeout(liveBoot, 1500);
-    if(window.requestIdleCallback) requestIdleCallback(()=>{ if(Date.now() - lvLastKey < 2500) setTimeout(liveBoot, 1500); else liveStart(); }, {timeout:15000});
+    if(Date.now() - lvLastKey < 1200) return setTimeout(liveBoot, 800);
+    if(window.requestIdleCallback) requestIdleCallback(()=>{ if(Date.now() - lvLastKey < 1200) setTimeout(liveBoot, 800); else liveStart(); }, {timeout:6000});
     else setTimeout(liveStart, 0);
   }
-  setTimeout(liveBoot, 3000);
+  setTimeout(liveBoot, 1500);
 
   // Sinônimos (base local "sinonimos-local", baixada só na primeira vez)
   let synDb = null;
