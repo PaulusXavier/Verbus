@@ -49,7 +49,7 @@ header button:hover{background:rgba(255,255,255,.3)}
 #toolbar .group.sty .gb #btnChgSty{flex:none;width:58px;margin-left:4px}
 #toolbar .group.sty .gb #btnChgSty span{text-align:center;line-height:1.15}
 /* Alterar Estilos (valores guardados por documento) */
-#page.vset{font-family:var(--vf,"Times New Roman",Times,"Liberation Serif",serif);line-height:var(--vlh,1.5)}
+#page.vset{font-family:var(--vf,Arial,"Liberation Sans",Helvetica,sans-serif);line-height:var(--vlh,1.5)}
 #page.vset h1,#page.vset h2,#page.vset h3{color:var(--vhc,inherit)}
 #page.vset p{margin-bottom:var(--vpa,8pt)}
 /* iniciador de caixa de diálogo (canto do grupo) e diálogos Fonte/Parágrafo */
@@ -99,8 +99,8 @@ body.painting #page{cursor:copy}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 main{flex:1;overflow:auto;padding:24px 36px 48px}
 #page{background:var(--paper);color:var(--paper-ink);width:100%;max-width:none;min-height:var(--ph,29.7cm);
-  margin:0;padding:var(--mt,2.5cm) var(--mr,3cm) var(--mb,2.5cm) var(--ml,3cm);box-shadow:0 0 0 1px var(--pgedge,#c6c6c6);outline:none;
-  font:12pt/1.5 "Times New Roman",Times,"Liberation Serif",serif;word-wrap:break-word;overflow-wrap:anywhere}
+  margin:0;padding:var(--mt,2.5cm) var(--mr,3cm) var(--mb,2.5cm) var(--ml,3cm);box-shadow:0 0 0 1px var(--pgedge,#c6c6c6),0 2px 8px rgba(0,0,0,.18);outline:none;
+  font:12pt/1.5 Arial,"Liberation Sans",Helvetica,sans-serif;text-align:justify;word-wrap:break-word;overflow-wrap:anywhere}
 #page{tab-size:var(--tabdef,1.25cm);-moz-tab-size:var(--tabdef,1.25cm)} #page .tb{white-space:pre}
 #page:empty:before{content:"";color:#9aa3ad}
 #page h1{font-size:24pt;margin:.5em 0 .3em}
@@ -207,7 +207,7 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="dark"] #pgOv .pgb.end{border-top-color:#4a525e}
 :root[data-theme="dark"] #pgOv .pgb.end span{background:#262b32;color:#98a3b0;border-color:#3b434d}
 body.hfedit #pgOv{display:none}
-#pgOv .pgg{position:absolute;left:-3px;right:-3px;background:var(--bg);box-shadow:inset 0 9px 7px -7px rgba(0,0,0,.45),inset 0 -9px 7px -7px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+#pgOv .pgg{position:absolute;left:-2px;right:-2px;background:var(--bg);box-shadow:inset 0 1px 0 var(--pgedge,#c6c6c6),inset 0 -1px 0 var(--pgedge,#c6c6c6);display:flex;align-items:center;justify-content:center}
 #pgOv .pgg span{display:none}
 #pgOv .pgg span.x{font:600 11px/16px var(--uifont,system-ui,sans-serif);color:var(--muted);background:var(--bar);border:1px solid var(--line);border-radius:11px;padding:0 12px}
 .himgc{position:absolute;max-width:none;user-select:none;pointer-events:none}
@@ -216,7 +216,7 @@ body.hfedit .himgc,body.hfedit .hfc{display:none}
 @media print{.himgc,.hfc{display:none !important}}
 @media print{#pgOv{display:none !important}#page{min-height:0 !important}}
 @media print{#page,#sheet{zoom:1 !important} #page .pb{border:0;margin:0} #findbar{display:none}}
-@page{size:A4;margin:3cm 2cm 2cm 3cm;@top-right{content:counter(page);font:12pt "Times New Roman",serif}}
+@page{size:A4;margin:3cm 2cm 2cm 3cm;@top-right{content:counter(page);font:12pt Arial,sans-serif}}
 @page capa{@top-right{content:none}}
 #work{flex:1;display:flex;min-height:0}
 #side{width:240px;flex:none;background:var(--bar);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
@@ -239,7 +239,7 @@ header .lbl{align-self:center;opacity:.85}
 #page ul.tasks li input{margin-right:8px}
 #page ul.tasks li:has(input:checked){text-decoration:line-through;color:#888}
 @media print{#side{display:none}#work{display:block}}
-#page.abnt{width:var(--pw,21cm);max-width:none;min-height:var(--ph,29.7cm);padding:var(--mt,3cm) var(--mr,2cm) var(--mb,2cm) var(--ml,3cm);font:12pt/1.5 "Times New Roman",Times,"Liberation Serif",serif;text-align:justify}
+#page.abnt{width:var(--pw,21cm);max-width:none;min-height:var(--ph,29.7cm);padding:var(--mt,3cm) var(--mr,2cm) var(--mb,2cm) var(--ml,3cm);font:12pt/1.5 Arial,"Liberation Sans",Helvetica,sans-serif;text-align:justify}
 #page.abnt p{margin:0;text-indent:1.25cm}
 #page.abnt h1,#page.abnt h2,#page.abnt h3{font-size:12pt;text-align:left;text-indent:0;margin:18pt 0}
 #page.abnt h1{text-transform:uppercase;font-weight:700}
@@ -352,7 +352,7 @@ body.hfedit #page{pointer-events:none}
 /* Cabeçalho e rodapé (estilo clássico) */
 #sheet{--hl:3cm;--hr:3cm;--ht:2.5cm;--hb:2.5cm;--hty:1cm;--hby:1cm}
 .hf{position:absolute;left:var(--hl);right:var(--hr);z-index:3;pointer-events:none;color:#8a8f96;
-  font:10pt/1.3 "Times New Roman",Times,"Liberation Serif",serif}
+  font:10pt/1.3 Arial,"Liberation Sans",Helvetica,sans-serif}
 #lnOv{position:absolute;top:0;width:34px;pointer-events:none;z-index:2;font:9pt/1 Calibri,"Carlito","Segoe UI",sans-serif;color:#7a828c}
 #lnOv span{position:absolute;right:0;display:flex;align-items:center}
 @media print{#lnOv{display:none !important}}
@@ -810,6 +810,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 }
 @media (max-width:480px){ #qat #btnRepeat{display:none} #titlebar .pessoal + .hbtn{margin-left:2px} #titlebar .hbtn{width:34px} }
 </style>
+<style>
+#page .ccx{cursor:pointer;user-select:none;font-family:"Segoe UI Symbol","DejaVu Sans",Arial,sans-serif}
+#page .ccf{background:rgba(29,95,209,.09);border-radius:3px;padding:0 2px}
+#page .ccf[data-ph]{color:#6b7280}
+#page select.ccs,#page input.ccd{font:inherit;color:inherit;background:rgba(29,95,209,.09);border:0;border-radius:3px;padding:0 2px;max-width:100%}
+body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
+@media print{#page .ccf,#page select.ccs,#page input.ccd{background:none}#page select.ccs{appearance:none;-webkit-appearance:none}#page input.ccd::-webkit-calendar-picker-indicator{display:none}#page .ccf[data-ph]{color:inherit}}
+</style>
 </head>
 <body>
 
@@ -860,7 +868,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     <div class="group fnt" role="group" aria-label="Fonte"><div class="gb rows">
       <div class="rr">
         <select id="font" title="Fonte">
-      <option>Calibri</option><option>Calibri Light</option><option>Cambria</option><option>Arial</option><option selected>Times New Roman</option>
+      <option>Calibri</option><option>Calibri Light</option><option>Cambria</option><option selected>Arial</option><option>Times New Roman</option>
       <option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option><option>Courier New</option><option>Consolas</option>
     </select><input type="text" id="size" role="combobox" aria-haspopup="listbox" aria-expanded="false" inputmode="decimal" autocomplete="off" value="12" title="Tamanho da fonte (pt): escolha ou digite" aria-label="Tamanho da fonte">
         <button id="btnGrow" class="rb" title="Aumentar fonte (Ctrl+Shift+&gt;)" aria-label="Aumentar fonte"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><text x="1" y="14" font-size="14" font-weight="600" font-family="Segoe UI,Calibri,Arial,sans-serif" fill="#444">A</text><path d="M11.5 1.8l2.7 3.2H8.8z" fill="#2b79c9"/></svg></button>
@@ -930,6 +938,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <div class="galwrap">
         <div class="gallery" id="gallery" role="listbox" aria-label="Galeria de estilos">
         <button type="button" role="option" data-gs="normal" data-gk="p" aria-label="Normal" title="Normal"><span class="pv" style="font-size:12px">AaBbCcDc</span><span class="nm">¶&nbsp;Normal</span></button>
+        <button type="button" role="option" data-gs="abnt" data-gk="p" aria-label="Texto ABNT" title="Texto ABNT: parágrafo com recuo de 1,25 cm, justificado, espaçamento 1,5"><span class="pv" style="font-size:12px">AaBbCcDc</span><span class="nm">Texto ABNT</span></button>
         <button type="button" role="option" data-gs="semesp" data-gk="p" aria-label="Sem Espaçamento" title="Sem Espaçamento"><span class="pv" style="font-size:12px">AaBbCcDc</span><span class="nm">¶&nbsp;Sem Esp...</span></button>
         <button type="button" role="option" data-gs="h1" data-gk="h1" aria-label="Título 1" title="Título 1"><span class="pv" style="font-size:15px;color:#2f5496">AaBbCcDc</span><span class="nm">Título 1</span></button>
         <button type="button" role="option" data-gs="h2" data-gk="h2" aria-label="Título 2" title="Título 2"><span class="pv" style="font-size:13px;color:#2f5496">AaBbCcDc</span><span class="nm">Título 2</span></button>
@@ -1041,7 +1050,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       <button id="btnBgOff" title="Remove a imagem de fundo">Remover fundo</button>
     </div><div class="gl">Plano de Fundo da Página</div></div>
     <div class="group" role="group" aria-label="Formatação do Documento"><div class="gb">
-      <button id="btnAbnt" title="Formatação ABNT: A4, margens 3/2/2/3 cm, Times 12, espaço 1,5, recuo 1,25 cm">ABNT</button>
+      <button id="btnAbnt" title="Formatação ABNT: A4, margens 3/2/2/3 cm, Arial 12, espaço 1,5, recuo 1,25 cm">ABNT</button>
     </div><div class="gl">Formatação do Documento</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-layout" data-tab="layout" aria-labelledby="tab-layout" hidden>
@@ -1126,7 +1135,29 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </div><div class="gl">Citações e Bibliografia</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
-    <div class="group"><div class="gb"><span class="soon">Em breve: as opções desta guia serão criadas depois.</span></div><div class="gl">&nbsp;</div></div>
+    <div class="group" role="group" aria-label="Correspondência oficial"><div class="gb">
+      <button id="cmOficio" title="Insere um ofício (número, data, destinatário, assunto, vocativo, texto, fecho e assinatura)">Ofício</button>
+      <button id="cmMemo" title="Insere um memorando (De, Para, Assunto, texto e assinatura)">Memorando</button>
+      <button id="cmDecl" title="Insere uma declaração para os devidos fins">Declaração</button>
+      <button id="cmCarta" title="Insere uma carta formal">Carta</button>
+      <button id="cmReq" title="Insere um requerimento">Requerimento</button>
+    </div><div class="gl">Correspondência oficial</div></div>
+    <div class="group" role="group" aria-label="Partes da carta"><div class="gb">
+      <button id="cmData" title="Insere local e data de hoje, alinhados à direita">Local e data</button>
+      <button id="cmDest" title="Insere o bloco do destinatário (Ao Senhor… cargo, órgão, cidade)">Destinatário</button>
+      <button id="cmAssunto" title="Insere a linha Assunto:">Assunto</button>
+      <button id="cmVoc" title="Insere o vocativo (Senhor(a) …,)">Vocativo</button>
+      <button id="cmFecho" title="Insere o fecho (Atenciosamente,)">Fecho</button>
+      <button id="cmAssin" title="Insere a assinatura com o seu nome, cargo e órgão">Assinatura</button>
+    </div><div class="gl">Partes da carta</div></div>
+    <div class="group" role="group" aria-label="Remetente"><div class="gb">
+      <button id="cmRem" title="Nome, cargo/registro, órgão e cidade usados na assinatura e no local e data">Remetente…</button>
+    </div><div class="gl">Remetente</div></div>
+    <div class="group" role="group" aria-label="Mala direta"><div class="gb">
+      <button id="mcOpen" title="Cole uma lista de destinatários (planilha) e gere uma carta para cada um">Destinatários…</button>
+      <select id="mcCampo" title="Insere um campo da lista, como {{Nome}}, no texto"><option value="">Inserir campo</option></select>
+      <button id="mcGen" title="Cria um novo documento com uma página para cada destinatário da lista">Gerar cartas</button>
+    </div><div class="gl">Mala direta</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-revisao" data-tab="revisao" aria-labelledby="tab-revisao" hidden>
     <div class="group" role="group" aria-label="Revisão de Texto"><div class="gb">
@@ -1224,7 +1255,23 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     </div><div class="gl">Formatar</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-desenvolvedor" data-tab="desenvolvedor" aria-labelledby="tab-desenvolvedor" hidden>
-    <div class="group"><div class="gb"><span class="soon">Em breve: as opções desta guia serão criadas depois.</span></div><div class="gl">&nbsp;</div></div>
+    <div class="group" role="group" aria-label="Controles"><div class="gb">
+      <button id="dvCheck" title="Insere uma caixa de seleção ☐ que marca ☒ ao clicar (também no modo formulário)">☐ Caixa de seleção</button>
+      <button id="dvText" title="Insere um campo de texto com a dica &quot;Clique e digite&quot;">Campo de texto</button>
+      <button id="dvList" title="Insere uma lista suspensa com as opções que você digitar">Lista suspensa</button>
+      <button id="dvDate" title="Insere um seletor de data">Data</button>
+    </div><div class="gl">Controles</div></div>
+    <div class="group" role="group" aria-label="Proteção"><div class="gb">
+      <button id="dvForm" title="Bloqueia o texto e deixa editáveis só os controles (caixas, campos, listas e datas), como num formulário" aria-pressed="false">Modo formulário</button>
+    </div><div class="gl">Proteção</div></div>
+    <div class="group" role="group" aria-label="Dados"><div class="gb">
+      <button id="dvBackup" title="Baixa um arquivo .json com todos os seus documentos">Backup (.json)</button>
+      <button id="dvRestore" title="Importa um backup .json; os documentos entram como novos, sem apagar os atuais">Restaurar backup</button>
+      <input type="file" id="dvFile" accept=".json,application/json" hidden>
+    </div><div class="gl">Dados</div></div>
+    <div class="group" role="group" aria-label="Código"><div class="gb">
+      <button id="dvHtml" title="Mostra e edita o código HTML do documento aberto">Código HTML</button>
+    </div><div class="gl">Código</div></div>
   </div>
 </div>
 
@@ -1484,7 +1531,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   <h3>Alterar Estilos</h3>
   <div class="fdGrid">
     <label class="full">Conjunto de estilos<select id="syPreset"><option value="">(personalizado)</option><option value="padrao">Padrão</option><option value="classico">Clássico</option><option value="moderno">Moderno</option><option value="elegante">Elegante</option></select></label>
-    <label class="full">Fonte do documento<select id="syFont"><option value="">Padrão (Times New Roman)</option><option>Cambria</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option></select></label>
+    <label class="full">Fonte do documento<select id="syFont"><option value="">Padrão (Arial)</option><option>Cambria</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Palatino Linotype</option><option>Garamond</option></select></label>
     <label>Cor dos títulos<select id="syColor"><option value="">Padrão (texto)</option><option value="#2f5496">Azul</option><option value="#2e7d32">Verde</option><option value="#8b1e3f">Vinho</option><option value="#4d4d4d">Cinza escuro</option></select></label>
     <label>Espaçamento<select id="sySp"><option value="padrao">Padrão</option><option value="compacto">Compacto</option><option value="relaxado">Relaxado</option></select></label>
   </div>
@@ -1652,6 +1699,30 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   </div>
   <p id="gtMsg" style="color:var(--muted);font-size:13px;min-height:18px;margin:8px 0 0"></p>
   <div class="dlgrow"><button id="gtOk">Ir para</button><button id="gtClose">Fechar</button></div>
+</dialog>
+<dialog id="dvHtmlDlg">
+  <h3>Código HTML do documento</h3>
+  <p style="margin:0 0 8px;color:var(--muted);font-size:13px">Edite com cuidado: ao aplicar, o texto do documento é substituído por este código.</p>
+  <textarea id="dvHtmlTxt" rows="16" spellcheck="false" style="width:100%;font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--paper);color:var(--paper-ink);border:1px solid var(--line);border-radius:4px;padding:6px"></textarea>
+  <div class="dlgrow"><button id="dvHtmlCopy">Copiar</button><button id="dvHtmlApply">Aplicar ao documento</button><button id="dvHtmlClose">Fechar</button></div>
+</dialog>
+<dialog id="cmRemDlg">
+  <h3>Remetente</h3>
+  <p style="margin:0 0 8px;color:var(--muted);font-size:13px">Usado na assinatura, no memorando e no local e data. Fica guardado neste navegador.</p>
+  <div style="display:grid;gap:6px">
+    <label>Nome <input type="text" id="cmRNome" style="width:100%"></label>
+    <label>Cargo / registro <input type="text" id="cmRCargo" style="width:100%"></label>
+    <label>Órgão <input type="text" id="cmROrgao" style="width:100%"></label>
+    <label>Cidade – UF <input type="text" id="cmRCidade" style="width:100%"></label>
+  </div>
+  <div class="dlgrow"><button id="cmRSave">Salvar</button><button id="cmRCancel">Cancelar</button></div>
+</dialog>
+<dialog id="mcDlg">
+  <h3>Mala direta</h3>
+  <p style="margin:0 0 8px;color:var(--muted);font-size:13px">Cole a lista copiada de uma planilha: a primeira linha traz os nomes dos campos (por exemplo Nome, Cargo, Órgão) e cada linha seguinte é um destinatário. No texto da carta, escreva os campos entre chaves duplas, como {{Nome}} (use o botão Inserir campo). {{DATA}} vira a data de hoje.</p>
+  <textarea id="mcData" rows="9" style="width:100%;font:13px/1.4 ui-monospace,Consolas,monospace;background:var(--paper);color:var(--paper-ink);border:1px solid var(--line);border-radius:4px;padding:6px" placeholder="Nome;Cargo;Órgão&#10;Maria Silva;Secretária;SEMED&#10;João Souza;Diretor;Escola Municipal"></textarea>
+  <div id="mcStat" style="margin:6px 0;color:var(--muted);font-size:13px"></div>
+  <div class="dlgrow"><button id="mcSave">Usar esta lista</button><button id="mcClose">Fechar</button></div>
 </dialog>
 <dialog id="cntDlg">
   <h3>Contagem de palavras</h3>
@@ -1909,6 +1980,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(!store.docs[store.current]){ const id = uid(); store.docs[id] = {title:'Documento sem título', html:'', t:Date.now()}; store.current = id; }
     const d = store.docs[store.current];
     title.value = d.title || 'Documento sem título'; page.innerHTML = d.html || '';
+    try{ setAbnt(!d.free); }catch(e){}   // formato (ABNT ou livre) guardado no documento
     applyMar(); renderSide();
     if(useIDB){
       persist(); await enqueue();                     // grava a migração (e o documento em branco, se for o caso)
@@ -2026,7 +2098,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   // estilo da fonte de cada caixa (h = cabeçalho, f = rodapé): vale na tela, na impressão/PDF, no .doc e no .docx
   function hfStyle(k){
     const hh = hfData(), st = (hh.st && hh.st[k]) || {}, ab = page.classList.contains('abnt');
-    return {ff: st.ff || 'Times New Roman', fs: st.fs > 0 ? st.fs : 10, b: !!st.b, i: !!st.i, u: !!st.u, c: /^#[0-9a-f]{6}$/i.test(st.c || '') ? st.c : ''};
+    return {ff: st.ff || 'Arial', fs: st.fs > 0 ? st.fs : 10, b: !!st.b, i: !!st.i, u: !!st.u, c: /^#[0-9a-f]{6}$/i.test(st.c || '') ? st.c : ''};
   }
   function hfStyleSet(k, ch){
     const hh = hfData(); hh.st = hh.st || {}; hh.st[k] = Object.assign({}, hh.st[k], ch);
@@ -3125,7 +3197,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const pg = pgOf(), sz = pg.w + 'cm ' + pg.h + 'cm';
     const extra = (pg.land ? ';mso-page-orientation:landscape' : '') + (pg.cols > 1 ? ';mso-columns:' + pg.cols + ' even none' : '');
     const base = ab ? ABNT_CSS.replace('size:21cm 29.7cm', 'size:' + sz).replace('margin:3cm 2cm 2cm 3cm', 'margin:' + mg + extra + ext)
-      : '@page Section1{size:' + sz + ';margin:' + mg + extra + ext + '}div.Section1{page:Section1}body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5}' + (window.__styCss ? window.__styCss() : '');
+      : '@page Section1{size:' + sz + ';margin:' + mg + extra + ext + '}div.Section1{page:Section1}body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.5}' + (window.__styCss ? window.__styCss() : '');
     return '<!DOCTYPE html><html lang="pt-BR" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"><title>' +
       title.value.replace(/</g,'&lt;') + '</title><style>' + base +
       'body{tab-interval:' + (Math.round(((store.docs[store.current] || {}).tabdef || 1.25) * 28.35 * 10) / 10) + 'pt}table{border-collapse:collapse}td{border:1px solid #888;padding:6px 8px}img{max-width:100%}</style></head><body>' +
@@ -3294,6 +3366,151 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   $('symb').addEventListener('change', e=>{ const v = e.target.value; e.target.value = ''; if(v === '__mais'){ window.__openSym(); return; } restore(); exec('insertText', v); });
   $('btnDate').addEventListener('click', ()=>{ restore(); exec('insertText', dataLongaBR()); });
   $('btnPb').addEventListener('click', ()=>{ restore(); exec('insertHTML','<div class="pb" contenteditable="false"></div><p><br></p>'); });
+
+  // ================= Correspondências =================
+  (function(){
+    const E = t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const RK = 'verbus:remetente', MK = 'verbus:mala';
+    const RDEF = {nome:'Paulo Luã Oliveira Xavier', cargo:'Psicólogo – CRP-20/09816', orgao:'CRAS Cristiana Vicente Nunes – SEMADS', cidade:'Boa Vista – RR'};
+    const rem = ()=>{ try{ return Object.assign({}, RDEF, JSON.parse(localStorage.getItem(RK) || '{}')); }catch(e){ return Object.assign({}, RDEF); } };
+    const P = (t, st)=>'<p style="margin:0;text-indent:0;text-align:left;' + (st || '') + '">' + (t || '<br>') + '</p>';
+    const C = 'text-align:center;', B = P('');
+    const ano = ()=>new Date().getFullYear();
+    const put = h=>{ restore(); exec('insertHTML', h); };
+    const bl = {
+      data: ()=>P(E(rem().cidade) + ', ' + dataLongaBR() + '.', 'text-align:right;'),
+      dest: ()=>P('Ao(À) Senhor(a) <b>[Nome do destinatário]</b>') + P('[Cargo]') + P('[Órgão / Instituição]') + P('[Cidade – UF]'),
+      assunto: ()=>P('<b>Assunto:</b> [assunto]'),
+      voc: ()=>P('Senhor(a) [cargo],'),
+      corpo: ()=>'<p>Digite aqui o texto.</p>',
+      fecho: t=>P(t || 'Atenciosamente,', C),
+      assin: ()=>{ const r = rem(); return B + P('_______________________________', C) + P('<b>' + E(r.nome) + '</b>', C) + P(E(r.cargo), C) + P(E(r.orgao), C); }
+    };
+    const docs = {
+      cmOficio: ()=>P('<b>OFÍCIO Nº ___/' + ano() + ' – ' + E(rem().orgao) + '</b>') + B + bl.data() + B + bl.dest() + B + bl.assunto() + B + bl.voc() + B + bl.corpo() + B + bl.fecho('Respeitosamente,') + bl.assin(),
+      cmMemo: ()=>P('<b>MEMORANDO Nº ___/' + ano() + '</b>') + B + bl.data() + B + P('<b>De:</b> ' + E(rem().cargo.split('–')[0].trim() + ' – ' + rem().orgao)) + P('<b>Para:</b> [destinatário]') + P('<b>Assunto:</b> [assunto]') + B + bl.corpo() + B + bl.fecho() + bl.assin(),
+      cmDecl: ()=>P('<b>DECLARAÇÃO</b>', C) + B + '<p>Declaro, para os devidos fins, que [nome completo], portador(a) do CPF nº [000.000.000-00], [complemento da declaração].</p>' + B + bl.data() + bl.assin(),
+      cmCarta: ()=>bl.data() + B + bl.dest() + B + P('Prezado(a) Senhor(a),') + B + bl.corpo() + B + bl.fecho() + bl.assin(),
+      cmReq: ()=>P('Ao(À) Senhor(a) [cargo do destinatário]') + P('[Órgão / Instituição]') + B + P('<b>REQUERIMENTO</b>', C) + B + '<p>[Nome completo], [qualificação], vem, respeitosamente, requerer [objeto do pedido], pelos motivos a seguir expostos: [justificativa].</p>' + '<p>Nestes termos, pede deferimento.</p>' + B + bl.data() + bl.assin()
+    };
+    Object.keys(docs).forEach(id=>{ const b = $(id); if(b) b.addEventListener('click', ()=>put(docs[id]())); });
+    [['cmData', bl.data], ['cmDest', bl.dest], ['cmAssunto', bl.assunto], ['cmVoc', bl.voc], ['cmFecho', ()=>bl.fecho()], ['cmAssin', bl.assin]].forEach(([id, f])=>{ const b = $(id); if(b) b.addEventListener('click', ()=>put(f())); });
+
+    // remetente
+    const rd = $('cmRemDlg');
+    $('cmRem').addEventListener('click', ()=>{ const r = rem(); $('cmRNome').value = r.nome; $('cmRCargo').value = r.cargo; $('cmROrgao').value = r.orgao; $('cmRCidade').value = r.cidade; rd.showModal(); });
+    $('cmRCancel').addEventListener('click', ()=>rd.close());
+    $('cmRSave').addEventListener('click', ()=>{
+      try{ localStorage.setItem(RK, JSON.stringify({nome:$('cmRNome').value.trim(), cargo:$('cmRCargo').value.trim(), orgao:$('cmROrgao').value.trim(), cidade:$('cmRCidade').value.trim()})); }catch(e){}
+      rd.close();
+    });
+
+    // mala direta
+    const md = $('mcDlg'), norm = t=>String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+    function parse(txt){
+      const lines = String(txt || '').split(/\r?\n/).filter(l=>l.trim());
+      if(lines.length < 1) return {head:[], rows:[]};
+      const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+      const cut = l=>l.split(sep).map(x=>x.trim().replace(/^"(.*)"$/, '$1'));
+      const head = cut(lines[0]).filter(Boolean);
+      return {head, rows: lines.slice(1).map(cut)};
+    }
+    function fillCampos(){
+      const sel = $('mcCampo'); let raw = ''; try{ raw = localStorage.getItem(MK) || ''; }catch(e){}
+      const {head} = parse(raw);
+      sel.innerHTML = '<option value="">Inserir campo</option>' + head.map(h=>'<option>' + E(h) + '</option>').join('');
+    }
+    function stat(){ const {head, rows} = parse($('mcData').value); $('mcStat').textContent = head.length ? head.length + ' campo(s): ' + head.join(', ') + ' · ' + rows.length + ' destinatário(s)' : 'Cole a lista acima.'; }
+    $('mcOpen').addEventListener('click', ()=>{ try{ $('mcData').value = localStorage.getItem(MK) || ''; }catch(e){} stat(); md.showModal(); });
+    $('mcData').addEventListener('input', stat);
+    $('mcClose').addEventListener('click', ()=>md.close());
+    $('mcSave').addEventListener('click', ()=>{ try{ localStorage.setItem(MK, $('mcData').value); }catch(e){} fillCampos(); md.close(); });
+    $('mcCampo').addEventListener('change', e=>{ const v = e.target.value; e.target.value = ''; if(v) put('{{' + E(v) + '}}'); });
+    $('mcGen').addEventListener('click', ()=>{
+      let raw = ''; try{ raw = localStorage.getItem(MK) || ''; }catch(e){}
+      const {head, rows} = parse(raw);
+      if(!head.length || !rows.length){ alert('Primeiro cole a lista em Destinatários… (primeira linha: nomes dos campos; depois um destinatário por linha).'); return; }
+      const base = page.innerHTML, nm = title.value || 'Carta', keys = head.map(norm);
+      const pages = rows.map(r=>base.replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (m, k)=>{
+        if(norm(k) === 'data') return dataLongaBR();
+        const i = keys.indexOf(norm(k)); return i >= 0 ? E(r[i] || '') : m;
+      }));
+      const free = !page.classList.contains('abnt');
+      newDoc(free);
+      page.innerHTML = pages.join('<div class="pb" contenteditable="false"></div>');
+      title.value = 'Mala direta – ' + nm; changed(); save(); renderSide();
+    });
+    fillCampos();
+  })();
+
+  // ================= Desenvolvedor =================
+  (function(){
+    const E = t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const put = h=>{ restore(); exec('insertHTML', h); };
+    $('dvCheck').addEventListener('click', ()=>put('<span class="ccx" contenteditable="false">☐</span>&nbsp;'));
+    $('dvText').addEventListener('click', ()=>put('<span class="ccf" data-ph="1" contenteditable="true">[Clique e digite]</span>&nbsp;'));
+    $('dvList').addEventListener('click', ()=>{
+      const v = prompt('Opções da lista, separadas por ponto e vírgula:', 'Sim;Não');
+      if(!v) return; const o = v.split(';').map(x=>x.trim()).filter(Boolean); if(!o.length) return;
+      put('<select class="ccs" contenteditable="false"><option value="">Escolha…</option>' + o.map(x=>'<option>' + E(x) + '</option>').join('') + '</select>&nbsp;');
+    });
+    $('dvDate').addEventListener('click', ()=>put('<input type="date" class="ccd" contenteditable="false">&nbsp;'));
+
+    // comportamento dos controles dentro do documento
+    page.addEventListener('click', e=>{
+      const x = e.target.closest && e.target.closest('.ccx');
+      if(x && page.contains(x)){ x.textContent = x.textContent.trim() === '☒' ? '☐' : '☒'; changed(); return; }
+      const f = e.target.closest && e.target.closest('.ccf[data-ph]');
+      if(f && page.contains(f)){ const r = document.createRange(); r.selectNodeContents(f); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); }
+    });
+    page.addEventListener('input', e=>{ const f = e.target.closest && e.target.closest('.ccf[data-ph]'); if(f) f.removeAttribute('data-ph'); });
+    page.addEventListener('change', e=>{
+      const t = e.target;
+      if(t.matches && t.matches('select.ccs')){ [...t.options].forEach(o=>{ if(o.selected) o.setAttribute('selected', ''); else o.removeAttribute('selected'); }); changed(); }
+      else if(t.matches && t.matches('input.ccd')){ t.setAttribute('value', t.value); changed(); }
+    });
+
+    // modo formulário
+    const bf = $('dvForm');
+    bf.addEventListener('click', ()=>{
+      const on = !document.body.classList.contains('formmode');
+      document.body.classList.toggle('formmode', on); bf.classList.toggle('on', on); bf.setAttribute('aria-pressed', on ? 'true' : 'false');
+      page.contentEditable = on ? 'false' : 'true';
+      page.querySelectorAll('.ccf').forEach(f=>{ f.contentEditable = 'true'; });
+    });
+
+    // backup
+    $('dvBackup').addEventListener('click', ()=>{
+      save();
+      const docs = {}; Object.keys(store.docs).forEach(id=>{ if(!store.docs[id].modelo) docs[id] = store.docs[id]; });
+      const blob = new Blob([JSON.stringify({app:'Verbus', versao:1, data:new Date().toISOString(), docs})], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'verbus-backup-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    });
+    $('dvRestore').addEventListener('click', ()=>$('dvFile').click());
+    $('dvFile').addEventListener('change', async e=>{
+      const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+      try{
+        const j = JSON.parse(await f.text()); const docs = j && j.docs; if(!docs || typeof docs !== 'object') throw new Error('x');
+        const ids = Object.keys(docs).filter(k=>docs[k] && typeof docs[k].html === 'string');
+        if(!ids.length) throw new Error('x');
+        save(); ids.forEach(k=>{ store.docs[uid()] = docs[k]; });
+        persist(); renderSide();
+        alert(ids.length + ' documento(s) restaurado(s). Eles aparecem no painel de documentos (Exibir > Painel de Navegação).');
+      }catch(err){ alert('Não foi possível ler este arquivo de backup.'); }
+    });
+
+    // código HTML
+    const hd = $('dvHtmlDlg');
+    $('dvHtml').addEventListener('click', ()=>{ $('dvHtmlTxt').value = page.innerHTML; hd.showModal(); });
+    $('dvHtmlClose').addEventListener('click', ()=>hd.close());
+    $('dvHtmlCopy').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText($('dvHtmlTxt').value); }catch(e){ $('dvHtmlTxt').select(); document.execCommand('copy'); } });
+    $('dvHtmlApply').addEventListener('click', ()=>{
+      if(!confirm('Substituir o conteúdo do documento por este código?')) return;
+      page.innerHTML = $('dvHtmlTxt').value; changed(); save(); hd.close();
+    });
+  })();
   $('btnCode').addEventListener('click', ()=>{
     restore(); const t = getSelection().toString(); if(!t) return;
     exec('insertHTML','<code>' + esc(t) + '</code>');
@@ -5493,7 +5710,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const hh = hfData(), hasH = hfHas('h'), hasF = hfHas('f'), imgsL = hfImgList(), any = hasH || hasF || imgsL.length > 0;
     const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
     const xe = t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const font = 'Times New Roman';
+    const font = 'Arial';
     const rprOf = (k, s0)=>{ const sy = hfResolve(k, s0), z = Math.round(sy.fs * 2); return '<w:rPr><w:rFonts w:ascii="' + sy.ff + '" w:hAnsi="' + sy.ff + '" w:cs="' + sy.ff + '"/>' + (sy.b ? '<w:b/>' : '') + (sy.i ? '<w:i/>' : '') + (sy.c ? '<w:color w:val="' + sy.c.slice(1).toUpperCase() + '"/>' : '') + '<w:sz w:val="' + z + '"/><w:szCs w:val="' + z + '"/>' + (sy.u ? '<w:u w:val="single"/>' : '') + '</w:rPr>'; };
     const imgRuns = [], imgRels = [], imgTypes = new Set();
     for(let i = 0; i < imgsL.length; i++){
@@ -5552,12 +5769,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(id !== store.current && store.docs[store.current]) save();
     store.current = id; const d = store.docs[id];
     title.value = d.title || 'Documento sem título'; page.innerHTML = d.html || '';
+    if(page.classList.contains('abnt') === !!d.free) setAbnt(!d.free);   // todo documento é ABNT, salvo os marcados como livres (modelos prontos)
     applyMar(); persist(); updateCount(); renderSide();
     if(window.__tabsSoon) window.__tabsSoon();
   }
-  function newDoc(){
+  function newDoc(free){
     save(); const id = uid();
     store.docs[id] = {title:'Documento sem título', html:'', t:Date.now()};
+    if(free === true) store.docs[id].free = true;
     openDoc(id); page.focus();
   }
   // ---------- Modelos de documento ----------
@@ -5654,12 +5873,11 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     save();
     const id = uid(), c = JSON.parse(JSON.stringify(t));
     ['modelo', 'cm', 'out', 'refs'].forEach(k=>{ delete c[k]; });
-    const ab = !!c.abnt; delete c.abnt;
+    c.free = !c.abnt; delete c.abnt;
     c.title = name || c.title || 'Documento sem título'; c.t = Date.now();
     c.html = (c.html || '').replace(/\{\{DATA\}\}/g, dataLongaBR());
     if(c.hf && c.hf.imgs) c.hf.imgs.forEach(i=>{ i.id = 'h' + Math.random().toString(36).slice(2, 8); });
     store.docs[id] = c; openDoc(id);
-    if(page.classList.contains('abnt') !== ab) setAbnt(ab);
     persist(); page.focus();
   }
   function saveAsTemplate(){
@@ -5996,7 +6214,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     if(!tyCaretOk()) return false;
     if(!typingActive()){
       const el = selEl();
-      ty = {ff: tyFam(el) || 'Times New Roman', fs: curPt() || 12};
+      ty = {ff: tyFam(el) || 'Arial', fs: curPt() || 12};
     }
     Object.assign(ty, p);
     tyEnsure(); tyShow();
@@ -6556,7 +6774,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 
   // ================= ABNT =================
   const ABNT_CSS = '@page Section1{size:21cm 29.7cm;margin:3cm 2cm 2cm 3cm}div.Section1{page:Section1}' +
-    'body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;text-align:justify}p{margin:0;text-indent:1.25cm}' +
+    'body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.5;text-align:justify}p{margin:0;text-indent:1.25cm}' +
     'h1,h2,h3{font-size:12pt;text-align:left;text-indent:0;margin:18pt 0}h1{font-weight:bold}h2{font-weight:normal}h3{font-weight:bold}h1.sn{text-align:center}' +
     'blockquote{margin:12pt 0 12pt 4cm;font-size:10pt;line-height:1;border:0;padding:0}blockquote p,td p,li p,.cover p,.sum p,p.rs,p.ref,p.leg,p.fonte{text-indent:0}' +
     'p.leg,p.fonte{font-size:10pt;line-height:1;text-align:center}p.rs{line-height:1;margin-bottom:12pt}p.ref{text-align:left;line-height:1;margin-bottom:12pt}' +
@@ -6564,14 +6782,13 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   const bAbnt = $('btnAbnt');
   function setAbnt(on, user){
     page.classList.toggle('abnt', on); $('sheet').classList.toggle('abnt', on); bAbnt.classList.toggle('on', on);
+    const dd = store.docs[store.current]; if(dd){ if(on) delete dd.free; else dd.free = true; persist(); }   // o formato é guardado em cada documento
     if(user){ const d = store.docs[store.current]; if(d){ delete d.mar; if(on) delete d.pg; } persist(); }
     applyMar();
-    try{ localStorage.setItem('verba:abnt', on ? '1' : '0'); }catch(e){}
     updateCount();
   }
   bAbnt.addEventListener('click', ()=>setAbnt(!page.classList.contains('abnt'), true));
-  let abntOn = false; try{ abntOn = localStorage.getItem('verba:abnt') === '1'; }catch(e){}
-  setAbnt(abntOn);
+  setAbnt(!(store.docs[store.current] || {}).free);   // ABNT é a base do aplicativo; só os documentos livres/modelos prontos ficam fora
 
   function pagesTxt(){
     if(!page.classList.contains('abnt')) return '';
@@ -7611,7 +7828,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         name.setAttribute('aria-label', 'Nome do documento');
         name.oninput = ()=>{ title.value = name.value; title.dispatchEvent(new Event('input', {bubbles:true})); };
         const rows = [['Páginas (estimativa A4)', pagesEst()], ['Palavras', s.words.toLocaleString('pt-BR')], ['Caracteres (com espaços)', s.withSp.toLocaleString('pt-BR')],
-          ['Parágrafos', s.paras.toLocaleString('pt-BR')], ['Tempo de leitura', s.read], ['Formato', page.classList.contains('abnt') ? 'ABNT' : 'Padrão'], ['Papel', PG_SIZES[pgOf().size][2] + (pgOf().land ? ' · paisagem' : ' · retrato') + (pgOf().cols > 1 ? ' · ' + pgOf().cols + ' colunas' : '')],
+          ['Parágrafos', s.paras.toLocaleString('pt-BR')], ['Tempo de leitura', s.read], ['Formato', page.classList.contains('abnt') ? 'ABNT' : 'Livre (sem ABNT)'], ['Papel', PG_SIZES[pgOf().size][2] + (pgOf().land ? ' · paisagem' : ' · retrato') + (pgOf().cols > 1 ? ' · ' + pgOf().cols + ' colunas' : '')],
           ['Margens (sup., inf., esq., dir.)', [m.t, m.b, m.l, m.r].map(cm).join(' · ')], ['Última alteração', fmtDate(d.t)],
           ['Documentos neste navegador', Object.values(store.docs).filter(d=>!d.modelo).length]];
         const tb = el('tbody'); rows.forEach(r=>tb.append(el('tr', null, el('td', {textContent:r[0]}), el('td', {textContent:String(r[1])}))));
@@ -7619,8 +7836,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
           el('h2', {textContent:'Mais'}), act('🔢', 'Contagem detalhada', 'Palavras, caracteres, parágrafos e tempos, inclusive da seleção', ()=>closeThen(openCount))];
       },
       novo(){
-        const list = [act('📄', 'Documento em branco', 'Começa uma página nova com o formato atual', ()=>{ close(false); newDoc(); }),
-          act('🎓', 'Documento ABNT', 'A4, margens 3/2/2/3 cm, Times 12, espaço 1,5', ()=>{ close(false); newDoc(); setAbnt(true, true); })];
+        const list = [act('🎓', 'Documento ABNT (padrão)', 'A4, margens 3/2/2/3 cm, Arial 12, espaço 1,5, recuo 1,25 cm, justificado', ()=>{ close(false); newDoc(); }),
+          act('📄', 'Documento livre', 'Sem as regras da ABNT (margens e estilos livres)', ()=>{ close(false); newDoc(true); })];
       list.push(el('h2', {textContent:'Modelos prontos'}),
         act('📋', 'Relatório Informativo — CRAS Cristiana Vicente Nunes', 'Cabeçalho da Prefeitura/SEMADS, quadros de Identificação, Demanda, Composição Familiar, Condições Habitacionais, Situação e Providências, data de hoje, assinatura e rodapé', ()=>{ close(false); newFromTemplate(tplRelatorio(), 'Relatório Informativo'); }),
         act('📄', 'Encaminhamento — CRAS Cristiana Vicente Nunes', 'Cabeçalho da Prefeitura/SEMADS, quadro com Assunto, dados do adolescente/criança, responsável, endereço, contato e Relato, data de hoje, assinatura, página de Anexo e rodapé', ()=>{ close(false); newFromTemplate(tplEncaminhamento(), 'Encaminhamento'); }));
@@ -7795,7 +8012,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
           fill(hdr, 'h'); fill(ftr, 'f');
           if(abnt && !hfHas('h') && !hfHas('f') && idx >= 0){   // número automático do padrão ABNT, no canto superior direito
             hdr.textContent = String(idx + 1);
-            hdr.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:right;font:12pt "Times New Roman",serif;top:' + Math.max(0, e.t / 2 - 9) + 'px';
+            hdr.style.cssText = 'display:block;left:' + e.l + 'px;width:' + cw + 'px;text-align:right;font:12pt Arial,sans-serif;top:' + Math.max(0, e.t / 2 - 9) + 'px';
           }
         }
         function showPage(n){
@@ -7953,7 +8170,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
         z.setAttribute('aria-label', 'Zoom'); z.onchange = ()=>{ $('zoom').value = z.value; $('zoom').dispatchEvent(new Event('change')); };
         const toggle = (id, name, desc, on)=>act('⚙', name + ': ' + (on ? 'ligado' : 'desligado'), desc, ()=>{ $(id).click(); go('opcoes'); }, on);
         return [act('✔', 'Revisão e idioma', 'Ortografia, idioma e erros comuns', ()=>closeThen(()=>$('btnRev').click())),
-          toggle('btnAbnt', 'Padrão ABNT', 'A4, margens 3/2/2/3 cm, Times 12', page.classList.contains('abnt')),
+          toggle('btnAbnt', 'Padrão ABNT', 'A4, margens 3/2/2/3 cm, Arial 12', page.classList.contains('abnt')),
           toggle('btnRuler', 'Régua', 'Mostra as réguas em cm', $('btnRuler').classList.contains('on')),
           act('☰', 'Painel lateral', 'Documentos e estrutura', ()=>{ $('btnSide').click(); say($('side').hidden ? 'Painel oculto.' : 'Painel visível.'); }),
           el('h2', {textContent:'Zoom da página'}), z];
@@ -8029,6 +8246,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
   (function(){
     const BLK = {
       semesp:'margin:0;line-height:1;',
+      abnt:'margin:0;text-indent:1.25cm;text-align:justify;line-height:1.5;',
       lista:'margin-left:1.27cm;',
       titulo:'font-family:"Times New Roman",Times,serif;font-size:28pt;line-height:1;letter-spacing:-.5pt;margin:0 0 .3em;',
       subtitulo:'color:#5a5a5a;letter-spacing:.75pt;font-size:12pt;',
@@ -8864,7 +9082,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     const toPct = v=>v <= 50 ? 10 + v / 50 * 90 : 100 + (v - 50) / 50 * 400;
     const toVal = p=>p <= 100 ? (p - 10) / 90 * 50 : 50 + (p - 100) / 400 * 50;
     let autoZ = false; const narrow = ()=>innerWidth <= 700;
-    const fitPct = ()=>Math.max(10, Math.floor((main.clientWidth - 8) / (pgOf().w * CMPX) * 100));   // largura da página = largura da tela
+    const fitPct = ()=>{ const cs = getComputedStyle(main); return Math.max(10, Math.floor((main.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 8) / (pgOf().w * CMPX) * 100)); };   // largura da página = largura da tela
     function curPct(){ return Math.round((parseFloat(sheet.style.zoom) || 1) * 100); }
     function setZoom(p){
       p = Math.max(10, Math.min(500, Math.round(p)));
@@ -8878,7 +9096,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     }
     zsel.addEventListener('change', ()=>{
       const p = curPct(); pctBtn.textContent = p + '%'; slide.value = toVal(p);
-      try{ localStorage.setItem('verba:zoom', String(p)); if(narrow() && !autoZ) localStorage.setItem('verbus:zoomMob', String(p)); }catch(e){}
+      try{ if(!autoZ) localStorage.setItem('verba:zoom', String(p)); if(narrow() && !autoZ) localStorage.setItem('verbus:zoomMob', String(p)); }catch(e){}
       placeV(); pgUpdate(); pgMarks();
     });
     slide.addEventListener('input', ()=>setZoom(toPct(parseFloat(slide.value))));
@@ -8895,12 +9113,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
     let z0 = innerWidth >= 1000 ? 110 : 100;
     try{ const sv = parseInt(localStorage.getItem('verba:zoom'), 10); if(sv >= 10 && sv <= 500 && (innerWidth >= 1000 || sv <= 100)) z0 = sv; }catch(e){}
     if(narrow()){ z0 = fitPct(); try{ const sv = parseInt(localStorage.getItem('verbus:zoomMob'), 10); if(sv >= 10 && sv <= 500) z0 = sv; }catch(e){} autoZ = true; }
+    if(!narrow()){ const f = fitPct(); if(z0 > f){ z0 = f; autoZ = true; } }   // a folha nunca fica cortada: se não cabe na janela, ajusta à largura
     setZoom(z0); autoZ = false;
     let lastW = innerWidth;
     addEventListener('resize', ()=>{      // girar o celular: reajusta à largura, a não ser que a pessoa tenha escolhido um zoom
       if(innerWidth === lastW) return; lastW = innerWidth;
       let m = null; try{ m = localStorage.getItem('verbus:zoomMob'); }catch(e){}
       if(narrow() && !m){ autoZ = true; setZoom(fitPct()); autoZ = false; }
+      else if(!narrow()){ const f = fitPct(); let sv = 0; try{ sv = parseInt(localStorage.getItem('verba:zoom'), 10) || 0; }catch(e){} const want = Math.min(sv || (innerWidth >= 1000 ? 110 : 100), f); if(want !== curPct()){ autoZ = true; setZoom(want); autoZ = false; } }
     });
 
     // "Página x de y"
@@ -9256,14 +9476,14 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
       if(!page.getAttribute('style')) page.removeAttribute('style');
       if(!on) return;
       const sp = SP[st.sp] || SP.padrao;
-      if(st.f) page.style.setProperty('--vf', '"' + st.f + '","Times New Roman",serif');
+      if(st.f) page.style.setProperty('--vf', '"' + st.f + '",Arial,sans-serif');
       if(st.hc) page.style.setProperty('--vhc', st.hc);
       page.style.setProperty('--vlh', sp.lh); page.style.setProperty('--vpa', sp.pa);
     };
     window.__styCss = function(){
       const st = cur(), xo = window.__stOvrCss ? window.__stOvrCss() : ''; if(!st || page.classList.contains('abnt')) return xo;
       const sp = SP[st.sp] || SP.padrao;
-      return 'body{' + (st.f ? 'font-family:"' + st.f + '","Times New Roman",serif;' : '') + 'line-height:' + sp.lh + '}' +
+      return 'body{' + (st.f ? 'font-family:"' + st.f + '",Arial,sans-serif;' : '') + 'line-height:' + sp.lh + '}' +
         (st.hc ? 'h1,h2,h3{color:' + st.hc + '}' : '') + 'p{margin:0 0 ' + sp.pa + '}' + xo;
     };
     const dlg = $('styDlg');
