@@ -72,7 +72,7 @@ header button:hover{background:rgba(255,255,255,.3)}
 #toolbar .dd select,#toolbar .dd input[type=color]{min-width:0}
 body.painting #page{cursor:copy}
 #page sup.fn{color:inherit;cursor:pointer;user-select:none;line-height:0}
-#page .fnote .fnn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0}
+#page .fnote .fnn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0;display:inline-block;min-width:1.5em;text-indent:0}
 #page .fnote:target,#page .fnote.flash{background:#fff3b0}
 #page sup.en{color:inherit;cursor:pointer;user-select:none;line-height:0}
 #page .enote .enn{color:inherit;cursor:pointer;user-select:none;vertical-align:super;font-size:smaller;line-height:0;margin-right:0}
@@ -216,7 +216,7 @@ body.hfedit #pgOv{display:none}
 body.hfedit .himgc,body.hfedit .hfc{display:none}
 @media print{.himgc,.hfc{display:none !important}}
 @media print{#pgOv{display:none !important}#page{min-height:0 !important}}
-@media print{#page,#sheet{zoom:1 !important} #page .pb{border:0;margin:0} #findbar{display:none}}
+@media print{#page,#sheet{zoom:1 !important} #page{display:flow-root} #page .pb{border:0;margin:0} #findbar{display:none}}   /* flow-root: a margem do 1º bloco (modelos do CRAS) não vaza para fora da folha; senão as notas de rodapé, posicionadas a partir do topo da folha, saem 20–41 px abaixo do lugar */
 @page{size:A4;margin:3cm 2cm 2cm 3cm;@top-right{content:counter(page);font:12pt Arial,sans-serif}}
 @page capa{@top-right{content:none}}
 #work{flex:1;display:flex;min-height:0}
@@ -690,6 +690,8 @@ body.tsel #page ::selection{background:transparent}
 #toolbar .rb.bigb.lyb.two{height:64px}
 #toolbar .lyb.two span{text-align:center;line-height:1.15}
 #toolbar .lywide{min-width:178px}
+#tp-layout .group[hidden]{display:none}
+#toolbar .rb.bigb.lyb:disabled{color:#989898;cursor:default;background:transparent;border-color:transparent}#toolbar .rb.bigb.lyb:disabled .ic{opacity:.5}
 #toolbar .lysm:disabled{color:#989898;cursor:default;background:transparent;border-color:transparent}
 #toolbar .lysm:disabled .ic{opacity:.5}
 #toolbar .lyest{display:flex;align-items:center;gap:5px;height:22px;padding:0 4px;font:12px/1 var(--uifont);color:var(--rink)}
@@ -1160,7 +1162,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         <label class="lr" title="Espaço depois do parágrafo, em pt (como no Word)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3.5h12M2 7h12" stroke="#666"/><path d="M8 14.5v-5M6 11.5l2-2 2 2" stroke="#2b79c9"/></svg><span class="ln">Depois:</span><span class="spn"><input type="text" id="spA" inputmode="decimal" autocomplete="off" value="0 pt" title="Espaço depois do parágrafo, em pt" aria-label="Espaço depois do parágrafo, em pt"><span class="sp" aria-hidden="true"><b class="up" data-for="spA" data-d="1"></b><b class="dn" data-for="spA" data-d="-1"></b></span></span></label>
       </div>
     </div><div class="gl">Parágrafo</div><button type="button" class="gdl" data-dlg="parDlg" title="Parágrafo…" aria-label="Parágrafo"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1h4M1 1v4M9 9L3.6 3.6M9 9H6M9 9V6" stroke="currentColor" stroke-width="1" fill="none"/></svg></button></div>
-    <div class="group" role="group" aria-label="Tabela"><div class="gb">
+<div class="group wide" role="group" aria-label="Organizar"><div class="gb cols" id="orgGb"><button type="button" class="rb bigb lyb two orgb" data-lysel="orgPos" aria-haspopup="menu" aria-expanded="false" disabled title="Posição da imagem na página (selecione uma imagem)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="3.5" width="21" height="25" fill="#fff"/><rect x="16" y="6" width="8" height="8" stroke="#2b79c9" fill="#dce8fb"/></svg><span>Posição</span><i class="car"></i></button><button type="button" class="rb bigb lyb two orgb" data-lysel="orgWrap" aria-haspopup="menu" aria-expanded="false" disabled title="Quebra de texto automática: como a imagem se encaixa no texto (selecione uma imagem)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="3.5" width="21" height="25" fill="#fff"/><path d="M8 9h6M8 13h6M8 17h16M8 21h16" /><rect x="16" y="8" width="8" height="7" stroke="#2b79c9" fill="#dce8fb"/></svg><span>Quebra de Texto<br>Automática</span><i class="car"></i></button><button type="button" class="rb bigb lyb two orgb" id="orgFwd" disabled title="Avançar: traz a imagem para a frente do texto (selecione uma imagem)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="9.5" width="14" height="14" fill="#fff"/><rect x="12.5" y="5.5" width="14" height="14" fill="#dce8fb" stroke="#2b79c9"/></svg><span>Avançar</span></button><button type="button" class="rb bigb lyb two orgb" id="orgBack" disabled title="Recuar: envia a imagem para trás do texto (selecione uma imagem)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="12.5" y="9.5" width="14" height="14" fill="#fff"/><rect x="5.5" y="5.5" width="14" height="14" fill="#dce8fb" stroke="#2b79c9"/></svg><span>Recuar</span></button><button type="button" class="rb bigb lyb two orgb" id="orgSel" aria-disabled="true" disabled title="Painel de Seleção: ainda não disponível no Verbus"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="21" height="21" fill="#fff"/><path d="M10 11h12M10 16h12M10 21h12"/></svg><span>Painel de<br>Seleção</span></button><div class="stack lystack"><button type="button" class="rb sm lysm orgb" data-lysel="orgAlignSel" aria-haspopup="menu" aria-expanded="false" disabled title="Alinhar a imagem na página (selecione uma imagem)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 2v12" stroke="#2b79c9"/><path d="M4 4h9M4 8h6M4 12h8"/></svg><span>Alinhar</span><i class="car"></i></button><button type="button" class="rb sm lysm orgb" id="orgGrp" aria-disabled="true" disabled title="Agrupar: ainda não disponível no Verbus"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="6" height="6"/><rect x="7.5" y="7.5" width="6" height="6" stroke="#2b79c9"/></svg><span>Agrupar</span><i class="car"></i></button><button type="button" class="rb sm lysm orgb" id="orgRot" aria-disabled="true" disabled title="Girar: ainda não disponível no Verbus"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12.5 8a4.5 4.5 0 11-1.5-3.4M12.5 2.5v3h-3" stroke="#2b79c9"/></svg><span>Girar</span><i class="car"></i></button></div><div class="lyhid" hidden><select id="orgPos"><optgroup label="Horizontal"><option value="ia:left">Esquerda</option><option value="ia:center">Centro</option><option value="ia:right">Direita</option></optgroup><optgroup label="Vertical"><option value="iv:top">Topo da página</option><option value="iv:mid">Meio da página</option><option value="iv:bot">Base da página</option></optgroup></select><select id="orgAlignSel"><optgroup label="Horizontal"><option value="ia:left">Alinhar à esquerda</option><option value="ia:center">Centralizar</option><option value="ia:right">Alinhar à direita</option></optgroup><optgroup label="Vertical"><option value="iv:top">Alinhar ao topo</option><option value="iv:mid">Alinhar ao meio</option><option value="iv:bot">Alinhar à base</option></optgroup></select><select id="orgWrap"><option value="inline">Alinhada com o texto</option><option value="left">Quadrado — à esquerda</option><option value="right">Quadrado — à direita</option><option value="tb">Acima e abaixo do texto</option><option value="behind">Atrás do texto</option><option value="front">Na frente do texto</option></select></div></div><div class="gl">Organizar</div></div>
+    <div class="group" role="group" aria-label="Tabela" hidden><div class="gb">
       <select id="tbl" title="Editar tabela (clique antes numa célula)">
       <option value="" selected disabled hidden>Editar tabela</option>
       <option value="rowB">Linha acima</option><option value="rowA">Linha abaixo</option>
@@ -2588,7 +2591,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           return r;
         };
         let brk = '';
-        for(let p = 1; p < n; p++){ const k = kids[kids.findIndex(x=>{ const r = R.get(x); return r && Math.abs(r.top - starts[p]) <= 1; })]; if(k) brk += '#page>:nth-child(' + ([...page.children].indexOf(k) + 1) + '){break-before:page}'; }
+        const selOf = el=>{ let sel = ''; for(let x = el; x && x !== page; x = x.parentNode){ if(!x.parentNode) return null; sel = '>:nth-child(' + ([...x.parentNode.children].indexOf(x) + 1) + ')' + sel; } return '#page' + sel; };   // caminho até o elemento (linha de tabela incluída)
+        for(let p = 1; p < n; p++){
+          const flat = pgFlat(kids), k = flat[flat.findIndex(x=>{ const r = R.get(x); return r && Math.abs(r.top - starts[p]) <= 1; })]; if(!k) continue;
+          const pv = k.previousElementSibling; if(pv && pv.matches('.pb,.sbk[data-t="next"],.sbk[data-t="odd"],.sbk[data-t="even"]')) continue;   // já há quebra de página antes dele: outra geraria página em branco
+          const sel = selOf(k); if(sel) brk += sel + '{break-before:page}';   // k pode ser uma linha dentro de tabela: antes a regra não pegava e a tabela seguia reta por cima das notas
+        }
         fnPosSet('@media screen{' + rules(e.l, p=>p * P2 + e.t + use) + '}@media print{' + brk + rules(0, p=>(p + 1) * use) + 'html #page{min-height:' + Math.floor(n * use - 1) + 'px !important}}');
       }
       pgClones();
@@ -4706,7 +4714,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
 
 
   // ---------- Notas de rodapé (numeração automática; na tela e na impressão cada nota fica no pé da página do seu número) ----------
-  const FN_NOTE = 'font-size:10pt;line-height:1.15;margin:0;text-indent:0;text-align:left';
+  const FN_NOTE = 'font-size:10pt;line-height:1.15;margin:0;padding-left:1.5em;text-indent:-1.5em;text-align:left';   // recuo deslocado (ABNT): as linhas seguintes ficam alinhadas sob a 1ª letra do texto, não sob o número
   const FN_PAD = 12, FN_LINE = 6;   // espaço acima da 1ª nota de cada página e posição do filete (px)
   const FN_SEP = 'width:5cm;border-top:1px solid #000;margin:14pt 0 6pt;height:0';
   function fnBox(create){
@@ -6198,7 +6206,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     // Baseado no Modelo_Pronto.docx do CRAS, com texto em Times New Roman 12, espaçamento 1,5: cabeçalho e rodapé em imagem, 5 campos e assinatura. Medidas em px (96 por polegada).
     const F = 'font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;';
     const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
-    const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
+    const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><p style="margin:0;text-indent:1.25cm;line-height:1.5"><br></p></td></tr></tbody></table>';
     // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
     const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><p style="margin:0;text-indent:1.25cm;line-height:1.5"><br></p></td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
@@ -6260,7 +6268,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         two(L('CPF:') + SP, L('Contato:') + SP, 32) +
         full(L('Endereço:') + SP, 32) +
         full(L('Bairro:') + SP, 32) +
-        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;line-height:1.5;text-align:justify"><br></p>', 270, null, 1) +
+        full('<p style="margin:0"><b>Relato:</b></p><p style="margin:0;text-indent:1.25cm;line-height:1.5;text-align:justify"><br></p>', 270, null, 1) +
         full('<p style="margin:0 0 0 270px;font-weight:normal">Boa Vista – RR, {{DATA}}</p>', 36) +
         full('&nbsp;', 40) +
         full('<p style="margin:0 0 0 300px;width:282px;text-align:center;font-weight:bold;line-height:1.5">____________________________</p>' +
@@ -9379,7 +9387,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     page.addEventListener('click', e=>{ if(e.target.tagName === 'IMG') select({k:'b', el:e.target}); });
     document.addEventListener('mousedown', e=>{
       if(!T) return;
-      if(e.target.closest('#imgbar,#imgOv,.himg')) return;
+      if(e.target.closest('#imgbar,#imgOv,.himg,#orgGb,#tblPop')) return;   // #orgGb: grupo Organizar da guia Layout; #tblPop: seus menus
       if(e.target.tagName === 'IMG' && page.contains(e.target)) return;
       if(e.target.closest('#hfbar')) return;
       select(null);
@@ -9677,6 +9685,22 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     });
   })();
 
+
+  // ---------- Layout > Organizar (como no Word): atua na imagem selecionada; fica acinzentado sem imagem ----------
+  (function(){
+    const bar = $('imgbar'), btns = [...document.querySelectorAll('#orgGb .orgb')];
+    const live = new Set(['orgFwd', 'orgBack']);   // Painel de Seleção, Agrupar e Girar ainda não existem no Verbus: ficam sempre acinzentados
+    const on = ()=>!bar.hidden;
+    function sync(){ btns.forEach(b=>{ const ok = on() && (b.dataset.lysel || live.has(b.id)); b.disabled = !ok; }); }
+    new MutationObserver(sync).observe(bar, {attributes:true, attributeFilter:['hidden']}); sync();
+    const setWrap = v=>{ const w = $('imWrap'); if(!on() || ![...w.options].some(o=>o.value === v)) return; w.value = v; w.dispatchEvent(new Event('change', {bubbles:true})); };
+    $('orgFwd').addEventListener('click', ()=>setWrap('front'));
+    $('orgBack').addEventListener('click', ()=>setWrap('behind'));
+    $('orgWrap').addEventListener('change', e=>{ setWrap(e.target.value); });
+    ['orgPos', 'orgAlignSel'].forEach(id=>$(id).addEventListener('change', e=>{
+      const [k, v] = e.target.value.split(':'); const b = bar.querySelector(k === 'ia' ? '[data-ia="' + v + '"]' : '[data-iv="' + v + '"]'); if(on() && b) b.click();
+    }));
+  })();
   $('pgOk').addEventListener('click', pgDlgApply);
   $('pgDlg').addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); pgDlgApply(); } });
   pgSync();
