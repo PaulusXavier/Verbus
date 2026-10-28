@@ -521,6 +521,21 @@ header .actions{display:none}
 .prNav button:disabled{opacity:.4;cursor:default}
 .prNav input{width:48px;height:30px;text-align:center;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit}
 @media (max-width:900px){ .prWrap{flex-direction:column;align-items:stretch} .prSet{width:100%} }
+.prTop{display:flex;align-items:center;gap:18px}
+.prCop{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.prCop input{width:76px;height:36px;text-align:center;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--paper-ink);font:inherit;font-size:15px}
+.prRow input[type=text]{width:100%;height:34px;border:1px solid var(--line);border-radius:4px;padding:0 8px;background:var(--paper);color:var(--paper-ink);font:inherit}
+.prInfo.prErr{color:#c0392b}
+.prScroll{width:100%;overflow:auto;max-height:calc(100vh - 215px);display:flex}
+.prScroll .prBox{margin:0 auto}
+.prNav{flex-wrap:wrap;justify-content:center;row-gap:8px}
+.prZ{display:flex;align-items:center;gap:6px;margin-left:20px}
+.prZ input[type=range]{width:120px}
+.prZl{min-width:42px;text-align:right;font-size:12px;color:var(--muted)}
+#bsMain .bsDoRow{margin-top:22px}
+#bsMain .bsDo{min-width:130px;height:38px;padding:0 20px;border:0;border-radius:4px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+#bsMain .bsDo:hover{filter:brightness(1.1)}
+#bsMain select{width:100%;max-width:560px;height:36px}
 #prNup{position:fixed;left:-99999px;top:0;width:auto}
 @media print{#bs{display:none !important} body.nup > *:not(#prNup){display:none !important} body.nup #prNup{position:static;display:block} body.nup{background:#fff !important}}
 .pgGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px}
@@ -891,7 +906,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     <button id="btnNew">Novo</button>
     <button id="btnOpen">Abrir arquivo</button>
     <span class="lbl">Baixar:</span>
-    <button id="btnDocx" title="Documento .docx (compatível com editores de texto) — Ctrl+S">.docx</button>
+    <button id="btnDocx" title="Baixa uma cópia em .docx (para gravar no arquivo, use Salvar — Ctrl+S)">.docx</button>
     <button id="btnDoc">.doc</button>
     <button id="btnHtml">.html</button>
     <button id="btnTxt">.txt</button>
@@ -1872,6 +1887,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   function uid(){ return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
   const savedEl = document.getElementById('saved');
   const MSG_OK = 'Salvo automaticamente neste navegador';
+  const FH = new Map();   // id do documento -> arquivo do computador ligado a ele (o Salvar grava direto nele, como no Word)
+  const hhmm = t=>new Date(t || Date.now()).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  function fileText(){
+    const e = FH.get(store.current); if(!e) return '';
+    return e.dirty ? e.name + ' — alterações ainda não gravadas no arquivo (Ctrl+S)' : 'Salvo em ' + e.name + ' às ' + hhmm(e.t);
+  }
   let useIDB = false, avisou = false;
   const dirty = new Set(), known = new Set(), imgKnown = new Set(), hashCache = new Map();
   let queue = Promise.resolve(), flushTimer = null, lastCurrent = null;
@@ -1964,8 +1985,10 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   function unpackHtml(html, imgs){ return html.replace(/verba-img:([0-9a-f]{16,64})/g, (m, h)=>imgs.get(h) || m); }
 
   function setStatus(ok, msg){
-    savedEl.textContent = ok ? MSG_OK : (msg || 'Não foi possível salvar');
-    savedEl.style.color = ok ? '' : '#c0392b';
+    const f = ok ? fileText() : '', e = FH.get(store.current);
+    savedEl.textContent = ok ? (f || MSG_OK) : (msg || 'Não foi possível salvar');
+    savedEl.style.color = ok ? (f && e.dirty ? '#b26a00' : '') : '#c0392b';
+    savedEl.title = f ? 'O documento também é guardado sozinho neste navegador' : '';
   }
   async function doFlush(){
     const ids = Array.from(dirty); dirty.clear();
@@ -2789,6 +2812,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     try{ fnRenumber(); }catch(e){}
     try{ enRenumber(); }catch(e){}
     updateCountSoon();
+    try{ fileTouch(); }catch(e){}
     clearTimeout(saveTimer);
     saveTimer = setTimeout(()=>{
       const go = ()=>{ save(); if(!$('side').hidden) renderSide(); };   // salvar serializa o HTML todo (imagens inclusas): faz no tempo ocioso
@@ -3256,8 +3280,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   // PDF pelo diálogo de impressão: o nome sugerido vem do título da aba
   (function(){
     let old = null;
-    window.addEventListener('beforeprint', ()=>{ const n = autoName(); if(n){ old = document.title; document.title = n; } });
-    window.addEventListener('afterprint', ()=>{ if(old != null){ document.title = old; old = null; } });
+    window.addEventListener('beforeprint', ()=>{ const n = window.__pdfNome || autoName() || title.value.trim(); if(n){ old = document.title; document.title = n; } });
+    window.addEventListener('afterprint', ()=>{ window.__pdfNome = null; if(old != null){ document.title = old; old = null; } });
   })();
   function hfLines(k, cls){
     const hh = hfData(), lines = [[]];
@@ -3302,19 +3326,34 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
 
   document.getElementById('btnNew').addEventListener('click', ()=>newDoc());
 
-  document.getElementById('btnOpen').addEventListener('click', ()=>document.getElementById('fileOpen').click());
-  document.getElementById('fileOpen').addEventListener('change', e=>{
-    const f = e.target.files[0]; if(!f) return;
+  // Abrir: no Chrome/Edge usa a janela do sistema e guarda a ligação com o arquivo (Ctrl+S grava nele); nos demais, o seletor comum
+  async function pickOpen(){
+    if(!(window.showOpenFilePicker && window.isSecureContext && window.top === window)){ document.getElementById('fileOpen').click(); return; }
+    try{
+      const [h] = await window.showOpenFilePicker({id:'verbus', multiple:false, types:[{description:'Documentos (.docx, .doc, .html, .txt)', accept:{
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document':['.docx'], 'application/msword':['.doc'], 'text/html':['.html', '.htm'], 'text/plain':['.txt']}}]});
+      abrirArquivo(await h.getFile(), h);
+    }catch(err){ if(!err || err.name !== 'AbortError') document.getElementById('fileOpen').click(); }
+  }
+  window.__abrirArquivo = pickOpen;
+  document.getElementById('btnOpen').addEventListener('click', pickOpen);
+  document.getElementById('fileOpen').addEventListener('change', e=>{ const f = e.target.files[0]; if(f) abrirArquivo(f, null); e.target.value = ''; });
+  function abrirArquivo(f, handle){
     if(page.innerText.trim()) newDoc();
+    const idDoc = store.current;
+    const ligar = ()=>{
+      if(handle){ FH.set(idDoc, {handle, name:f.name, t:Date.now(), dirty:false}); fhPut(idDoc); setStatus(true); }
+      else if(FH.delete(idDoc)){ fhPut(idDoc); setStatus(true); }
+    };
     if(/\.docx$/i.test(f.name)){
       (async()=>{
         try{
           if(!window.mammoth) await loadScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js');
           const res = await window.mammoth.convertToHtml({arrayBuffer: await f.arrayBuffer()});
-          page.innerHTML = res.value; title.value = f.name.replace(/\.[^.]+$/, ''); changed();
+          page.innerHTML = res.value; title.value = f.name.replace(/\.[^.]+$/, ''); changed(); ligar();
         }catch(err){ alert('Não foi possível abrir o .docx. Verifique a conexão com a internet.'); }
       })();
-      e.target.value = ''; return;
+      return;
     }
     const r = new FileReader();
     r.onload = ()=>{
@@ -3331,11 +3370,10 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         r.result.split(/\r?\n/).forEach(l=>{ const p = document.createElement('p'); p.textContent = l || '\u200b'; page.appendChild(p); });
       }
       title.value = f.name.replace(/\.[^.]+$/, '');
-      changed();
+      changed(); ligar();
     };
     r.readAsText(f);
-    e.target.value = '';
-  });
+  }
 
   // Texto digitado direto na folha vazia vira parágrafo <p> (senão fica sem espaçamento e sem estilo)
   page.addEventListener('input', ()=>{
@@ -5920,7 +5958,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     if((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey){
       const k = e.key.toLowerCase();
       if(k==='f' || k==='h'){ e.preventDefault(); openFind(); if(k==='h') ri.focus(); }
-      else if(k==='s'){ e.preventDefault(); $('btnDocx').click(); }
+      else if(k==='s'){ e.preventDefault(); fileDo(false); }
       else if('lerj'.includes(k) && k.length === 1 && page.contains(document.activeElement) && page.isContentEditable){
         e.preventDefault(); exec({l:'justifyLeft', e:'justifyCenter', r:'justifyRight', j:'justifyFull'}[k]);
       }
@@ -6023,15 +6061,115 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     zip.file('word/document.xml', doc);
     return zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
   }
+  const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  async function makeDocx(){
+    if(!window.htmlDocx) await loadScript('https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js');
+    const ab = page.classList.contains('abnt'), m = effMar();
+    let out = window.htmlDocx.asBlob(wrap(), {margins:{top:Math.round(m.t*15), right:Math.round(m.r*15), bottom:Math.round(m.b*15), left:Math.round(m.l*15)}});
+    try{ out = await docxComCabecalho(out, ab); }catch(e){ if(hfHas('h') || hfHas('f')) alert('O .docx foi gerado sem o cabeçalho/rodapé (não foi possível carregar a biblioteca). Use o botão .doc ou verifique a internet.'); }
+    return out;
+  }
+  // botão ".docx" da barra antiga: só baixa uma cópia
   $('btnDocx').addEventListener('click', async ()=>{
-    try{
-      if(!window.htmlDocx) await loadScript('https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js');
-      const ab = page.classList.contains('abnt'), m = effMar();
-      let out = window.htmlDocx.asBlob(wrap(), {margins:{top:Math.round(m.t*15), right:Math.round(m.r*15), bottom:Math.round(m.b*15), left:Math.round(m.l*15)}});
-      try{ out = await docxComCabecalho(out, ab); }catch(e){ if(hfHas('h') || hfHas('f')) alert('O .docx foi gerado sem o cabeçalho/rodapé (não foi possível carregar a biblioteca). Use o botão .doc ou verifique a internet.'); }
-      download(out, fileName('.docx'), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    }catch(err){ alert('Não foi possível gerar o .docx. Verifique a conexão com a internet ou use o botão .doc.'); }
+    try{ download(await makeDocx(), fileName('.docx'), DOCX_MIME); }
+    catch(err){ alert('Não foi possível gerar o .docx. Verifique a conexão com a internet ou use o botão .doc.'); }
   });
+
+  // ---------- Salvar e Salvar como, como no Word ----------
+  // Chrome/Edge: a primeira vez abre a janela "Salvar como" do computador (pasta, nome, tipo); depois, Ctrl+S grava direto no mesmo arquivo.
+  // Outros navegadores (Firefox, Safari, celular) não deixam um site gravar em arquivo: aí o Salvar baixa uma cópia.
+  const FTYPES = {
+    docx:{ext:'.docx', mime:DOCX_MIME, desc:'Documento do Word (*.docx)'},
+    doc:{ext:'.doc', mime:'application/msword', desc:'Documento do Word 97-2003 (*.doc)'},
+    html:{ext:'.html', mime:'text/html', desc:'Página da Web (*.html)'},
+    txt:{ext:'.txt', mime:'text/plain', desc:'Texto simples (*.txt)'}
+  };
+  const FS_SAVE = ()=>!!(window.showSaveFilePicker && window.isSecureContext && window.top === window);
+  const kindOf = n=>{ const m = /\.([a-z0-9]+)$/i.exec(n || ''), k = m ? m[1].toLowerCase() : ''; return k === 'htm' ? 'html' : (FTYPES[k] ? k : 'docx'); };
+  const baseName = n=>String(n || '').replace(/\.(docx|doc|html?|txt)$/i, '');
+  window.__fileFS = FS_SAVE;
+  async function makeFile(kind){
+    if(kind === 'docx') return await makeDocx();
+    if(kind === 'doc') return new Blob(['\ufeff' + wrap(true)], {type:'application/msword'});
+    if(kind === 'html') return new Blob([wrap()], {type:'text/html'});
+    return new Blob([page.innerText], {type:'text/plain'});
+  }
+  // as ligações documento -> arquivo sobrevivem ao recarregar a página (o navegador pede permissão de novo ao gravar)
+  const FHDB = ()=>new Promise((res, rej)=>{ try{ const r = indexedDB.open('verbus-arquivos', 1); r.onupgradeneeded = ()=>r.result.createObjectStore('h'); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }catch(e){ rej(e); } });
+  async function fhPut(id){
+    try{
+      const e = FH.get(id), db = await FHDB(), st = db.transaction('h', 'readwrite').objectStore('h');
+      if(e) st.put({handle:e.handle, name:e.name, t:e.t, dirty:e.dirty}, id); else st.delete(id);
+    }catch(err){}
+  }
+  (async()=>{
+    try{
+      const db = await FHDB(), st = db.transaction('h').objectStore('h');
+      const all = await new Promise(r=>{ const q = st.openCursor(), o = []; q.onsuccess = ()=>{ const c = q.result; if(c){ o.push([c.key, c.value]); c.continue(); } else r(o); }; q.onerror = ()=>r(o); });
+      all.forEach(([k, v])=>{ if(v && v.handle && !FH.has(k)) FH.set(k, v); });
+      if(all.length) setStatus(true);
+    }catch(err){}
+  })();
+  function fileTouch(){
+    const e = FH.get(store.current);
+    if(e && !e.dirty){ e.dirty = true; fhPut(store.current); setStatus(true); }
+  }
+  async function writeTo(h, blob){
+    if(h.requestPermission && (await h.requestPermission({mode:'readwrite'})) !== 'granted') throw new Error('o navegador não deixou gravar neste arquivo');
+    const w = await h.createWritable();
+    try{ await w.write(blob); await w.close(); }catch(err){ try{ await w.abort(); }catch(_){} throw err; }
+  }
+  // as = true: "Salvar como" (sempre pergunta). Devolve {cancel} | {how:'arquivo'|'baixado', name}
+  async function fileSave(as, kind, name){
+    const id = store.current, ent = FH.get(id);
+    save();
+    if(!as && ent){
+      const blob = await makeFile(kindOf(ent.name));
+      await writeTo(ent.handle, blob);
+      ent.t = Date.now(); ent.dirty = false; fhPut(id); setStatus(true);
+      return {how:'arquivo', name:ent.name};
+    }
+    const k0 = kind || (ent ? kindOf(ent.name) : 'docx'), T = FTYPES[k0];
+    const base = baseName(name || (ent ? ent.name : fileName(''))).replace(/[\\/:*?"<>|]+/g, '-').replace(/[. ]+$/, '') || 'documento';
+    // o arquivo é gerado ANTES de abrir a janela: se a geração falhar (ex.: sem internet para a biblioteca do .docx), não sobra arquivo vazio
+    const blob0 = await makeFile(k0);
+    if(!FS_SAVE()){
+      download(blob0, base + T.ext, T.mime);
+      return {how:'baixado', name:base + T.ext};
+    }
+    const types = [k0].concat(Object.keys(FTYPES).filter(x=>x !== k0)).map(k=>({description:FTYPES[k].desc, accept:{[FTYPES[k].mime]:[FTYPES[k].ext]}}));
+    let h;
+    try{ h = await window.showSaveFilePicker({id:'verbus', suggestedName:base + T.ext, types, excludeAcceptAllOption:true}); }
+    catch(err){
+      if(err && err.name === 'AbortError') return {cancel:true};
+      if(err && err.name === 'SecurityError') throw new Error('o arquivo demorou para ficar pronto e o navegador fechou a janela de salvar; clique em Salvar de novo (agora vai direto)');
+      if(err && err.name === 'TypeError'){ try{ h = await window.showSaveFilePicker({id:'verbus', suggestedName:'documento' + T.ext, types, excludeAcceptAllOption:true}); }catch(e2){ if(e2 && e2.name === 'AbortError') return {cancel:true}; throw e2; } }
+      else throw err;
+    }
+    const kf = kindOf(h.name);
+    await writeTo(h, kf === k0 ? blob0 : await makeFile(kf));
+    FH.set(id, {handle:h, name:h.name, t:Date.now(), dirty:false}); fhPut(id);
+    const tt = baseName(h.name);   // como no Word, o título do documento passa a ser o nome do arquivo
+    if(tt && tt !== title.value){ title.value = tt; save(); if(!$('side').hidden) renderSide(); }
+    setStatus(true);
+    return {how:'arquivo', name:h.name};
+  }
+  // devolve a mensagem para mostrar ('' se a pessoa cancelou)
+  async function fileDo(as, kind, name){
+    try{
+      const r = await fileSave(as, kind, name);
+      if(r.cancel) return '';
+      if(r.how === 'baixado'){
+        savedEl.textContent = 'Baixado: ' + r.name; savedEl.style.color = '';
+        return 'Arquivo baixado: ' + r.name + '. Este navegador não grava direto no arquivo (no Chrome ou no Edge do computador, sim).';
+      }
+      return 'Salvo em ' + r.name + ' às ' + hhmm() + '.';
+    }catch(err){
+      const m = 'Não foi possível salvar: ' + (err && err.message ? err.message : (err && err.type === 'error' ? 'não deu para carregar a biblioteca do .docx (verifique a internet ou salve como .doc)' : String(err)));
+      setStatus(false, m); return m;
+    }
+  }
+  window.__fileDo = fileDo;
 
   // Painel: documentos e estrutura
   function openDoc(id){
@@ -6996,7 +7134,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     [['recortar','cortar','control x','controle x','ctrl x'], ()=>{ restore(); document.execCommand('cut'); changed(); }],
     [['colar','control v','controle v','ctrl v'], ()=>$('btnPaste').click()],
     [['selecionar tudo','seleciona tudo','control a','controle a','ctrl a'], ()=>{ page.focus(); document.execCommand('selectAll'); }],
-    [['salvar','control s','controle s','ctrl s'], ()=>$('btnDocx').click()],
+    [['salvar','control s','controle s','ctrl s'], ()=>fileDo(false)],
     [['localizar','procurar','control f','controle f','ctrl f'], ()=>openFind()],
     [['imprimir','control p','controle p','ctrl p'], ()=>window.print()],
     [['centralizar','control e','controle e','ctrl e'], ()=>exec('justifyCenter')],
@@ -8204,7 +8342,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       return list;
       },
       abrir(){
-        const list = [act('📂', 'Procurar no computador', 'Abre arquivos .docx, .doc, .html ou .txt', ()=>closeThen(()=>$('fileOpen').click())), el('h2', {textContent:'Salvos neste navegador'})];
+        const list = [act('📂', 'Procurar no computador', 'Abre arquivos .docx, .doc, .html ou .txt', ()=>closeThen(()=>window.__abrirArquivo())), el('h2', {textContent:'Salvos neste navegador'})];
         Object.entries(store.docs).filter(([id, d])=>!d.modelo).sort((a,b)=>b[1].t - a[1].t).forEach(([id, d])=>{
           const name = (id === store.current ? title.value : d.title) || 'Sem título';
           const b = act('📝', name, fmtDate(d.t) + (id === store.current ? ' · aberto agora' : ''), ()=>{ close(false); openDoc(id); page.focus(); }, id === store.current);
@@ -8217,28 +8355,76 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         return list;
       },
       salvar(){
-        return [el('p', {className:'bsNote', textContent:'O Verbus já salva sozinho neste navegador enquanto você escreve.'}),
-          act('💾', 'Salvar neste navegador', 'Grava agora o documento aberto', ()=>{ save(); flushNow().then(()=>say('Salvo neste navegador às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) + '.')); }),
-          act('⬇', 'Baixar como .docx', 'Guarda uma cópia no seu computador (Ctrl+S)', ()=>{ $('btnDocx').click(); say('Gerando o arquivo…'); })];
+        const ent = FH.get(store.current), can = window.__fileFS();
+        const intro = ent ? 'Este documento está ligado ao arquivo “' + ent.name + '”. Salvar grava direto nele, sem baixar outra cópia (como no Word).'
+          : can ? 'Este documento ainda não está num arquivo do computador. Ao salvar, o Verbus abre a janela do sistema para você escolher a pasta e o nome.'
+          : 'Este navegador não deixa um site gravar direto no arquivo; Salvar baixa uma cópia (.docx). No Chrome ou no Edge do computador, Salvar grava no próprio arquivo.';
+        return [el('p', {className:'bsNote', textContent:intro}),
+          act('💾', ent ? 'Salvar em ' + ent.name : can ? 'Salvar…' : 'Baixar como .docx', 'Ctrl+S', async ()=>{ say('Salvando…'); const m = await window.__fileDo(false); go('salvar'); say(m); }),
+          act('📁', 'Salvar como…', 'Outra pasta, outro nome ou outro tipo (Ctrl+Shift+S)', ()=>go('salvarcomo')),
+          el('h2', {textContent:'Neste navegador'}),
+          el('p', {className:'bsNote', textContent:'O Verbus também guarda o documento sozinho neste navegador enquanto você escreve; ele aparece em “Abrir”.'}),
+          act('🗂', 'Salvar neste navegador agora', 'Grava já o documento aberto', ()=>{ save(); flushNow().then(()=>say('Salvo neste navegador às ' + hhmm() + '.')); })];
       },
       salvarcomo(){
-        const f = (ic, t, d, id)=>act(ic, t, d, ()=>{ $(id).click(); say('Gerando o arquivo…'); });
-        return [f('📘', 'Documento (.docx)', 'Formato aberto, compatível com vários editores', 'btnDocx'), f('📗', 'Documento (.doc)', 'Formato antigo, com cabeçalho e rodapé', 'btnDoc'),
-          f('🌐', 'Página da Web (.html)', 'Para abrir no navegador', 'btnHtml'), f('📃', 'Texto simples (.txt)', 'Só o texto, sem formatação', 'btnTxt')];
+        const ent = FH.get(store.current), can = window.__fileFS();
+        const nameIn = el('input', {type:'text', className:'bsName', value:baseName(ent ? ent.name : fileName(''))});
+        nameIn.setAttribute('aria-label', 'Nome do arquivo');
+        const typeSel = el('select'); typeSel.setAttribute('aria-label', 'Tipo de arquivo');
+        [['docx', 'Documento do Word (*.docx)'], ['doc', 'Documento do Word 97-2003 (*.doc)'], ['html', 'Página da Web (*.html)'], ['txt', 'Texto simples (*.txt)'], ['pdf', 'PDF (*.pdf) — pela janela de impressão']].forEach(o=>typeSel.append(el('option', {value:o[0], textContent:o[1]})));
+        typeSel.value = ent ? kindOf(ent.name) : 'docx';
+        const ok = el('button', {type:'button', className:'bsDo'});
+        const sync = ()=>{ ok.textContent = typeSel.value === 'pdf' ? 'Criar PDF…' : can ? 'Salvar…' : 'Baixar'; };
+        typeSel.onchange = sync; sync();
+        ok.onclick = async ()=>{
+          const nm = nameIn.value.trim() || 'documento';
+          if(typeSel.value === 'pdf'){ window.__pdfNome = nm; closeThen(()=>setTimeout(()=>window.print(), 150)); return; }
+          say('Salvando…'); const m = await window.__fileDo(true, typeSel.value, nm); go('salvarcomo'); say(m);
+        };
+        nameIn.onkeydown = e=>{ if(e.key === 'Enter'){ e.preventDefault(); ok.click(); } };
+        return [el('p', {className:'bsNote', textContent: can ? 'Escolha o nome e o tipo. Ao continuar, abre a janela do seu computador para você escolher a pasta.' : 'Este navegador baixa o arquivo na pasta de downloads (no Chrome ou no Edge do computador dá para escolher a pasta).'}),
+          el('h2', {textContent:'Nome do arquivo'}), nameIn, el('h2', {textContent:'Tipo'}), typeSel, el('div', {className:'bsDoRow'}, ok)];
       },
       imprimir(){
         const wrap = el('div', {className:'prWrap'}), set = el('div', {className:'prSet'}), prev = el('div', {className:'prPrev'});
         const doPrint = ()=>closeThen(()=>setTimeout(()=>window.print(), 150));
         const btn = el('button', {type:'button', className:'prBtn'}, el('span', {className:'ic', textContent:'🖨'}), el('span', {textContent:'Imprimir'}));
         const SIDEMSG = {um:'', frente:'Imprime só as folhas 1, 3, 5… Depois recoloque o papel impresso na bandeja, com a face certa para cima, e imprima a 2ª passada.', verso:'Imprime as folhas 2, 4, 6… em ordem inversa, para cair atrás das folhas já impressas na 1ª passada. Confira a posição do papel na sua impressora.'};
-        async function printCustom(){
-          const total = sheetCount(), list = [];
-          for(let i = 0; i < total; i++) list.push(i);
-          let use = list;
-          if(side === 'frente') use = list.filter(i=>i % 2 === 0);
-          if(side === 'verso') use = list.filter(i=>i % 2 === 1).reverse();
-          if(!use.length){ sideInfo.textContent = 'Com só ' + total + ' folha, não há folhas pares para a 2ª passada.'; return; }
-          const pgc = pgOf(), host = el('div', {id:'prNup'}), built = use.map(si=>buildSheet(si));
+        // "1-3, 5, 8-" -> índices de página (base 0); {err} se não der para entender
+        function parseRange(txt, N){
+          const parts = String(txt || '').split(/[;,]/).map(x=>x.trim()).filter(Boolean), got = new Set();
+          if(!parts.length) return {err:'Digite as páginas, por exemplo 1-3, 5, 8-.'};
+          for(const p of parts){
+            const m = /^(\d*)\s*(-)?\s*(\d*)$/.exec(p);
+            if(!m || (!m[1] && !m[3])) return {err:'Não entendi “' + p + '”. Use números e intervalos, como 1-3, 5, 8-.'};
+            let a, b;
+            if(!m[2]) a = b = parseInt(m[1], 10);
+            else{ a = m[1] ? parseInt(m[1], 10) : 1; b = m[3] ? parseInt(m[3], 10) : N; }
+            if(a < 1 || b < 1 || a > N || b > N) return {err:'O documento tem ' + N + ' página' + (N > 1 ? 's' : '') + '. Corrija “' + p + '”.'};
+            if(a > b){ const t = a; a = b; b = t; }
+            for(let i = a; i <= b; i++) got.add(i - 1);
+          }
+          return {pages:[...got].sort((x, y)=>x - y)};
+        }
+        // monta a lista de folhas a imprimir (intervalo, lados, cópias e agrupamento, como no Word)
+        function makeJob(){
+          const N = plan.length; let pages;
+          if(range === 'cur') pages = [Math.min(N - 1, nup > 1 ? pageNo * nup : pageNo)];
+          else if(range === 'custom'){ const r = parseRange(rangeIn.value, N); if(r.err) return {err:r.err}; pages = r.pages; }
+          else pages = Array.from({length:N}, (_, i)=>i);
+          let sheets = [];
+          for(let i = 0; i < pages.length; i += nup) sheets.push(pages.slice(i, i + nup));
+          const total = sheets.length;
+          if(side === 'frente') sheets = sheets.filter((_, i)=>i % 2 === 0);
+          if(side === 'verso') sheets = sheets.filter((_, i)=>i % 2 === 1).reverse();
+          if(!sheets.length) return {err: side === 'verso' ? 'Com só ' + total + ' folha, não há folhas pares para a 2ª passada.' : 'Não há nada para imprimir.'};
+          let out = sheets;
+          if(copies > 1) out = coll ? Array.from({length:copies}).flatMap(()=>sheets) : sheets.flatMap(x=>Array(copies).fill(x));
+          if(out.length > 300) return {err:'São ' + out.length + ' folhas de uma vez: é muita coisa. Deixe as cópias para a janela do navegador ou imprima em partes.'};
+          return {sheets:out, trivial: range === 'all' && nup === 1 && side === 'um' && copies === 1};
+        }
+        async function printCustom(sheets){
+          const pgc = pgOf(), host = el('div', {id:'prNup'}), built = sheets.map((idxs, si)=>buildSheet(si, idxs));
           built.forEach((b, k)=>{
             const x = b.el; x.style.cssText += ';position:relative;transform:none;left:auto;top:auto;width:' + Math.floor(geo.W) + 'px;height:' + (Math.floor(geo.H) - 1) + 'px;overflow:hidden;break-after:' + (k < built.length - 1 ? 'page' : 'auto') + ';box-shadow:none';
             host.append(x);
@@ -8251,7 +8437,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           addEventListener('afterprint', clean, {once:true});
           window.print();
         }
-        btn.onclick = ()=>{ if(nup === 1 && side === 'um') doPrint(); else printCustom(); };
+        btn.onclick = ()=>{
+          const job = makeJob();
+          if(job.err){ prMsg.textContent = job.err === rangeInfo.textContent ? 'Corrija o intervalo de páginas.' : job.err; prMsg.className = 'prInfo prErr'; return; }
+          prMsg.textContent = ''; prMsg.className = 'prInfo';
+          if(job.trivial) doPrint(); else printCustom(job.sheets);
+        };
         const row = (label, sel)=>{ const id = 'pr' + label.replace(/\W/g, ''); sel.id = id; return el('div', {className:'prRow'}, el('label', {htmlFor:id, textContent:label}), sel); };
         const sel = opts=>{ const s = el('select'); opts.forEach(o=>s.append(el('option', {value:o[0], textContent:o[1]}))); return s; };
         const selOri = sel([['p', 'Orientação Vertical (retrato)'], ['l', 'Orientação Horizontal (paisagem)']]);
@@ -8262,22 +8453,60 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         const sideInfo = el('p', {className:'prInfo'});
         const link = el('button', {type:'button', className:'prLink', textContent:'Configurar Página…'});
         const info = el('p', {className:'prInfo'});
-        set.append(btn,
+        let copies = 1, range = 'all', coll = true, zoom = null, fitK = 1;
+        const copIn = el('input', {type:'number', min:1, max:99, value:1, id:'prCopias'}); copIn.setAttribute('aria-label', 'Cópias');
+        const btnRow = el('div', {className:'prTop'}, btn, el('div', {className:'prCop'}, el('label', {htmlFor:'prCopias', textContent:'Cópias:'}), copIn));
+        const prMsg = el('p', {className:'prInfo'}); prMsg.setAttribute('role', 'alert');
+        const copInfo = el('p', {className:'prInfo'});
+        const selRange = sel([['all', 'Imprimir Todas as Páginas'], ['cur', 'Imprimir Página Atual'], ['custom', 'Intervalo Personalizado']]);
+        const rangeIn = el('input', {type:'text', placeholder:'Ex.: 1-3, 5, 8-', autocomplete:'off'});
+        const rangeRow = row('Páginas a imprimir', rangeIn); rangeRow.style.display = 'none';
+        const rangeInfo = el('p', {className:'prInfo'});
+        const selColl = sel([['1', 'Agrupado: 1,2,3  1,2,3  1,2,3'], ['0', 'Não agrupado: 1,1,1  2,2,2  3,3,3']]); selColl.disabled = true;
+        set.append(btnRow, prMsg, copInfo,
           el('h2', {textContent:'Impressora'}),
-          el('p', {className:'prInfo', textContent:'Cópias, intervalo de páginas e impressora são escolhidos na janela do navegador, que abre ao clicar em Imprimir. Para gerar um arquivo, escolha \"Salvar como PDF\" nela.'}),
-          el('h2', {textContent:'Definições'}),
-          row('Lados', selSide), sideInfo, row('Orientação', selOri), row('Tamanho do papel', selSize), row('Margens', selMar), row('Páginas por folha', selNup), link, info);
+          el('p', {className:'prInfo', textContent:'A impressora, a cor e a impressão frente e verso automática são escolhidas na janela do navegador, que abre ao clicar em Imprimir. Para gerar um arquivo, escolha “Salvar como PDF” nela.'}),
+          el('h2', {textContent:'Configurações'}),
+          row('Páginas', selRange), rangeRow, rangeInfo, row('Lados', selSide), sideInfo, row('Agrupamento', selColl), row('Orientação', selOri), row('Tamanho do papel', selSize), row('Margens', selMar), row('Páginas por folha', selNup), link, info);
+        const syncCop = ()=>{
+          selColl.disabled = copies < 2;
+          copInfo.textContent = copies > 1 ? 'O Verbus repete as folhas; deixe “Cópias” em 1 na janela do navegador para não multiplicar de novo.' : '';
+        };
+        const setCopies = ()=>{ copies = Math.max(1, Math.min(99, parseInt(copIn.value, 10) || 1)); syncCop(); prMsg.textContent = ''; };
+        copIn.oninput = setCopies; copIn.onchange = ()=>{ setCopies(); copIn.value = String(copies); };
+        const chkRange = ()=>{
+          rangeInfo.className = 'prInfo'; const N = plan.length;
+          if(range === 'cur') rangeInfo.textContent = 'Imprime a página ' + ((nup > 1 ? pageNo * nup : pageNo) + 1) + ', a que aparece na pré-visualização.';
+          else if(range === 'custom'){
+            const r = parseRange(rangeIn.value, N);
+            if(!rangeIn.value.trim()) rangeInfo.textContent = 'O documento tem ' + N + ' página' + (N > 1 ? 's' : '') + '. Separe com vírgula e use hífen para intervalos.';
+            else if(r.err){ rangeInfo.textContent = r.err; rangeInfo.className = 'prInfo prErr'; }
+            else rangeInfo.textContent = r.pages.length + ' página' + (r.pages.length > 1 ? 's' : '') + ' a imprimir.';
+          }else rangeInfo.textContent = '';
+        };
+        selRange.onchange = ()=>{ range = selRange.value; rangeRow.style.display = range === 'custom' ? '' : 'none'; chkRange(); prMsg.textContent = ''; if(range === 'custom') rangeIn.focus(); };
+        rangeIn.oninput = ()=>{ chkRange(); prMsg.textContent = ''; };
+        rangeIn.onkeydown = e=>{ if(e.key === 'Enter'){ e.preventDefault(); btn.click(); } };
+        selColl.onchange = ()=>{ coll = selColl.value === '1'; };
 
         // ---- pré-visualização ----
         const nav = el('div', {className:'prNav'});
         const bPrev = el('button', {type:'button', textContent:'◀', title:'Página anterior'}), bNext = el('button', {type:'button', textContent:'▶', title:'Próxima página'});
         const inp = el('input', {type:'text', inputMode:'numeric', value:'1'}); inp.setAttribute('aria-label', 'Página');
         const tot = el('span', {textContent:'de 1'});
-        nav.append(bPrev, inp, tot, bNext);
+        const zOut = el('button', {type:'button', textContent:'−', title:'Diminuir o zoom'}), zIn = el('button', {type:'button', textContent:'+', title:'Aumentar o zoom'}), zFit = el('button', {type:'button', textContent:'⤢', title:'Ajustar à página'});
+        const zr = el('input', {type:'range', min:10, max:200, step:5, value:50}), zl = el('span', {className:'prZl', textContent:'50%'});
+        zr.setAttribute('aria-label', 'Zoom da pré-visualização');
+        const zset = v=>{ zoom = Math.max(0.1, Math.min(2, v)); fit(); };
+        zOut.onclick = ()=>zset((zoom == null ? fitK : zoom) - 0.1); zIn.onclick = ()=>zset((zoom == null ? fitK : zoom) + 0.1);
+        zr.oninput = ()=>zset(parseInt(zr.value, 10) / 100); zFit.onclick = ()=>{ zoom = null; fit(); };
+        nav.append(bPrev, inp, tot, bNext, el('span', {className:'prZ'}, zOut, zr, zIn, zl, zFit));
         const box = el('div', {className:'prBox'}), paper = el('div', {className:'prPaper'}), ifr = el('iframe');
         ifr.setAttribute('sandbox', 'allow-same-origin'); ifr.setAttribute('title', 'Pré-visualização da página'); ifr.tabIndex = -1;
         const lyBack = el('div', {className:'prLy'}), lyFront = el('div', {className:'prLy'}), hdr = el('div', {className:'prHf'}), ftr = el('div', {className:'prHf'});
-        paper.append(lyBack, ifr, lyFront, hdr, ftr); box.append(paper); prev.append(box, nav);
+        paper.append(lyBack, ifr, lyFront, hdr, ftr); box.append(paper);
+        const scroll = el('div', {className:'prScroll'}, box); prev.append(scroll, nav);
+        scroll.addEventListener('wheel', e=>{ if(!e.ctrlKey) return; e.preventDefault(); zset((zoom == null ? fitK : zoom) + (e.deltaY < 0 ? 0.05 : -0.05)); }, {passive:false});
         wrap.append(set, prev);
 
         let plan = [0], pageNo = 0, cols = 1, shiftX = 0, geo = null, token = 0, nup = 1, side = 'um', lastHtml = '', curSheet = null, sheetSig = '';
@@ -8286,7 +8515,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         function fit(){
           if(!geo) return;
           const availW = Math.max(160, prev.clientWidth - 24), availH = Math.max(240, innerHeight - 250);
-          const k = Math.min(1, availW / geo.W, availH / geo.H);
+          fitK = Math.min(1, availW / geo.W, availH / geo.H); const k = zoom == null ? fitK : zoom;
+          zr.value = String(Math.round(k * 100)); zl.textContent = Math.round(k * 100) + '%';
           box.style.width = Math.round(geo.W * k) + 'px'; box.style.height = Math.round(geo.H * k) + 'px';
           [paper, curSheet].forEach(x=>{ if(x){ x.style.width = geo.W + 'px'; x.style.height = geo.H + 'px'; x.style.transform = 'scale(' + k + ')'; } });
         }
@@ -8316,12 +8546,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           fr.srcdoc = lastHtml;
           return {el:pp, ready};
         }
-        function buildSheet(si){
+        function buildSheet(si, idxs){
           const sh = el('div', {className:'prPaper nupSheet'}), W = geo.W, H = geo.H, g = NUP[nup] || [1,1], readies = [];
           sh.style.width = W + 'px'; sh.style.height = H + 'px';
           const pad = nup > 1 ? 0.6 * CMPX : 0, cellW = (W - 2 * pad) / g[0], cellH = (H - 2 * pad) / g[1], sc = nup > 1 ? Math.min(cellW / W, cellH / H) * 0.97 : 1;
           for(let k = 0; k < nup; k++){
-            const idx = si * nup + k; if(idx >= plan.length) break;
+            const idx = idxs ? idxs[k] : si * nup + k; if(idx == null || idx >= plan.length) break;
             const bp = buildPaper(idx), col = k % g[0], row = Math.floor(k / g[0]);
             // caixa já do tamanho reduzido (com corte), para a impressão não estender a página original além da folha
             const cellBox = el('div');
@@ -8362,7 +8592,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         }
         function showPage(n){
           const U = nup > 1 ? sheetCount() : plan.length;
-          pageNo = Math.max(0, Math.min(U - 1, n));
+          pageNo = Math.max(0, Math.min(U - 1, n)); chkRange();
           inp.value = String(pageNo + 1); tot.textContent = 'de ' + U; inp.setAttribute('aria-label', nup > 1 ? 'Folha' : 'Página');
           bPrev.disabled = pageNo === 0; bNext.disabled = pageNo >= U - 1;
           if(!geo) return;
@@ -8581,7 +8811,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     });
     $('btnFile').addEventListener('mousedown', e=>e.preventDefault());
     $('btnQSave').addEventListener('mousedown', e=>e.preventDefault());
-    $('btnQSave').addEventListener('click', ()=>$('btnDocx').click());
+    $('btnQSave').addEventListener('click', ()=>fileDo(false));
     let k0 = 'inicio'; try{ k0 = localStorage.getItem('verba:tab') || 'inicio'; }catch(e){}
     show(tabs.some(t=>t.dataset.tab === k0 && !t.hidden) ? k0 : 'inicio');
   })();
