@@ -297,7 +297,7 @@ dialog button:hover{background:var(--accent-soft)}
 #rList li .ra button{height:26px;font-size:12px}
 .dlgrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 
-/* Inserir (estilo Word): janelas, galerias, comentários, vídeo, WordArt */
+/* Inserir (estilo clássico): janelas, galerias, comentários, vídeo, Arte de Texto */
 .vdlg{width:min(560px,94vw)}
 .vdlg label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:13px;margin-bottom:8px}
 .vdlg label input[type=checkbox]{width:auto}
@@ -596,6 +596,10 @@ dialog input[type=number]{height:30px;border:1px solid var(--line);border-radius
 #tblDrawOv,#tblHint{position:fixed;z-index:1000;pointer-events:none;display:none}#tblDrawOv{border:2px dashed #1769c2;background:#1769c21c;box-sizing:border-box}#tblHint{left:50%;top:8px;transform:translateX(-50%);background:#16395f;color:#fff;padding:7px 12px;border-radius:4px;font:13px Arial;box-shadow:0 2px 8px #0004;white-space:nowrap}.tbl-draw{cursor:crosshair!important}.tbl-erase{cursor:pointer!important}#tDraw.on,#tErase.on{background:#dce9f8;border-color:#1769c2}#page.tbl-draw,#page.tbl-erase{user-select:none}
 .tPropTabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 12px}.tPropTabs button{padding:5px 9px;border:0;border-bottom:2px solid transparent;background:transparent;color:inherit;cursor:pointer}.tPropTabs button[aria-selected="true"]{border-color:var(--accent);font-weight:700}.tPropTabs+section{min-height:110px}
 #tblReorderHandle{position:fixed;z-index:9999;width:22px;height:22px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);box-shadow:0 1px 4px #0003;cursor:grab;font-size:15px;line-height:18px;touch-action:none}#tblReorderHandle.dragging{cursor:grabbing;background:var(--accent-soft)}
+.ixe{border-bottom:1px dotted #2b79c9}.idx p,.figidx p{text-indent:0;margin:0}.idx .ixl{display:flex;gap:6px}.idx .ixl .ixd,.figidx .ixd{flex:1;border-bottom:1px dotted #888;margin:0 4px 4px}@media print{.ixe{border:0}}
+.group[hidden]{display:none!important}
+.chkb .cbx{display:inline-block;width:12px;height:12px;border:1px solid #666;background:#fff;margin:0 3px 0 2px;position:relative;flex:none;box-sizing:border-box}.chkb.on .cbx::after{content:"";position:absolute;left:3px;top:0;width:3px;height:7px;border:solid #2b579a;border-width:0 2px 2px 0;transform:rotate(40deg)}.vwb.on{background:#cfd4da;border-color:#a8adb5}body.vread #tabs,body.vread #toolbar,body.vread #side,body.vread #rulerWrap,body.vread #vruler,body.vread #minibar{display:none!important}body.vweb #rulerWrap,body.vweb #vruler,body.vweb #pgOv,body.vweb #hdr,body.vweb #ftr,body.vweb #hfBack,body.vweb #hfFront,body.vdraft #pgOv,body.vdraft #hdr,body.vdraft #ftr,body.vdraft #hfBack,body.vdraft #hfFront{display:none!important}body.pggrid #page{background-image:linear-gradient(rgba(120,140,170,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(120,140,170,.35) 1px,transparent 1px);background-size:1cm 1cm}#vExit{position:fixed;top:10px;right:18px;z-index:60;padding:6px 14px;border:1px solid #2b579a;background:#2b579a;color:#fff;border-radius:4px;cursor:pointer;font:13px "Segoe UI",Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25)}@media print{body.pggrid #page{background-image:none}#vExit{display:none}}
+.rb[disabled],.rb[disabled] *{opacity:.5;pointer-events:none}::highlight(mcf){background:#ffe58a;color:inherit}#mcPv{position:fixed;right:18px;top:150px;width:min(520px,46vw);max-height:68vh;overflow:auto;background:#fff;color:#222;border:1px solid #8a8f98;box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:55}#mcPv .mph{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#2b579a;color:#fff;position:sticky;top:0}#mcPv .mph button{background:none;border:0;color:#fff;cursor:pointer;font-size:14px}#mcPvB{padding:18px 22px}#mcPvB p{margin:0 0 .6em}@media print{#mcPv{display:none}}
 </style>
 <style id="pgStyle"></style>
 <style id="word16">
@@ -1122,9 +1126,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       <button id="btnImg" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Imagens: inserir uma imagem do computador (ou no cabeçalho/rodapé). Depois escolha a disposição: alinhada, quadrado, acima e abaixo, atrás ou na frente do texto"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4.5" y="6.5" width="23" height="19" fill="#fff" stroke="#777"/><circle cx="21" cy="12" r="2.2" fill="#f2c36b" stroke="none"/><path d="M5 25l7-9 5 5 4-4 6 8z" fill="#5b9bd5" stroke="none"/></svg><span>Imagens <i class="car"></i></span></button>
       <button id="btnImgOn" type="button" class="rb bigb lyb two" aria-haspopup="dialog" title="Imagens Online: inserir uma imagem a partir do endereço (URL) dela na internet"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="5.5" width="20" height="16" fill="#fff" stroke="#777"/><path d="M4 21l6-7 4 4 3-3 6 6z" fill="#5b9bd5" stroke="none"/><circle cx="22" cy="22" r="6" fill="#e8f1fb" stroke="#2b79c9"/><path d="M16 22h12M22 16v12M18 18.5c2 1.5 6 1.5 8 0M18 25.5c2-1.5 6-1.5 8 0" stroke="#2b79c9" stroke-width=".9"/></svg><span>Imagens<br>Online</span></button>
       <button id="btnShapes" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Formas: retângulos, setas, estrelas, balões e linhas"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="21" r="7" fill="#9dc3e6" stroke="#2f528f"/><path d="M21 4l8 14H13z" fill="#ffd966" stroke="#bf9000"/><rect x="14" y="18" width="12" height="10" fill="#a9d18e" stroke="#548235"/></svg><span>Formas <i class="car"></i></span></button>
-      <button id="btnSmart" type="button" class="rb bigb lyb two" aria-haspopup="dialog" title="SmartArt: lista, processo, ciclo, hierarquia, pirâmide e matriz"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="11" y="3.5" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><rect x="3.5" y="21" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><rect x="18.5" y="21" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><path d="M16 10.5v5M8.5 21v-5.5h15V21" stroke="#2f528f"/></svg><span>SmartArt</span></button>
+      <button id="btnSmart" type="button" class="rb bigb lyb two" aria-haspopup="dialog" title="Diagrama: lista, processo, ciclo, hierarquia, pirâmide e matriz"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="11" y="3.5" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><rect x="3.5" y="21" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><rect x="18.5" y="21" width="10" height="7" fill="#9dc3e6" stroke="#2f528f"/><path d="M16 10.5v5M8.5 21v-5.5h15V21" stroke="#2f528f"/></svg><span>Diagrama</span></button>
       <button id="btnChart" type="button" class="rb bigb lyb two" aria-haspopup="dialog" title="Gráfico: colunas, barras, linhas ou pizza a partir de uma tabela de dados"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 4v23.5H28" stroke="#777"/><rect x="8" y="16" width="5" height="11" fill="#4472c4" stroke="none"/><rect x="15" y="9" width="5" height="18" fill="#ed7d31" stroke="none"/><rect x="22" y="13" width="5" height="14" fill="#a5a5a5" stroke="none"/></svg><span>Gráfico</span></button>
-      <button id="btnSnap" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Instantâneo: captura a tela ou uma janela e permite recortar"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="8.5" width="22" height="16" rx="1.5" fill="#fff" stroke="#777"/><circle cx="14.5" cy="16.5" r="4.5" fill="#cfe3f7" stroke="#2b79c9"/><path d="M24 3v8M20 7h8" stroke="#2b79c9" stroke-width="2"/></svg><span>Instantâneo <i class="car"></i></span></button>
+      <button id="btnSnap" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Captura de Tela: captura a tela ou uma janela e permite recortar"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="8.5" width="22" height="16" rx="1.5" fill="#fff" stroke="#777"/><circle cx="14.5" cy="16.5" r="4.5" fill="#cfe3f7" stroke="#2b79c9"/><path d="M24 3v8M20 7h8" stroke="#2b79c9" stroke-width="2"/></svg><span>Captura de Tela <i class="car"></i></span></button>
       <div class="lyhid" hidden>
         <button id="btnImgHF" title="Inserir imagem no cabeçalho (a margem de cima cresce se precisar)">Imagem no cabeçalho</button>
         <button id="btnImgFT" title="Inserir imagem no rodapé (a margem de baixo cresce se precisar)">Imagem no rodapé</button>
@@ -1173,9 +1177,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </div><div class="gl">Cabeçalho e Rodapé</div></div>
     <div class="group" role="group" aria-label="Texto"><div class="gb cols">
       <button id="btnTbx" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Caixa de texto: um quadro com borda para destacar um trecho, avisos ou barras laterais. Se houver texto selecionado, ele vai para dentro da caixa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4.5" y="6.5" width="23" height="19" rx="1.5"/><path d="M9 12h14M9 16h14M9 20h8" stroke-linecap="round"/></svg><span>Caixa de<br>Texto <i class="car"></i></span></button>
-      <button id="btnQuick" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Partes Rápidas: guarde trechos que você usa sempre e insira com um clique"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff" stroke="#777"/><rect x="10" y="10" width="12" height="7" fill="#f2c36b" stroke="#b58b3a"/><path d="M10 21h12M10 25h8" stroke="#999"/></svg><span>Partes<br>Rápidas <i class="car"></i></span></button>
+      <button id="btnQuick" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Blocos de Texto: guarde trechos que você usa sempre e insira com um clique"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v21h-17z" fill="#fff" stroke="#777"/><rect x="10" y="10" width="12" height="7" fill="#f2c36b" stroke="#b58b3a"/><path d="M10 21h12M10 25h8" stroke="#999"/></svg><span>Partes<br>Rápidas <i class="car"></i></span></button>
       <button id="btnCampos" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Campos de preenchimento: caixa de seleção, texto, data e lista suspensa"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="9" height="9" fill="#fff" stroke="#777"/><path d="M6 9.5l2 2 3.5-4.5" stroke="#2b79c9" stroke-width="1.6" fill="none"/><rect x="16" y="6" width="12" height="7" fill="#eef3fb" stroke="#777"/><rect x="4" y="19" width="24" height="7" fill="#eef3fb" stroke="#777"/><path d="M22 21.5l2 2 2-2" stroke="#777" fill="none"/></svg><span>Campos <i class="car"></i></span></button>
-      <button id="btnWordArt" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="WordArt: texto decorativo com cor, contorno e sombra"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="5" y="27" font-size="28" font-style="italic" font-weight="700" font-family="Georgia,serif" fill="#9dc3e6" stroke="none">A</text><text x="3" y="25" font-size="28" font-style="italic" font-weight="700" font-family="Georgia,serif" fill="#2b79c9" stroke="none">A</text></svg><span>WordArt <i class="car"></i></span></button>
+      <button id="btnWordArt" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Arte de Texto: texto decorativo com cor, contorno e sombra"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="5" y="27" font-size="28" font-style="italic" font-weight="700" font-family="Georgia,serif" fill="#9dc3e6" stroke="none">A</text><text x="3" y="25" font-size="28" font-style="italic" font-weight="700" font-family="Georgia,serif" fill="#2b79c9" stroke="none">A</text></svg><span>Arte de Texto <i class="car"></i></span></button>
       <button id="btnDrop" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Letra Capitular: letra grande no início do parágrafo"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="5" width="9" height="12" fill="#e8f1fb" stroke="#2b79c9"/><text x="6.2" y="15.5" font-size="12" font-weight="700" fill="#2b79c9" stroke="none" font-family="Georgia,serif">A</text><path d="M17 7h10M17 11h10M17 15h10M5 21h22M5 25h22" stroke="#999"/></svg><span>Letra<br>Capitular <i class="car"></i></span></button>
       <div class="stack lystack">
         <button type="button" class="rb sm lysm" id="btnSign" aria-haspopup="dialog" title="Linha de Assinatura: espaço para assinar, com nome e cargo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 11c2.5-6 3.5 2 5.5-3s2 3 3.5-1" stroke="#2b79c9"/><path d="M1.5 14h13" stroke="#777"/></svg><span>Linha de Assinatura</span></button>
@@ -1261,25 +1265,19 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </div><div class="gl">Tabela</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-referencias" data-tab="referencias" aria-labelledby="tab-referencias" hidden>
-    <div class="group" role="group" aria-label="Sumário e Legendas"><div class="gb">
-      <select id="abntIns" title="Inserir elemento ABNT">
-      <option value="" selected disabled hidden>Inserir…</option>
-      <option value="capa">Capa</option><option value="rosto">Folha de rosto</option>
-      <option value="resumo">Resumo</option><option value="sumario">Sumário</option>
-      <option value="Figura">Legenda de figura</option><option value="Tabela">Legenda de tabela</option><option value="Quadro">Legenda de quadro</option>
-    </select>
-    </div><div class="gl">Sumário e Legendas</div></div>
-    <div class="group" role="group" aria-label="Títulos"><div class="gb">
-      <select id="block" title="Estilo do parágrafo">
+    <div class="group" role="group" aria-label="Sumário"><div class="gb cols"><button id="btnToc" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Sumário: insere o sumário automático (ABNT) ou elementos como capa, folha de rosto e resumo"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 11h10M11 15h10M11 19h7" stroke="#2b79c9"/></svg><span>Sumário <i class="car"></i></span></button><div class="stack lystack lywide"><button id="btnTocAdd" type="button" class="rb sm lysm" aria-haspopup="menu" aria-expanded="false" title="Define o nível do título do parágrafo atual (Título 1, 2 ou 3) para entrar no sumário"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 9h5" stroke="#666"/><path d="M1 12.5h5M3.5 10v5" stroke="#2f8f4e"/></svg><span>Adicionar Texto</span><i class="car"></i></button><button id="btnTocUpd" type="button" class="rb sm lysm" title="Atualiza o sumário com os títulos atuais do documento"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 9h5" stroke="#666"/><path d="M11 12a3 3 0 1 1-1-2.2M11.5 8v2h-2" stroke="#d13438"/></svg><span>Atualizar Sumário</span></button></div></div><div class="gl">Sumário</div></div><div class="group" role="group" aria-label="Elementos ABNT e títulos" hidden><div class="gb"><select id="block" title="Estilo do parágrafo">
       <option value="p">Normal</option>
       <option value="h1">Título 1</option>
       <option value="h1sn">Título sem número</option>
       <option value="h2">Título 2</option>
       <option value="h3">Título 3</option>
       <option value="blockquote">Citação longa (ABNT)</option>
-    </select>
-      <button id="btnNum" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button>
-    </div><div class="gl">Títulos</div></div>
+    </select><select id="abntIns" title="Inserir elemento ABNT">
+      <option value="" selected disabled hidden>Inserir…</option>
+      <option value="capa">Capa</option><option value="rosto">Folha de rosto</option>
+      <option value="resumo">Resumo</option><option value="sumario">Sumário</option>
+      <option value="Figura">Legenda de figura</option><option value="Tabela">Legenda de tabela</option><option value="Quadro">Legenda de quadro</option>
+    </select><button id="btnNum" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button></div></div>
     <div class="group" role="group" aria-label="Notas de Rodapé"><div class="gb cols">
       <button id="btnFn" type="button" class="rb bigb lyb two" title="Inserir nota de rodapé (Ctrl+Alt+F): fica no pé da página"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="3" y="25" font-size="15" font-family="Segoe UI,Arial,sans-serif" fill="#666" stroke="none">AB</text><text x="21" y="12" font-size="10" font-family="Segoe UI,Arial,sans-serif" fill="#d13438" stroke="none">1</text></svg><span>Inserir Nota<br>de Rodapé</span></button>
       <div class="stack lystack lywide">
@@ -1297,31 +1295,17 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       </div>
       <div class="lyhid" hidden><button id="btnRefUpd" type="button" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar</button></div>
     </div><div class="gl">Citações e Bibliografia</div></div>
+    <div class="group" role="group" aria-label="Legendas"><div class="gb cols"><button id="btnCap" type="button" class="rb bigb lyb two" title="Inserir Legenda: Figura, Tabela ou Quadro (ABNT)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="4" width="22" height="16" rx="1" fill="#fff"/><path d="M8 17l5-6 4 4 3-3 4 5" stroke="#2f8f4e"/><path d="M8 25h16" stroke="#2b79c9" stroke-width="2"/></svg><span>Inserir<br>Legenda</span></button><div class="stack lystack lywide"><button id="btnFigIdx" type="button" class="rb sm lysm" title="Lista de ilustrações (figuras, tabelas ou quadros), com a página de cada legenda"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#2b79c9"/></svg><span>Inserir Índice de Ilustrações</span></button><button id="btnFigUpd" type="button" class="rb sm lysm" title="Atualiza as listas de ilustrações do documento"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff" stroke="#999"/><path d="M5.5 6h5M5.5 9h5" stroke="#999"/></svg><span>Atualizar Tabela</span></button><button id="btnXref2" type="button" class="rb sm lysm" title="Referência Cruzada: título, indicador ou nota"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h8v6H2z" fill="#fff"/><path d="M6 9v3h7" stroke="#d13438"/><path d="M11 10l2.5 2-2.5 2" stroke="#d13438"/></svg><span>Referência Cruzada</span></button></div></div><div class="gl">Legendas</div></div>
+    <div class="group" role="group" aria-label="Índice"><div class="gb cols"><button id="btnIdxMark" type="button" class="rb bigb lyb two" title="Marca o texto selecionado como entrada do índice remissivo"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M16 12v10M11 17h10" stroke="#2f8f4e" stroke-width="2.2"/></svg><span>Marcar<br>Entrada</span></button><div class="stack lystack lywide"><button id="btnIdxIns" type="button" class="rb sm lysm" title="Insere o índice remissivo (ordem alfabética, com a página de cada entrada)"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 5h5M5.5 7.5h5M5.5 10h5M5.5 12.5h3" stroke="#2b79c9"/></svg><span>Inserir Índice</span></button><button id="btnIdxUpd" type="button" class="rb sm lysm" title="Atualiza o índice remissivo"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff" stroke="#999"/><path d="M5.5 6h5M5.5 9h5" stroke="#999"/></svg><span>Atualizar Índice</span></button></div></div><div class="gl">Índice</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
-    <div class="group" role="group" aria-label="Correspondência oficial"><div class="gb">
-      <button id="cmOficio" title="Insere um ofício (número, data, destinatário, assunto, vocativo, texto, fecho e assinatura)">Ofício</button>
-      <button id="cmMemo" title="Insere um memorando (De, Para, Assunto, texto e assinatura)">Memorando</button>
-      <button id="cmDecl" title="Insere uma declaração para os devidos fins">Declaração</button>
-      <button id="cmCarta" title="Insere uma carta formal">Carta</button>
-      <button id="cmReq" title="Insere um requerimento">Requerimento</button>
-    </div><div class="gl">Correspondência oficial</div></div>
-    <div class="group" role="group" aria-label="Partes da carta"><div class="gb">
-      <button id="cmData" title="Insere local e data de hoje, alinhados à direita">Local e data</button>
-      <button id="cmDest" title="Insere o bloco do destinatário (Ao Senhor… cargo, órgão, cidade)">Destinatário</button>
-      <button id="cmAssunto" title="Insere a linha Assunto:">Assunto</button>
-      <button id="cmVoc" title="Insere o vocativo (Senhor(a) …,)">Vocativo</button>
-      <button id="cmFecho" title="Insere o fecho (Atenciosamente,)">Fecho</button>
-      <button id="cmAssin" title="Insere a assinatura com o seu nome, cargo e órgão">Assinatura</button>
-    </div><div class="gl">Partes da carta</div></div>
-    <div class="group" role="group" aria-label="Remetente"><div class="gb">
-      <button id="cmRem" title="Nome, cargo/registro, órgão e cidade usados na assinatura e no local e data">Remetente…</button>
-    </div><div class="gl">Remetente</div></div>
-    <div class="group" role="group" aria-label="Mala direta"><div class="gb">
-      <button id="mcOpen" title="Cole uma lista de destinatários (planilha) e gere uma carta para cada um">Destinatários…</button>
-      <select id="mcCampo" title="Insere um campo da lista, como {{Nome}}, no texto"><option value="">Inserir campo</option></select>
-      <button id="mcGen" title="Cria um novo documento com uma página para cada destinatário da lista">Gerar cartas</button>
-    </div><div class="gl">Mala direta</div></div>
+    <div class="group" role="group" aria-label="Criar"><div class="gb cols"><button id="mcEnv" type="button" class="rb bigb lyb two" title="Envelopes: insere um envelope com o remetente e o destinatário"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="8" width="26" height="17" fill="#fff"/><path d="M3 8l13 10 13-10" stroke="#666"/><path d="M6 21h6" stroke="#2b79c9"/></svg><span>Envelopes</span></button><button id="mcEti" type="button" class="rb bigb lyb two" title="Etiquetas: monta uma folha de etiquetas com a lista de destinatários"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="11" height="9" fill="#fff"/><rect x="17" y="5" width="11" height="9" fill="#fff"/><rect x="4" y="17" width="11" height="9" fill="#fff"/><rect x="17" y="17" width="11" height="9" fill="#fff"/><path d="M6.5 8.5h6M6.5 11h4M19.5 8.5h6M19.5 11h4" stroke="#2b79c9"/></svg><span>Etiquetas</span></button></div><div class="gl">Criar</div></div>
+    <div class="group" role="group" aria-label="Iniciar Mala Direta"><div class="gb cols"><button id="mcIni" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Iniciar Mala Direta: escreva uma carta com campos e gere uma página para cada destinatário"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 12h10M11 16h10M11 20h6" stroke="#666"/><path d="M20 22l4 4 5-7" stroke="#2f8f4e" stroke-width="2"/></svg><span>Iniciar Mala<br>Direta <i class="car"></i></span></button><button id="mcSel" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Selecionar Destinatários: digitar ou colar uma lista, ou abrir um arquivo .csv"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="24" height="20" fill="#fff"/><path d="M4 11h24" stroke="#2b79c9"/><circle cx="12" cy="17" r="2.6" fill="#fff" stroke="#2b79c9"/><circle cx="20" cy="17" r="2.6" fill="#fff" stroke="#2f8f4e"/><path d="M8 23c1-3 7-3 8 0M16 23c1-3 7-3 8 0" stroke="#666"/></svg><span>Selecionar<br>Destinatários <i class="car"></i></span></button><button id="mcOpen" type="button" class="rb bigb lyb two" title="Editar Lista de Destinatários: cole a lista de uma planilha (primeira linha = nomes dos campos)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="24" height="20" fill="#fff"/><path d="M4 11h24M11 5v20" stroke="#999"/><path d="M19 22l7-7 2 2-7 7h-2z" stroke="#d13438"/></svg><span>Editar Lista de<br>Destinatários</span></button></div><div class="gl">Iniciar Mala Direta</div></div>
+    <div class="group" role="group" aria-label="Gravar e Inserir Campos"><div class="gb cols"><button id="mcHl" type="button" class="rb bigb lyb two" title="Realçar Campos de Mesclagem: marca em amarelo os campos {{assim}} do texto"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><rect x="11" y="11" width="10" height="5" fill="#ffe58a" stroke="#c9a400"/><path d="M11 20h10M11 23h6" stroke="#999"/></svg><span>Realçar Campos<br>de Mesclagem</span></button><button id="mcBloco" type="button" class="rb bigb lyb two" title="Bloco de Endereço: insere nome, endereço e cidade como campos"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 11h10M11 14.5h10M11 18h7" stroke="#2b79c9"/><path d="M11 22h5" stroke="#999"/></svg><span>Bloco de<br>Endereço</span></button><button id="mcSaud" type="button" class="rb bigb lyb two" title="Linha de Saudação: insere “Prezado(a) {{Nome}},”"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 12h6" stroke="#2b79c9" stroke-width="2"/><path d="M11 17h10M11 21h7" stroke="#999"/></svg><span>Linha de<br>Saudação</span></button><button id="mcCampoBtn" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" data-needs="1" disabled title="Inserir Campo de Mesclagem: coloca um campo da lista no texto"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 10h10" stroke="#999"/><rect x="11" y="14" width="10" height="5" fill="#fff" stroke="#2b79c9"/><path d="M11 23h8" stroke="#999"/></svg><span>Inserir Campo de<br>Mesclagem <i class="car"></i></span></button></div><div class="gl">Gravar e Inserir Campos</div></div>
+    <div class="group" role="group" aria-label="Visualizar Resultados"><div class="gb cols"><button id="mcPrev" type="button" class="rb bigb lyb two" data-needs="1" disabled title="Visualizar Resultados: mostra a carta com os dados de cada destinatário (o documento não é alterado)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 16c4-7 8-9 13-9s9 2 13 9c-4 7-8 9-13 9S7 23 3 16z" fill="#fff"/><circle cx="16" cy="16" r="4.5" fill="#fff" stroke="#2b79c9"/></svg><span>Visualizar<br>Resultados</span></button><div class="stack lystack lywide"><div class="mcnav" style="display:flex;align-items:center;gap:2px;height:23px"><button id="mcFirst" type="button" class="rb sm" data-needs="1" disabled title="Primeiro registro" aria-label="Primeiro registro">|◀</button><button id="mcPrevB" type="button" class="rb sm" data-needs="1" disabled title="Registro anterior" aria-label="Registro anterior">◀</button><input id="mcNum" type="number" min="1" value="1" data-needs="1" disabled aria-label="Número do registro" style="width:44px;height:18px;font-size:12px"><button id="mcNextB" type="button" class="rb sm" data-needs="1" disabled title="Próximo registro" aria-label="Próximo registro">▶</button><button id="mcLast" type="button" class="rb sm" data-needs="1" disabled title="Último registro" aria-label="Último registro">▶|</button></div><button id="mcFind" type="button" class="rb sm lysm" data-needs="1" disabled title="Localizar Destinatário: procura um nome na lista"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6.5" cy="6.5" r="4" fill="#fff"/><path d="M9.5 9.5L14 14" stroke="#666"/></svg><span>Localizar Destinatário</span></button><button id="mcErr" type="button" class="rb sm lysm" data-needs="1" disabled title="Verificar Erros: confere campos que não existem na lista e dados em branco"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 9l2 2 3.5-4" stroke="#2f8f4e"/></svg><span>Verificar Erros</span></button></div></div><div class="gl">Visualizar Resultados</div></div>
+    <div class="group" role="group" aria-label="Concluir"><div class="gb cols"><button id="mcFin" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" data-needs="1" disabled title="Concluir e Mesclar: cria um documento com uma página para cada destinatário, ou imprime"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M12 18h10M18 14l4 4-4 4" stroke="#2b79c9" stroke-width="2"/></svg><span>Concluir e<br>Mesclar <i class="car"></i></span></button></div><div class="gl">Concluir</div></div>
+    <div class="group" role="group" aria-label="Modelos"><div class="gb cols"><button id="mcMod" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Ofício, Memorando, Declaração, Carta e Requerimento"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 11h10M11 15h10M11 19h5" stroke="#666"/><path d="M20 21l5-5" stroke="#2b79c9" stroke-width="2"/></svg><span>Modelos de<br>Documento <i class="car"></i></span></button><button id="mcPartes" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Local e data, Destinatário, Assunto, Vocativo, Fecho e Assinatura"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 10h6M11 14h10M11 18h10M11 22h4" stroke="#666"/></svg><span>Partes da<br>Carta <i class="car"></i></span></button><div class="stack lystack lywide"><button id="mcRemB" type="button" class="rb sm lysm" title="Nome, cargo/registro, órgão e cidade usados na assinatura e no local e data"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5.5" r="2.6" fill="#fff"/><path d="M3 14c.8-4 9.2-4 10 0" stroke="#666"/></svg><span>Remetente…</span></button></div></div><div class="gl">Modelos</div></div>
+    <div class="group" role="group" aria-label="Comandos internos" hidden><div class="gb"><button id="cmOficio" title="Insere um ofício (número, data, destinatário, assunto, vocativo, texto, fecho e assinatura)">Ofício</button><button id="cmMemo" title="Insere um memorando (De, Para, Assunto, texto e assinatura)">Memorando</button><button id="cmDecl" title="Insere uma declaração para os devidos fins">Declaração</button><button id="cmCarta" title="Insere uma carta formal">Carta</button><button id="cmReq" title="Insere um requerimento">Requerimento</button><button id="cmData" title="Insere local e data de hoje, alinhados à direita">Local e data</button><button id="cmDest" title="Insere o bloco do destinatário (Ao Senhor… cargo, órgão, cidade)">Destinatário</button><button id="cmAssunto" title="Insere a linha Assunto:">Assunto</button><button id="cmVoc" title="Insere o vocativo (Senhor(a) …,)">Vocativo</button><button id="cmFecho" title="Insere o fecho (Atenciosamente,)">Fecho</button><button id="cmAssin" title="Insere a assinatura com o seu nome, cargo e órgão">Assinatura</button><button id="cmRem" title="Nome, cargo/registro, órgão e cidade usados na assinatura e no local e data">Remetente…</button><button id="mcGen" title="Cria um novo documento com uma página para cada destinatário da lista">Gerar cartas</button><select id="mcCampo" title="Insere um campo da lista, como {{Nome}}, no texto"><option value="">Inserir campo</option></select></div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-revisao" data-tab="revisao" aria-labelledby="tab-revisao" hidden>
     <div class="group" role="group" aria-label="Revisão de Texto"><div class="gb">
@@ -1341,16 +1325,12 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </div><div class="gl">Fala</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-exibir" data-tab="exibir" aria-labelledby="tab-exibir" hidden>
-    <div class="group" role="group" aria-label="Zoom"><div class="gb">
-      <select id="zoom" title="Zoom"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.1" selected>110%</option><option value="1.25">125%</option><option value="1.5">150%</option></select>
-    </div><div class="gl">Zoom</div></div>
-    <div class="group" role="group" aria-label="Mostrar"><div class="gb">
-      <button id="btnRuler" title="Mostrar/ocultar régua" class="on">Régua</button>
-      <button id="btnSide" title="Mostrar/ocultar o painel de documentos e estrutura">Painel de Navegação</button>
-    </div><div class="gl">Mostrar</div></div>
-    <div class="group" role="group" aria-label="Modo"><div class="gb">
-      <button id="btnTheme" title="Alternar tema claro/escuro">Tema</button>
-    </div><div class="gl">Modo</div></div>
+    <div class="group" role="group" aria-label="Modos de Exibição"><div class="gb cols"><button id="btnVwRead" type="button" class="rb bigb lyb two vwb " title="Modo de Leitura: esconde a faixa de opções e deixa só o texto, para ler (Esc sai)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 8c4-2 8-2 12 1 4-3 8-3 12-1v17c-4-2-8-2-12 1-4-3-8-3-12-1z" fill="#fff"/><path d="M16 9v17" stroke="#2b79c9"/></svg><span>Modo de<br>Leitura</span></button><button id="btnVwPrint" type="button" class="rb bigb lyb two vwb on" title="Layout de Impressão: a folha como sai no papel, com margens e páginas"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7" y="3.5" width="18" height="24" fill="#fff"/><path d="M11 10h10M11 14h10M11 18h10M11 22h6" stroke="#666"/></svg><span>Layout de<br>Impressão</span></button><button id="btnVwWeb" type="button" class="rb bigb lyb two vwb " title="Layout da Web: texto na largura da janela, sem réguas, cabeçalho e rodapé"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="4" width="22" height="22" fill="#fff"/><circle cx="21" cy="21" r="6" fill="#fff" stroke="#2b79c9"/><path d="M15 21h12M21 15c-3 3-3 9 0 12M21 15c3 3 3 9 0 12" stroke="#2b79c9"/><path d="M9 9h10M9 13h6" stroke="#666"/></svg><span>Layout<br>da Web</span></button><div class="stack lystack lywide"><button id="btnVwOutline" type="button" class="rb sm lysm " title="Estrutura de Tópicos: abre o painel com os títulos do documento"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 3.5h11M5 7h8.5M7.5 10.5h6M2.5 14h5" stroke="#666"/></svg><span>Estrutura de Tópicos</span></button><button id="btnVwDraft" type="button" class="rb sm lysm " title="Rascunho: só o texto, sem cabeçalho, rodapé e marcas de página"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h5" stroke="#666"/></svg><span>Rascunho</span></button></div></div><div class="gl">Modos de Exibição</div></div>
+    <div class="group" role="group" aria-label="Mostrar"><div class="gb cols"><div class="stack lystack lywide"><button id="btnRuler" type="button" class="rb sm lysm chkb on" title="Mostrar/ocultar régua"><i class="cbx"></i><span>Régua</span></button><button id="btnGridPg" type="button" class="rb sm lysm chkb" title="Linhas de grade de 1 cm sobre a folha (só na tela, não saem na impressão)"><i class="cbx"></i><span>Linhas de Grade</span></button><button id="btnSide" type="button" class="rb sm lysm chkb" title="Mostrar/ocultar o painel de documentos e estrutura"><i class="cbx"></i><span>Painel de Navegação</span></button></div></div><div class="gl">Mostrar</div></div>
+    <div class="group" role="group" aria-label="Zoom"><div class="gb cols"><button id="btnZoomDlg" type="button" class="rb bigb lyb two vwb " title="Zoom: digite a porcentagem desejada"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="14" cy="14" r="8" fill="#fff"/><path d="M20 20l8 8" stroke-width="2.6"/></svg><span>Zoom</span></button><button id="btnZ100" type="button" class="rb bigb lyb two vwb " title="Zoom de 100%"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7" y="3.5" width="18" height="24" fill="#fff"/><text x="9.5" y="21" font-size="9" font-family="Segoe UI,Arial,sans-serif" fill="#2b79c9" stroke="none">100</text></svg><span>100%</span></button><div class="stack lystack lywide"><button id="btnZOne" type="button" class="rb sm lysm " title="Uma Página: a folha inteira na janela"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h9v13h-9z" fill="#fff"/></svg><span>Uma Página</span></button><button id="btnZMany" type="button" class="rb sm lysm " title="Várias Páginas: reduz o zoom para ver mais de uma folha"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 3.5h5v9h-5zM9.5 3.5h5v9h-5z" fill="#fff"/></svg><span>Várias Páginas</span></button><button id="btnZWide" type="button" class="rb sm lysm " title="Largura da Página: a folha ocupa a largura da janela"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3.5h12v9H2z" fill="#fff"/><path d="M4 8h8M4 8l1.6-1.4M4 8l1.6 1.4M12 8l-1.6-1.4M12 8l-1.6 1.4" stroke="#2b79c9"/></svg><span>Largura da Página</span></button></div></div><div class="gl">Zoom</div></div>
+    <div class="group" role="group" aria-label="Janela"><div class="gb cols"><button id="btnNewWin" type="button" class="rb bigb lyb two vwb " title="Nova Janela: abre o Verbus em outra janela do navegador"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="6" width="17" height="13" fill="#fff"/><rect x="11" y="12" width="17" height="14" fill="#fff"/><path d="M11 16h17" stroke="#2b79c9"/></svg><span>Nova<br>Janela</span></button></div><div class="gl">Janela</div></div>
+    <div class="group" role="group" aria-label="Modo"><div class="gb"><button id="btnTheme" title="Alternar tema claro/escuro">Tema</button></div><div class="gl">Modo</div></div>
+    <div class="group" role="group" aria-label="Zoom (interno)" hidden><div class="gb"><select id="zoom" title="Zoom"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.1" selected>110%</option><option value="1.25">125%</option><option value="1.5">150%</option></select></div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-tabela" data-tab="tabela" aria-labelledby="tab-tabela" hidden>
     <div class="group" role="group" aria-label="Desenhar tabela"><div class="gb cols">
@@ -1574,6 +1554,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   <button id="imClose" class="sp">Fechar</button>
 </div>
 
+<button id="vExit" type="button" hidden>Sair do Modo de Leitura (Esc)</button>
+<div id="mcPv" hidden><div class="mph"><b id="mcPvT">Registro 1 de 1</b><button type="button" id="mcPvX" aria-label="Fechar">✕</button></div><div id="mcPvB"></div></div>
+<input type="file" id="mcFile" accept=".csv,.txt,.tsv,text/csv,text/plain" hidden>
 <div id="work">
 <aside id="side">
   <div class="tabs"><button id="tabDocs" class="on">Documentos</button><button id="tabOut">Estrutura</button></div>
@@ -3617,6 +3600,138 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       page.innerHTML = pages.join('<div class="pb" contenteditable="false"></div>');
       title.value = 'Mala direta – ' + nm; changed(); save(); renderSide();
     });
+
+    // ---- Guia Correspondências: mala direta no estilo clássico ----
+    function pmenu(btn, build){
+      let pop = null;
+      function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', escK, true); }
+      function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+      function escK(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+      btn.addEventListener('mousedown', e=>e.preventDefault());
+      btn.addEventListener('click', ()=>{
+        if(pop){ close(); return; }
+        pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+        build().forEach(it=>{
+          if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+          const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it.t; if(it.h) b.title = it.h;
+          b.addEventListener('click', ()=>{ close(); it.f(); }); pop.appendChild(b);
+        });
+        pop.style.maxHeight = '70vh'; pop.style.overflowY = 'auto'; pop.addEventListener('mousedown', e=>e.preventDefault());
+        document.body.appendChild(pop);
+        const r = btn.getBoundingClientRect();
+        pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4) + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+        document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', escK, true);
+      });
+    }
+    const mcRaw = ()=>{ try{ return localStorage.getItem(MK) || ''; }catch(e){ return ''; } };
+    const mcData = ()=>parse(mcRaw());
+    const nm = h=>norm(h);
+    const pickF = re=>mcData().head.filter(h=>re.test(nm(h)));
+    const click = id=>()=>$(id).click();
+    function mcRefresh(){
+      const {head, rows} = mcData(), ok = head.length > 0 && rows.length > 0;
+      document.querySelectorAll('#tp-correspondencias [data-needs]').forEach(b=>{ b.disabled = !ok; });
+      $('mcNum').max = String(rows.length || 1);
+      if(!ok) closePv();
+    }
+    window.__mcRefresh = mcRefresh;
+    // Iniciar Mala Direta / Selecionar Destinatários
+    pmenu($('mcIni'), ()=>[
+      {t:'Cartas (este documento)', h:'Escreva a carta, insira campos e gere uma página por destinatário', f:()=>{ if(!mcData().head.length) $('mcOpen').click(); else alert('Escreva a carta, use Inserir Campo de Mesclagem e depois Concluir e Mesclar.'); }}, '-',
+      {t:'Envelopes', f:click('mcEnv')}, {t:'Etiquetas', f:click('mcEti')}]);
+    pmenu($('mcSel'), ()=>[
+      {t:'Digitar Nova Lista…', f:()=>{ try{ localStorage.setItem(MK, ''); }catch(e){} fillCampos(); mcRefresh(); $('mcOpen').click(); }},
+      {t:'Usar Lista Existente (arquivo .csv ou .txt)…', f:()=>$('mcFile').click()},
+      {t:'Colar lista da planilha…', f:click('mcOpen')}, '-',
+      {t:'Limpar a lista', f:()=>{ if(confirm('Apagar a lista de destinatários guardada neste navegador?')){ try{ localStorage.removeItem(MK); }catch(e){} fillCampos(); mcRefresh(); } }}]);
+    $('mcFile').addEventListener('change', async e=>{
+      const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+      let t = await f.text(); if(/\uFFFD/.test(t)){ try{ t = new TextDecoder('windows-1252').decode(await f.arrayBuffer()); }catch(x){} }
+      try{ localStorage.setItem(MK, t); }catch(x){}
+      fillCampos(); mcRefresh(); const d = mcData(); alert(d.head.length ? 'Lista carregada: ' + d.head.length + ' campo(s) e ' + d.rows.length + ' destinatário(s).' : 'Não encontrei campos nesse arquivo.');
+    });
+    const oldSave = $('mcSave'); oldSave.addEventListener('click', mcRefresh);
+    // Campos
+    pmenu($('mcCampoBtn'), ()=>mcData().head.map(h=>({t:h, f:()=>put('{{' + E(h) + '}}')})));
+    $('mcBloco').addEventListener('click', ()=>{
+      let f = pickF(/nome/).slice(0, 1).concat(pickF(/endere|logradouro|rua/), pickF(/bairro/), pickF(/cidade|munic/), pickF(/cep/));
+      if(!f.length) f = ['Nome', 'Endereço', 'Cidade'];
+      put('<p style="text-indent:0;text-align:left">' + [...new Set(f)].map(h=>'{{' + E(h) + '}}').join('<br>') + '</p><p><br></p>');
+    });
+    $('mcSaud').addEventListener('click', ()=>{ const h = pickF(/nome/)[0] || mcData().head[0] || 'Nome'; put('<p>Prezado(a) {{' + E(h) + '}},</p><p><br></p>'); });
+    // Realçar campos {{...}} sem alterar o texto (Custom Highlight API)
+    let hlOn = false;
+    function hlDraw(){
+      if(!(window.CSS && CSS.highlights && window.Highlight)) return;
+      if(!hlOn){ CSS.highlights.delete('mcf'); return; }
+      const rs = [], w = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
+      for(let n; (n = w.nextNode());){ const re = /\{\{[^{}]+\}\}/g; let m; while((m = re.exec(n.nodeValue))){ const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); rs.push(r); } }
+      CSS.highlights.set('mcf', new Highlight(...rs));
+    }
+    $('mcHl').addEventListener('click', ()=>{
+      if(!(window.CSS && CSS.highlights && window.Highlight)){ alert('Este navegador não consegue realçar os campos. Eles aparecem no texto como {{Nome}}.'); return; }
+      hlOn = !hlOn; $('mcHl').classList.toggle('on', hlOn); hlDraw();
+    });
+    page.addEventListener('input', ()=>{ if(hlOn) hlDraw(); });
+    // Visualizar resultados (painel separado: o documento não muda)
+    let idx = 0;
+    const fillRow = (base, head, r)=>{ const keys = head.map(norm); return base.replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (m, k)=>{ if(norm(k) === 'data') return dataLongaBR(); const i = keys.indexOf(norm(k)); return i >= 0 ? E(r[i] || '') : m; }); };
+    function showPv(){
+      const {head, rows} = mcData(); if(!rows.length) return;
+      idx = Math.max(0, Math.min(rows.length - 1, idx));
+      const cs = getComputedStyle(page), box = $('mcPvB');
+      box.style.fontFamily = cs.fontFamily; box.style.fontSize = cs.fontSize; box.style.lineHeight = cs.lineHeight; box.style.textAlign = cs.textAlign;
+      box.innerHTML = fillRow(page.innerHTML, head, rows[idx]).replace(/<div class="pb"[^>]*><\/div>/g, '<hr>');
+      $('mcPvT').textContent = 'Registro ' + (idx + 1) + ' de ' + rows.length; $('mcNum').value = String(idx + 1); $('mcPv').hidden = false; $('mcPrev').classList.add('on');
+    }
+    function closePv(){ $('mcPv').hidden = true; $('mcPrev').classList.remove('on'); }
+    $('mcPrev').addEventListener('click', ()=>{ if($('mcPv').hidden) showPv(); else closePv(); });
+    $('mcPvX').addEventListener('click', closePv);
+    const go = n=>()=>{ const t = mcData().rows.length; idx = n === 'first' ? 0 : n === 'last' ? t - 1 : idx + n; if($('mcPv').hidden) showPv(); else showPv(); };
+    $('mcFirst').addEventListener('click', go('first')); $('mcLast').addEventListener('click', go('last'));
+    $('mcPrevB').addEventListener('click', go(-1)); $('mcNextB').addEventListener('click', go(1));
+    $('mcNum').addEventListener('change', e=>{ idx = (parseInt(e.target.value, 10) || 1) - 1; showPv(); });
+    $('mcFind').addEventListener('click', ()=>{
+      const q = (prompt('Localizar destinatário (parte do nome ou de qualquer campo):', '') || '').trim(); if(!q) return;
+      const {rows} = mcData(), n = norm(q), k = rows.findIndex(r=>norm(r.join(' ')).includes(n));
+      if(k < 0){ alert('Nenhum destinatário encontrado.'); return; } idx = k; showPv();
+    });
+    $('mcErr').addEventListener('click', ()=>{
+      const {head, rows} = mcData(), keys = head.map(norm), used = [...new Set([...page.innerHTML.matchAll(/\{\{\s*([^{}]+?)\s*\}\}/g)].map(m=>m[1]))].filter(k=>norm(k) !== 'data');
+      const msgs = [], miss = used.filter(k=>!keys.includes(norm(k)));
+      if(!used.length) msgs.push('O texto ainda não tem campos de mesclagem. Use Inserir Campo de Mesclagem.');
+      if(miss.length) msgs.push('Campos do texto que não existem na lista: ' + miss.join(', ') + '.');
+      const blanks = [];
+      rows.forEach((r, i)=>used.forEach(k=>{ const c = keys.indexOf(norm(k)); if(c >= 0 && !(r[c] || '').trim()) blanks.push('registro ' + (i + 1) + ' (' + head[c] + ')'); }));
+      if(blanks.length) msgs.push('Dados em branco: ' + blanks.slice(0, 12).join('; ') + (blanks.length > 12 ? '… (+' + (blanks.length - 12) + ')' : '') + '.');
+      const short = rows.map((r, i)=>r.length < head.length ? i + 1 : 0).filter(Boolean);
+      if(short.length) msgs.push('Registros com menos colunas que o cabeçalho: ' + short.slice(0, 12).join(', ') + '.');
+      alert(msgs.length ? msgs.join('\n\n') : 'Nenhum erro encontrado: ' + rows.length + ' destinatário(s) e ' + used.length + ' campo(s) em uso.');
+    });
+    // Concluir
+    pmenu($('mcFin'), ()=>[
+      {t:'Editar Documentos Individuais…', h:'Cria um documento novo com uma página para cada destinatário', f:click('mcGen')},
+      {t:'Imprimir Documentos…', h:'Cria o documento mesclado e abre a impressão', f:()=>{ $('mcGen').click(); setTimeout(()=>window.print(), 500); }}]);
+    // Criar: envelopes e etiquetas
+    $('mcEnv').addEventListener('click', ()=>{
+      const r = rem(), f = pickF(/nome/).slice(0, 1).concat(pickF(/endere|logradouro|rua/), pickF(/bairro/), pickF(/cidade|munic/), pickF(/cep/)), fs = f.length ? [...new Set(f)] : ['Nome', 'Endereço', 'Cidade'];
+      put('<div style="min-height:10cm"><p style="text-indent:0;text-align:left;line-height:1.2;font-size:10pt">' + [r.nome, r.cargo, r.orgao, r.cidade].filter(Boolean).map(E).join('<br>') + '</p>' +
+        '<p style="text-indent:0;text-align:left;margin:3.5cm 0 0 8cm;line-height:1.3">' + fs.map(h=>'{{' + E(h) + '}}').join('<br>') + '</p></div>' + PB);
+    });
+    $('mcEti').addEventListener('click', ()=>{
+      const {head, rows} = mcData(); if(!head.length || !rows.length){ alert('Primeiro cole a lista em Editar Lista de Destinatários…'); return; }
+      const cell = r=>'<td style="width:50%;height:3.4cm;padding:8px;vertical-align:middle;border:1px dashed #bbb"><p style="text-indent:0;text-align:left;line-height:1.25">' + r.filter(x=>x && x.trim()).map(E).join('<br>') + '</p></td>';
+      let t = '<table style="width:100%;border-collapse:collapse"><tbody>';
+      for(let i = 0; i < rows.length; i += 2) t += '<tr>' + cell(rows[i]) + (rows[i + 1] ? cell(rows[i + 1]) : '<td></td>') + '</tr>';
+      put(t + '</tbody></table><p><br></p>');
+    });
+    // Modelos e partes (usam os botões internos)
+    pmenu($('mcMod'), ()=>[['Ofício', 'cmOficio'], ['Memorando', 'cmMemo'], ['Declaração', 'cmDecl'], ['Carta', 'cmCarta'], ['Requerimento', 'cmReq']].map(([t, id])=>({t, f:click(id)})));
+    pmenu($('mcPartes'), ()=>[['Local e data', 'cmData'], ['Destinatário', 'cmDest'], ['Assunto', 'cmAssunto'], ['Vocativo', 'cmVoc'], ['Fecho', 'cmFecho'], ['Assinatura', 'cmAssin']].map(([t, id])=>({t, f:click(id)})));
+    $('mcRemB').addEventListener('mousedown', e=>e.preventDefault());
+    $('mcRemB').addEventListener('click', click('cmRem'));
+    mcRefresh();
     fillCampos();
   })();
 
@@ -5407,7 +5522,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       }}
     ]));
 
-    // ----- desenho em canvas (SmartArt e Gráfico)
+    // ----- desenho em canvas (Diagrama e Gráfico)
     const FONT = 'Calibri,"Segoe UI",Arial,sans-serif';
     const mixW = (hex, t)=>{ const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v=>Math.round(v + (255 - v) * t)); return 'rgb(' + c.join(',') + ')'; };
     const dark = hex=>{ const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v=>Math.round(v * .7)); return 'rgb(' + c.join(',') + ')'; };
@@ -5476,7 +5591,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     }
     bind('btnSmart', ()=>{
       const COLS = [['Azul', '#4472c4'], ['Laranja', '#ed7d31'], ['Verde', '#70ad47'], ['Cinza', '#7f7f7f'], ['Dourado', '#bf9000'], ['Vinho', '#a5233a']];
-      const d = dlg('SmartArt',
+      const d = dlg('Diagrama',
         '<div class="fdGrid"><label>Layout<select id="saKind"><option value="lista">Lista básica de blocos</option><option value="proc">Processo básico</option><option value="etapas">Processo em etapas</option><option value="ciclo">Ciclo básico</option><option value="hier">Hierarquia</option><option value="pirm">Pirâmide básica</option><option value="matriz">Matriz básica</option></select></label>' +
         '<label>Cor<select id="saCol">' + COLS.map(c=>'<option value="' + c[1] + '">' + c[0] + '</option>').join('') + '</select></label></div>' +
         '<label>Itens (um por linha; na Hierarquia, recue com espaços os níveis abaixo)<textarea id="saTxt" rows="5">Etapa 1\nEtapa 2\nEtapa 3</textarea></label>' +
@@ -5572,7 +5687,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       ['gcType', 'gcTit', 'gcData', 'gcLab'].forEach(i=>q('#' + i).addEventListener('input', draw)); draw();
     });
 
-    // ----- Instantâneo (captura de tela com recorte)
+    // ----- Captura de Tela (captura de tela com recorte)
     async function snap(){
       if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){ alert('Este navegador não permite capturar a tela. Use o Chrome ou o Edge no computador.'); return; }
       let st; try{ st = await navigator.mediaDevices.getDisplayMedia({video:true, audio:false}); }catch(e){ return; }
@@ -5583,7 +5698,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       }catch(e){ st.getTracks().forEach(t=>t.stop()); alert('Não foi possível capturar a tela.'); }
     }
     function cropDlg(c){
-      const d = dlg('Instantâneo',
+      const d = dlg('Captura de Tela',
         '<p style="margin:0 0 8px;color:var(--muted);font-size:13px">Arraste sobre a imagem para escolher o trecho (recorte), ou insira a tela inteira.</p><div class="crop"><img alt="Captura" src="' + c.toDataURL('image/png') + '"><i></i></div>',
         'Inserir recorte', (dd, q)=>{ const s = sel; if(!s || s.w < 4 || s.h < 4) return 'Arraste sobre a imagem para escolher o trecho, ou use "Inserir tela inteira".'; const o = document.createElement('canvas'); o.width = s.w; o.height = s.h; o.getContext('2d').drawImage(c, s.x, s.y, s.w, s.h, 0, 0, s.w, s.h); restore(); window.__insImgFile(o.toDataURL('image/png')); },
         {w:'min(900px,96vw)', extra:'<button type="button" data-all style="margin-right:auto">Inserir tela inteira</button>'});
@@ -5612,7 +5727,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     });
 
     // =====================================================================  TEXTO
-    // ----- Partes Rápidas
+    // ----- Blocos de Texto
     const QBUILT = [{n:'Atenciosamente', h:'<p style="text-align:left">Atenciosamente,</p>'}, {n:'Sem mais para o momento', h:'<p>Sem mais para o momento, colocamo-nos à disposição para quaisquer esclarecimentos.</p>'}];
     bind('btnQuick', b=>{
       const my = store.get('partes', []);
@@ -5624,7 +5739,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         const x = mk('button', 'qx'); x.type = 'button'; x.textContent = '✕'; x.title = 'Excluir esta parte'; x.onclick = e=>{ e.stopPropagation(); const l = store.get('partes', []); l.splice(i, 1); store.set('partes', l); close(); };
         row.append(a, x); return row;
       }}));
-      list.push('-', {t:'Salvar Seleção na Galeria de Partes Rápidas…', f:()=>{
+      list.push('-', {t:'Salvar Seleção na Galeria de Blocos de Texto…', f:()=>{
         const r = curRange(); if(!r || r.collapsed){ alert('Selecione o texto (ou a tabela) que você quer guardar.'); return; }
         const tmp = document.createElement('div'); tmp.appendChild(r.cloneContents()); const html = tmp.innerHTML, nm0 = r.toString().trim().replace(/\s+/g, ' ').slice(0, 40);
         dlg('Criar Nova Parte Rápida', '<label>Nome<input type="text" id="qpN" autocomplete="off"></label><p style="color:var(--muted);font-size:12px;margin:0">A parte fica guardada neste navegador e pode ser inserida em qualquer documento.</p>', 'OK', (d, q)=>{
@@ -5634,13 +5749,13 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       menu(b, list);
     });
 
-    // ----- WordArt
+    // ----- Arte de Texto
     const WA = [
       'color:#000;font-weight:700', 'color:#2f5496;font-weight:700', 'color:#c55a11;font-weight:700', 'color:#fff;-webkit-text-stroke:1.5px #2f5496;font-weight:700',
       'color:#2f5496;font-weight:700;text-shadow:2px 2px 3px rgba(0,0,0,.4)', 'color:#7030a0;font-weight:700;text-shadow:3px 3px 0 #d9c3ec', 'color:#c00000;font-weight:700;font-style:italic;text-shadow:1px 1px 0 #f4b183',
       'color:#548235;font-weight:700;letter-spacing:.12em;font-variant:small-caps', 'color:#bf8f00;font-weight:700;text-shadow:0 0 6px #ffe699', 'color:#fff;font-weight:700;-webkit-text-stroke:1px #000;text-shadow:3px 3px 0 #000', 'color:#1f3864;font-weight:700;font-family:Georgia,serif;font-style:italic;text-shadow:2px 2px 0 #b4c7e7', 'color:#ed7d31;font-weight:700;font-family:Impact,Arial Black,sans-serif;letter-spacing:.05em'
     ];
-    bind('btnWordArt', b=>menu(b, [{h:'WordArt'}, {node:close=>{
+    bind('btnWordArt', b=>menu(b, [{h:'Arte de Texto'}, {node:close=>{
       const g = mk('div', 'gal'); g.style.gridTemplateColumns = 'repeat(4,56px)';
       WA.forEach((st, i)=>{ const x = mk('button'); x.type = 'button'; x.title = 'Estilo ' + (i + 1); x.innerHTML = '<span style="font-size:22px;' + st + '">A</span>'; x.addEventListener('click', ()=>{ close(); const t = selText() || 'Seu texto aqui'; ins('<span class="wa" style="font-size:32pt;line-height:1.2;' + st + '">' + H(t) + '</span>'); }); g.appendChild(x); });
       return g;
@@ -6792,8 +6907,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   // Chrome/Edge: a primeira vez abre a janela "Salvar como" do computador (pasta, nome, tipo); depois, Ctrl+S grava direto no mesmo arquivo.
   // Outros navegadores (Firefox, Safari, celular) não deixam um site gravar em arquivo: aí o Salvar baixa uma cópia.
   const FTYPES = {
-    docx:{ext:'.docx', mime:DOCX_MIME, desc:'Documento do Word (*.docx)'},
-    doc:{ext:'.doc', mime:'application/msword', desc:'Documento do Word 97-2003 (*.doc)'},
+    docx:{ext:'.docx', mime:DOCX_MIME, desc:'Documento (*.docx)'},
+    doc:{ext:'.doc', mime:'application/msword', desc:'Documento antigo (*.doc)'},
     html:{ext:'.html', mime:'text/html', desc:'Página da Web (*.html)'},
     txt:{ext:'.txt', mime:'text/plain', desc:'Texto simples (*.txt)'}
   };
@@ -8155,6 +8270,142 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       {t:'Referências', h:'Insere a lista com o título REFERÊNCIAS', f:()=>insertBib('REFERÊNCIAS')},
       {t:'Bibliografia', h:'Insere a lista com o título BIBLIOGRAFIA', f:()=>insertBib('BIBLIOGRAFIA')}, '-',
       {t:'Atualizar lista', f:()=>$('btnRefUpd').click()}]);
+
+    // ---- Guia Referências no estilo do Word: Sumário, Legendas e Índice ----
+    function pgOfEl(el){
+      let t = el; while(t && t.parentNode !== page) t = t.parentNode;
+      if(!t) return 1; const m = effMar(), use = Math.max(CMPX, pgOf().h * CMPX - m.t - m.b);
+      return Math.max(1, Math.floor((t.offsetTop - m.t) / use) + 1);
+    }
+    const abntPick = v=>{ const sl = $('abntIns'); sl.value = v; sl.dispatchEvent(new Event('change', {bubbles:true})); };
+    popMenu($('btnToc'), ()=>[
+      {t:'Sumário automático', h:'Insere o sumário com os títulos do documento (ou atualiza o que já existe)', f:()=>abntPick('sumario')}, '-',
+      {t:'Capa', f:()=>abntPick('capa')}, {t:'Folha de rosto', f:()=>abntPick('rosto')}, {t:'Resumo', f:()=>abntPick('resumo')}, '-',
+      {t:'Numerar títulos (1, 1.1, 1.1.1)', f:()=>$('btnNum').click()}]);
+    popMenu($('btnTocAdd'), ()=>[
+      {t:'Não mostrar no Sumário', f:()=>blockChange('p')},
+      {t:'Nível 1 (Título 1)', f:()=>blockChange('h1')},
+      {t:'Nível 2 (Título 2)', f:()=>blockChange('h2')},
+      {t:'Nível 3 (Título 3)', f:()=>blockChange('h3')}]);
+    $('btnTocUpd').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnTocUpd').addEventListener('click', ()=>{ if(!page.querySelector('.sum')){ alert('Este documento ainda não tem sumário. Use Sumário > Sumário automático.'); return; } sumario(); });
+    // Legendas
+    popMenu($('btnCap'), ()=>['Figura', 'Tabela', 'Quadro'].map(t=>({t:'Legenda de ' + t.toLowerCase(), f:()=>abntPick(t)})));
+    const capsOf = tipo=>[...page.querySelectorAll('p.leg[data-t="' + tipo + '"]')];
+    function figIdxHtml(tipo){
+      const rows = capsOf(tipo).map(p=>'<p><span>' + esc(p.textContent.trim()) + '</span><span class="ixd"></span><span>' + pgOfEl(p) + '</span></p>').join('') || '<p><i>Nenhuma legenda de ' + tipo.toLowerCase() + ' no documento.</i></p>';
+      return '<h1 class="sn">LISTA DE ' + (tipo === 'Figura' ? 'FIGURAS' : tipo === 'Tabela' ? 'TABELAS' : 'QUADROS') + '</h1>' + rows;
+    }
+    function figIdxFix(){ page.querySelectorAll('.figidx').forEach(b=>{ b.querySelectorAll('p').forEach(p=>{ p.style.display = 'flex'; p.style.gap = '6px'; }); }); }
+    popMenu($('btnFigIdx'), ()=>['Figura', 'Tabela', 'Quadro'].map(t=>({t:'Lista de ' + (t === 'Figura' ? 'figuras' : t === 'Tabela' ? 'tabelas' : 'quadros'), f:()=>{
+      if(!capsOf(t).length){ alert('Não há legendas de ' + t.toLowerCase() + '. Use Inserir Legenda primeiro.'); return; }
+      restore(); exec('insertHTML', '<div class="figidx" data-t="' + t + '">' + figIdxHtml(t) + '</div>' + PB); figIdxFix(); changed(); }})));
+    $('btnFigUpd').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnFigUpd').addEventListener('click', ()=>{
+      const l = page.querySelectorAll('.figidx');
+      if(!l.length){ alert('Nenhuma lista de ilustrações no documento.'); return; }
+      l.forEach(b=>{ b.innerHTML = figIdxHtml(b.dataset.t); }); figIdxFix(); changed();
+    });
+    $('btnXref2').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnXref2').addEventListener('click', ()=>$('btnXref').click());
+    // Índice remissivo
+    $('btnIdxMark').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnIdxMark').addEventListener('click', ()=>{
+      const s = getSelection(); let r = s.rangeCount && page.contains(s.anchorNode) ? s.getRangeAt(0) : null;
+      if(!r || r.collapsed){ alert('Selecione a palavra ou o trecho que será uma entrada do índice.'); return; }
+      const txt = r.toString().trim(); if(!txt) return;
+      const nome = (prompt('Entrada do índice:', txt) || '').trim(); if(!nome) return;
+      try{ const sp = document.createElement('span'); sp.className = 'ixe'; sp.dataset.ix = nome; r.surroundContents(sp); changed(); }
+      catch(e){ alert('Selecione um trecho dentro de um único parágrafo.'); }
+    });
+    function idxHtml(){
+      const map = new Map();
+      page.querySelectorAll('.ixe').forEach(e=>{ const k = e.dataset.ix; if(!k) return; if(!map.has(k)) map.set(k, new Set()); map.get(k).add(pgOfEl(e)); });
+      const keys = [...map.keys()].sort((a, b)=>a.localeCompare(b, 'pt-BR', {sensitivity:'base'}));
+      if(!keys.length) return null;
+      let last = '', out = '<h1 class="sn">ÍNDICE</h1>';
+      keys.forEach(k=>{
+        const L = k.charAt(0).toLocaleUpperCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if(L !== last){ out += '<p><b>' + esc(L) + '</b></p>'; last = L; }
+        out += '<p class="ixl" style="display:flex;gap:6px"><span>' + esc(k) + '</span><span class="ixd"></span><span>' + [...map.get(k)].sort((a, b)=>a - b).join(', ') + '</span></p>';
+      });
+      return out;
+    }
+    $('btnIdxIns').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnIdxIns').addEventListener('click', ()=>{
+      const h = idxHtml(); if(!h){ alert('Nenhuma entrada marcada. Use Marcar Entrada nos termos que devem aparecer no índice.'); return; }
+      const old = page.querySelector('.idx');
+      if(old){ old.innerHTML = h; changed(); return; }
+      restore(); exec('insertHTML', '<div class="idx">' + h + '</div>'); changed();
+    });
+    $('btnIdxUpd').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnIdxUpd').addEventListener('click', ()=>{
+      const old = page.querySelector('.idx'); if(!old){ alert('Este documento ainda não tem índice. Use Inserir Índice.'); return; }
+      const h = idxHtml(); old.innerHTML = h || '<p><i>Nenhuma entrada marcada.</i></p>'; changed();
+    });
+  })();
+
+
+  // ================= Guia Exibir: modos de exibição, Mostrar, Zoom e Janela =================
+  (function(){
+    const main = document.querySelector('main'), sheet = $('sheet'), zsel = $('zoom'), body = document.body;
+    const vbs = [...document.querySelectorAll('#statusbar .vb')];
+    const MODES = {read:'btnVwRead', print:'btnVwPrint', web:'btnVwWeb', draft:'btnVwDraft'};
+    let mode = 'print', zBefore = null;
+    function curPct(){ return Math.round((parseFloat(sheet.style.zoom) || 1) * 100); }
+    function zoomTo(p){
+      p = Math.max(10, Math.min(500, Math.round(p))); const z = p / 100;
+      let o = [...zsel.options].find(x=>Math.abs(parseFloat(x.value) - z) < 1e-6 && !x.dataset.c);
+      if(!o){ o = zsel.querySelector('option[data-c]') || document.createElement('option'); o.dataset.c = '1'; o.value = String(z); o.textContent = p + '%'; if(!o.parentNode) zsel.appendChild(o); }
+      zsel.value = o.value; zsel.dispatchEvent(new Event('change'));
+    }
+    const padX = ()=>{ const cs = getComputedStyle(main); return (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) + 8; };
+    const padY = ()=>{ const cs = getComputedStyle(main); return (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) + 8; };
+    const fitW = ()=>Math.max(10, Math.floor((main.clientWidth - padX()) / (pgOf().w * CMPX) * 100));
+    const fitH = ()=>Math.max(10, Math.floor((main.clientHeight - padY()) / (pgOf().h * CMPX) * 100));
+    function setMode(m){
+      if(m === mode) return;
+      const prev = mode; mode = m;
+      ['vread', 'vweb', 'vdraft'].forEach(c=>body.classList.remove(c));
+      if(m !== 'print') body.classList.add('v' + m);
+      page.contentEditable = m === 'read' ? 'false' : 'true';
+      $('vExit').hidden = m !== 'read';
+      Object.keys(MODES).forEach(k=>{ const b = $(MODES[k]); b.classList.toggle('on', k === m); });
+      if(vbs[0]) vbs[0].classList.toggle('on', m === 'read'); if(vbs[1]) vbs[1].classList.toggle('on', m === 'print' || m === 'draft'); if(vbs[2]) vbs[2].classList.toggle('on', m === 'web');
+      vbs.forEach(b=>b.setAttribute('aria-pressed', b.classList.contains('on') ? 'true' : 'false'));
+      if(m === 'web'){ if(zBefore === null) zBefore = curPct(); zoomTo(fitW()); }
+      else if(prev === 'web' && zBefore !== null){ zoomTo(zBefore); zBefore = null; }
+      setTimeout(()=>window.dispatchEvent(new Event('resize')), 0);
+    }
+    $('btnVwRead').addEventListener('click', ()=>setMode('read'));
+    $('btnVwPrint').addEventListener('click', ()=>setMode('print'));
+    $('btnVwWeb').addEventListener('click', ()=>setMode('web'));
+    $('btnVwDraft').addEventListener('click', ()=>setMode('draft'));
+    $('vExit').addEventListener('click', ()=>setMode('print'));
+    document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && mode === 'read' && !document.querySelector('dialog[open]')) setMode('print'); });
+    $('btnVwOutline').addEventListener('click', ()=>{ if($('side').hidden) $('btnSide').click(); $('tabOut').click(); });
+    // botões de exibição da barra de status
+    [['read', 0, 'Modo de Leitura'], ['print', 1, 'Layout de Impressão'], ['web', 2, 'Layout da Web']].forEach(([m, i, t])=>{
+      const b = vbs[i]; if(!b) return;
+      b.disabled = false; b.classList.remove('dis'); b.title = t; b.addEventListener('click', ()=>setMode(m));
+    });
+    // Mostrar
+    $('btnGridPg').addEventListener('click', e=>{ const on = body.classList.toggle('pggrid'); e.currentTarget.classList.toggle('on', on); });
+    const sideSync = ()=>$('btnSide').classList.toggle('on', !$('side').hidden);
+    new MutationObserver(sideSync).observe($('side'), {attributes:true, attributeFilter:['hidden']}); sideSync();
+    const rulerSync = ()=>{ const w = $('rulerWrap'); if(w) $('btnRuler').classList.toggle('on', !w.hidden); };
+    $('btnRuler').addEventListener('click', ()=>setTimeout(rulerSync, 0)); rulerSync();
+    // Zoom
+    $('btnZoomDlg').addEventListener('click', ()=>{
+      const v = prompt('Zoom (10 a 500%):', String(curPct())); if(v === null) return;
+      const n = parseFloat(String(v).replace('%', '').replace(',', '.')); if(isFinite(n) && n >= 10 && n <= 500) zoomTo(n); else alert('Digite um valor entre 10 e 500.');
+    });
+    $('btnZ100').addEventListener('click', ()=>zoomTo(100));
+    $('btnZOne').addEventListener('click', ()=>zoomTo(Math.min(fitW(), fitH())));
+    $('btnZMany').addEventListener('click', ()=>zoomTo(Math.max(20, Math.min(fitW(), Math.floor((main.clientHeight - padY()) / (2.1 * pgOf().h * CMPX) * 100)))));
+    $('btnZWide').addEventListener('click', ()=>zoomTo(fitW()));
+    // Janela
+    $('btnNewWin').addEventListener('click', ()=>{ window.open(location.href.split('#')[0], '_blank'); });
   })();
 
   // ---------- Réguas (horizontal e vertical, estilo clássico) ----------
@@ -9084,7 +9335,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         const nameIn = el('input', {type:'text', className:'bsName', value:baseName(ent ? ent.name : fileName(''))});
         nameIn.setAttribute('aria-label', 'Nome do arquivo');
         const typeSel = el('select'); typeSel.setAttribute('aria-label', 'Tipo de arquivo');
-        [['docx', 'Documento do Word (*.docx)'], ['doc', 'Documento do Word 97-2003 (*.doc)'], ['html', 'Página da Web (*.html)'], ['txt', 'Texto simples (*.txt)'], ['pdf', 'PDF (*.pdf) — pela janela de impressão']].forEach(o=>typeSel.append(el('option', {value:o[0], textContent:o[1]})));
+        [['docx', 'Documento (*.docx)'], ['doc', 'Documento antigo (*.doc)'], ['html', 'Página da Web (*.html)'], ['txt', 'Texto simples (*.txt)'], ['pdf', 'PDF (*.pdf) — pela janela de impressão']].forEach(o=>typeSel.append(el('option', {value:o[0], textContent:o[1]})));
         typeSel.value = ent ? kindOf(ent.name) : 'docx';
         const ok = el('button', {type:'button', className:'bsDo'});
         const sync = ()=>{ ok.textContent = typeSel.value === 'pdf' ? 'Criar PDF…' : can ? 'Salvar…' : 'Baixar'; };
