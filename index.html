@@ -4750,7 +4750,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   }
   // O Chrome joga o número para fora do parágrafo quando o cursor está no fim dele (o número ficava sozinho numa linha): traz de volta para o fim do parágrafo
   function tuckMark(mk){
-    if(!mk || mk.parentNode !== page) return;
+    if(!mk || (mk.parentNode !== page && !/^(TD|TH)$/.test(mk.parentNode.nodeName))) return;
     const pv = mk.previousSibling;
     if(!pv || pv.nodeType !== 1 || !/^(P|H[1-6]|BLOCKQUOTE)$/.test(pv.tagName)) return;
     const z = mk.nextSibling && mk.nextSibling.nodeType === 3 && mk.nextSibling.data === '\u200b' ? mk.nextSibling : null;
@@ -6200,7 +6200,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     const hd = (t, ml)=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 15px ' + ml + 'px;text-align:left;break-after:avoid">' + t + '</p>';
     const box = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
     // Quadro longo (Situação): uma célula só, sem linha dupla no meio; a borda acompanha a quebra de página.
-    const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><br></td></tr></tbody></table>';
+    const big = (w, h, ml)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + w + 'px;margin:0 0 0 ' + ml + 'px"><tbody><tr><td style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:left"><p style="margin:0;text-indent:1.25cm;line-height:1.5"><br></p></td></tr></tbody></table>';
     const c = (w, h, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:' + h + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
     // Composição Familiar em grade (Nome / Parentesco / Idade / Ocupação ou renda): Tab passa de célula em célula e a última Tab cria nova linha
     const famW = [250, 120, 64, 182];
