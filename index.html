@@ -1006,7 +1006,7 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 #toolbar .tsz input{width:54px;height:22px;border:1px solid var(--ctlb);background:var(--ctl);color:var(--rink);font:12px var(--uifont);padding:0 3px}
 #toolbar select.tfit{width:100%;height:22px}
 @media screen{body.tblgrid #page table td,body.tblgrid #page table th{outline:1px dashed rgba(110,125,150,.75);outline-offset:-1px}}
-@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}#page table[data-flow]{border-collapse:separate !important;border-spacing:0}#page table[data-flow] td{-webkit-box-decoration-break:clone;box-decoration-break:clone}}
+@media print{#tblHandle,#tblMove,#tblDrop{display:none !important}#page tr{break-inside:avoid}#page table[data-flow] tr,#page tr[data-flow]{break-inside:auto}#page table[data-flow]{border-collapse:separate !important;border-spacing:0}#page table[data-flow] td{-webkit-box-decoration-break:clone;box-decoration-break:clone}#page table:has(tr[data-open]){border-collapse:separate !important;border-spacing:0}#page tr[data-flow] td{-webkit-box-decoration-break:clone;box-decoration-break:clone}#page tr[data-open] td{border-top:1px solid #000 !important;border-bottom:1px solid #000 !important}#page tr:has(+ tr[data-open]) td,#page tr[data-open] + tr td{position:relative}#page tr:has(+ tr[data-open]) td::after,#page tr[data-open] + tr td::before{content:"";position:absolute;left:0;right:0;height:1px;background:#fff}#page tr:has(+ tr[data-open]) td::after{bottom:-1px}#page tr[data-open] + tr td::before{top:-1px}}
 
 /* Celular: título entre os botões e o selo (sem sobrepor) e faixa de opções com barra de rolagem visível */
 @media (max-width:700px){
@@ -2722,15 +2722,17 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     const Lb = side(cs.borderLeftWidth, cs.borderLeftStyle, cs.borderLeftColor), Rb = side(cs.borderRightWidth, cs.borderRightStyle, cs.borderRightColor);
     const g = o=>{ const q = []; let cur = 0; gaps.forEach(([a, b])=>{ q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + Math.max(cur, a).toFixed(1) + 'px', 'transparent ' + b.toFixed(1) + 'px'); cur = b; }); q.push(o.col + ' ' + cur.toFixed(1) + 'px', o.col + ' 100%'); return 'linear-gradient(to bottom,' + q.join(',') + ')'; };
     const imgs = [], sz = [], ps = [];
-    if(Lb){ imgs.push(g(Lb)); sz.push(Lb.w + 'px 100%'); ps.push('left top'); }
-    if(Rb){ imgs.push(g(Rb)); sz.push(Rb.w + 'px 100%'); ps.push('right top'); }
+    const sx = '0px';   // linha dentro de uma tabela maior (bordas recolhidas): alinha o traço com a borda real das outras linhas
+    if(Lb){ imgs.push(g(Lb)); sz.push(Lb.w + 'px 100%'); ps.push('left ' + sx + ' top'); }
+    if(Rb){ imgs.push(g(Rb)); sz.push(Rb.w + 'px 100%'); ps.push('right ' + sx + ' top'); }
     // Fecha o quadro onde a página termina (borda de baixo) e reabre no começo da página seguinte (borda de cima), como no Word
     const Tb = side(cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor), Bb = side(cs.borderBottomWidth, cs.borderBottomStyle, cs.borderBottomColor);
     // As linhas de fechamento são elementos reais na camada #pgOv (em vez de degradês de fundo, que em alguns navegadores/zooms sumiam)
     const cx = (cr.left - sr.left) / sc, cw = cr.width / sc, cy = (cr.top - sr.top) / sc;
+    const Bc = Bb || Lb || Rb, Tc = Tb || Lb || Rb;   // quadro só com bordas laterais (modelos): o fechamento usa o mesmo traço
     gaps.forEach(([a, b])=>{
-      if(Bb) splitLines.push({x:cx, w:cw, y:cy + a - Bb.w, h:Bb.w, col:Bb.col});
-      if(Tb) splitLines.push({x:cx, w:cw, y:cy + b, h:Tb.w, col:Tb.col});
+      if(Bc) splitLines.push({x:cx, w:cw, y:cy + a - Bc.w, h:Bc.w, col:Bc.col});
+      if(Tc) splitLines.push({x:cx, w:cw, y:cy + b, h:Tc.w, col:Tc.col});
     });
     if(imgs.length) css += sel + '{border-left-color:transparent !important;border-right-color:transparent !important;background-image:' + imgs.join(',') + ' !important;background-size:' + sz.join(',') + ' !important;background-position:' + ps.join(',') + ' !important;background-repeat:no-repeat !important;background-origin:border-box !important}';
     return css;
@@ -2838,6 +2840,17 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         const need = Math.ceil(endY + e.b - (page.offsetTop || 0));
         page.style.minHeight = need > pg.h * CMPX ? need + 'px' : '';
       }
+      // Impressão: o navegador pagina sozinho e podia começar a seção em outro ponto que a tela; aqui cada início de página da tela vira uma quebra de página
+      const printBreaks = ()=>{
+        let brk = '';
+        const selOf = el=>{ let sel = ''; for(let x = el; x && x !== page; x = x.parentNode){ if(!x.parentNode) return null; sel = '>:nth-child(' + ([...x.parentNode.children].indexOf(x) + 1) + ')' + sel; } return '#page' + sel; };   // caminho até o elemento (linha de tabela incluída)
+        for(let p = 1; p < n; p++){
+          const flat = pgFlat(kids), k = flat[flat.findIndex(x=>{ const r = R.get(x); return r && Math.abs(r.top - starts[p]) <= 1; })]; if(!k) continue;
+          const pv = k.previousElementSibling; if(pv && pv.matches('.pb,.sbk[data-t="next"],.sbk[data-t="odd"],.sbk[data-t="even"]')) continue;   // já há quebra de página antes dele: outra geraria página em branco
+          const sel = selOf(k); if(sel) brk += sel + '{break-before:page}';   // k pode ser uma linha dentro de tabela: antes a regra não pegava e a tabela seguia reta por cima das notas
+        }
+        return brk;
+      };
       if(fn){
         // posiciona cada nota no pé da sua página (só por CSS gerado: nada disso é gravado no documento)
         const cw = Math.max(CMPX, pg.w * CMPX - e.l - e.r), P2 = e.t + use + e.b + PG_GAP;
@@ -2855,15 +2868,28 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
           });
           return r;
         };
-        let brk = '';
-        const selOf = el=>{ let sel = ''; for(let x = el; x && x !== page; x = x.parentNode){ if(!x.parentNode) return null; sel = '>:nth-child(' + ([...x.parentNode.children].indexOf(x) + 1) + ')' + sel; } return '#page' + sel; };   // caminho até o elemento (linha de tabela incluída)
+        const brk = printBreaks();
+        // célula única que atravessa a quebra: na impressão o navegador corta onde quiser; um float com shape-outside reserva a faixa das notas no pé da página
+        const prByCell = new Map();
         for(let p = 1; p < n; p++){
-          const flat = pgFlat(kids), k = flat[flat.findIndex(x=>{ const r = R.get(x); return r && Math.abs(r.top - starts[p]) <= 1; })]; if(!k) continue;
-          const pv = k.previousElementSibling; if(pv && pv.matches('.pb,.sbk[data-t="next"],.sbk[data-t="odd"],.sbk[data-t="even"]')) continue;   // já há quebra de página antes dele: outra geraria página em branco
-          const sel = selOf(k); if(sel) brk += sel + '{break-before:page}';   // k pode ser uma linha dentro de tabela: antes a regra não pegava e a tabela seguia reta por cima das notas
+          if(!sp.has(starts[p]) || !fn.pn[p - 1]) continue;
+          const o = sp.get(starts[p]), bh = FN_PAD + fn.pn[p - 1].reduce((a2, id)=>a2 + (fn.hOf.get(id) || 0), 0);
+          if(!prByCell.has(o.k)) prByCell.set(o.k, []); prByCell.get(o.k).push({p, bh});
         }
-        fnPosSet('@media screen{' + rules(e.l, p=>p * P2 + e.t + use) + '}@media print{' + brk + rules(0, p=>(p + 1) * use) + 'html #page{min-height:' + Math.floor(n * use - 1) + 'px !important}}');
+        let prn = '';
+        prByCell.forEach((list, k)=>{
+          const cell = k.tagName === 'TR' ? k.cells[0] : k.rows[0].cells[0], rk = R.get(k); if(!cell || !rk) return;
+          const cs = getComputedStyle(cell), nat = rk.top + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.paddingTop) || 0);
+          let q = 0; for(let i = 1; i < n; i++){ if(!sp.has(starts[i]) && starts[i] <= rk.top + 1) q = i; }
+          const top0 = q ? q * use + (nat - starts[q]) : nat;
+          const poly = ['0 0', '0.1px 0']; let hf = 0;
+          list.forEach(b=>{ const bb = b.p * use - top0, a2 = bb - b.bh; poly.push('0.1px ' + a2.toFixed(2) + 'px', '100% ' + a2.toFixed(2) + 'px', '100% ' + bb.toFixed(2) + 'px', '0.1px ' + bb.toFixed(2) + 'px'); hf = bb; });
+          poly.push('0.1px ' + hf.toFixed(2) + 'px', '0 ' + hf.toFixed(2) + 'px');
+          prn += cellSel(cell) + '::before{content:"";float:left;width:100%;height:' + hf.toFixed(2) + 'px;shape-outside:polygon(' + poly.join(',') + ')}';
+        });
+        fnPosSet('@media screen{' + rules(e.l, p=>p * P2 + e.t + use) + '}@media print{' + brk + rules(0, p=>(p + 1) * use) + prn + 'html #page{min-height:' + Math.floor(n * use - 1) + 'px !important}}');
       }
+      else if(hard && n > 1){ const pb = printBreaks(); if(pb) fnPosSet('@media print{' + pb + '}'); }
       pgClones();
       if(was !== n){ try{ hfRender(); }catch(err){} }
       try{ window.__pgUpdate && window.__pgUpdate(); }catch(err){}   // atualiza "Página x de y" (pgUpdate fica dentro de outra função)
@@ -7670,7 +7696,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         (o.l ? 'border-left:' + B + ';' : '') + (o.r ? 'border-right:' + B + ';' : '') + (o.t ? 'border-top:' + B + ';' : '') + (o.b ? 'border-bottom:' + B + ';' : '') + '">' + inner + '</td>';
     };
     // linha com um campo que ocupa a largura toda
-    const full = (inner, h, o, flow)=>'<tr' + (flow ? ' data-flow="1"' : '') + '>' + td(2, 606, inner, h, Object.assign({l:1, r:1}, o)) + '</tr>';
+    const full = (inner, h, o, flow)=>'<tr' + (flow ? ' data-flow="1" data-open="1"' : '') + '>' + td(2, 606, inner, h, Object.assign({l:1, r:1}, o)) + '</tr>';
     // linha com dois campos, um em cada coluna
     const two = (a, b, h, o)=>'<tr>' + td(1, 285, a, h, Object.assign({l:1}, o)) + td(1, 321, b, h, Object.assign({r:1}, o)) + '</tr>';
     const html =
