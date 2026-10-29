@@ -7774,8 +7774,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       '<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:595px;margin:0 0 0 9px"><tbody><tr><td style="' + F + 'width:595px;height:178px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:justify"><p style="margin:0;text-indent:1.25cm;line-height:1.5"><br></p></td></tr></tbody></table>' +
       p('Boa Vista – RR, {{DATA}}', 'margin-top:60px;text-align:right;break-after:avoid') +
       p('<br>') + p('<br>') +
-      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 269px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">Técnico de Referência</p>' +
-      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 269px;text-align:right">Psicólogo</p>';
+      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 278px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">Técnico de Referência</p>' +
+      '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 278px;text-align:right">Psicólogo</p>';
     return {
       title:'Termo de Desligamento', kind:'desligamento', html, abnt:false,
       sty:{f:'Arial', hc:'', sp:'padrao'},
@@ -7804,9 +7804,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       row([L(30, 'Eu,'), B(653)]) +
       row([L(95, 'Estado civil:'), B(165), L(105, 'Natural de:'), B(318)]) +
       row([L(150, 'Data de nascimento:'), B(55), L(14, '/'), B(45), L(14, '/'), B(60), L(60, 'Idade:'), B(55), L(230, 'Sexo: Masc. (&nbsp;&nbsp;&nbsp;)&nbsp;&nbsp;&nbsp;Fem. (&nbsp;&nbsp;&nbsp;)')]) +
-      row([L(62, 'CPF n°:'), B(160), L(70, 'RG n°:'), B(165), L(70, 'SSP/UF:'), B(156)]) +
+      row([L(62, 'CPF nº:'), B(160), L(70, 'RG nº:'), B(165), L(70, 'SSP/UF:'), B(156)]) +
       row([L(110, 'Nacionalidade:'), B(272), L(85, 'Telefone:'), B(216)]) +
-      row([L(78, 'Endereço:'), B(427), L(40, 'N°:'), B(138)]) +
+      row([L(78, 'Endereço:'), B(427), L(40, 'Nº:'), B(138)]) +
       row([L(60, 'Bairro:'), B(623)]) +
       '<p style="' + F + 'line-height:1.2;margin:8px 0 0"></p>' +
       row([L(335, 'Declaro que RECEBI COMO BENEFICIÁRIO(A)'), B(50), L(298, 'Cesta(s) de Complementação Alimentar,')]) +
@@ -7830,10 +7830,16 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     // Baseado no Estudo_de_Caso.docx do CRAS (SMAS): Arial 12, espaçamento 1,5, seis quadros, assinatura e página de ANEXO. Cabeçalho em imagem (SMAS); rodapé igual ao do Relatório Informativo. Medidas em px (96 por polegada).
     const F = 'font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000;';
     const W = 649;   // largura útil: 794 − 79 − 66
-    const hd = t=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 8px;text-align:left;break-after:avoid">' + t + '</p>';
+    const hd = t=>'<p style="' + F + 'font-weight:bold;line-height:1.5;margin:24px 0 6px;text-align:left;break-after:avoid">' + t + '</p>';
     const par = '<p style="margin:0;text-indent:1.25cm;line-height:1.5;text-align:justify"><br></p>';
     const box = (h, inner)=>'<table data-flow="1" style="border-collapse:collapse;table-layout:fixed;width:' + W + 'px;margin:0"><tbody><tr><td style="' + F + 'width:' + W + 'px;height:' + h + 'px;border:1px solid #000;padding:3px 7px;vertical-align:top;line-height:1.5;text-align:justify">' + (inner || par) + '</td></tr></tbody></table>';
-    const c = (w, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:34px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
+    const c = (w, inner, span)=>'<td' + (span ? ' colspan="' + span + '"' : '') + ' style="' + F + 'width:' + w + 'px;height:32px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:left"><b>' + inner + '</b>&nbsp;</td>';
+    // Composição Familiar em grade (Nome / Parentesco / Idade / Ocupação ou renda): Tab passa de célula em célula e a última Tab cria nova linha
+    const famW = [265, 130, 64, 190];
+    const famC = (w, t, head)=>'<td style="' + F + 'width:' + w + 'px;height:' + (head ? 28 : 26) + 'px;border:1px solid #000;padding:0 7px;vertical-align:middle;line-height:1.5;text-align:' + (head ? 'center;font-weight:bold;background-color:#f2f2f2' : 'left') + '">' + (t || '<br>') + '</td>';
+    const fam = '<table data-sec="1" style="border-collapse:collapse;table-layout:fixed;width:' + W + 'px;margin:0"><colgroup>' + famW.map(w=>'<col style="width:' + w + 'px">').join('') + '</colgroup><tbody>' +
+      '<tr>' + ['Nome', 'Parentesco', 'Idade', 'Ocupação / Renda'].map((t, i)=>famC(famW[i], t, true)).join('') + '</tr>' +
+      ('<tr>' + famW.map(w=>famC(w, '', false)).join('') + '</tr>').repeat(2) + '</tbody></table>';
     const html =
       '<p style="' + F + 'font-weight:bold;text-decoration:underline;text-align:center;line-height:1.5;margin:20px 0 0">ESTUDO DE CASO</p>' +
       hd('01. IDENTIFICAÇÃO:') +
@@ -7842,10 +7848,10 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         '<tr>' + c(428, 'DATA DE NASCIMENTO:') + c(221, 'IDADE:') + '</tr>' +
         '<tr>' + c(W, 'ENDEREÇO:', 2) + '</tr>' +
         '<tr>' + c(W, 'CONTATO:', 2) + '</tr></tbody></table>' +
-      hd('02. DEMANDA:') + box(37) +
-      hd('03. SITUAÇÃO PROBLEMA:') + box(47) +
-      hd('04. COMPOSIÇÃO FAMILIAR:') + box(54) +
-      hd('05. PARECER TÉCNICO:') + box(49, '<p style="margin:0;line-height:1.5;text-align:left"><b>Concluo que:</b>&nbsp;</p>' + par) +
+      hd('02. DEMANDA:') + box(50) +
+      hd('03. SITUAÇÃO PROBLEMA:') + box(64) +
+      hd('04. COMPOSIÇÃO FAMILIAR:') + fam +
+      hd('05. PARECER TÉCNICO:') + box(62, '<p style="margin:0;line-height:1.5;text-align:left"><b>Concluo que:</b>&nbsp;</p>' + par) +
       hd('06. PROVIDÊNCIAS:') + box(49, '<ul style="margin:0;padding-left:40px;line-height:1.5;text-align:left"><li>Visita domiciliar;</li><li>Elaboração de estudo de caso.</li></ul>') +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 0;text-align:left;break-after:avoid">Informações adicionais:&nbsp;</p>' +
       ('<p style="' + F + 'line-height:1.5;margin:0;text-align:justify"><br></p>').repeat(3) +
@@ -7885,7 +7891,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     const E = n=>[n, BR];                      // campo em branco
 
     // título + quadro da foto (sem bordas, exceto a foto)
-    const topo = '<table style="border-collapse:collapse;table-layout:fixed;width:698px;margin:0"><colgroup><col style="width:580px"><col style="width:118px"></colgroup><tbody><tr>' +
+    const topo = '<table style="border-collapse:collapse;table-layout:fixed;width:672px;margin:0"><colgroup><col style="width:554px"><col style="width:118px"></colgroup><tbody><tr>' +
       '<td style="' + F + 'height:98px;border:0;padding:0;vertical-align:middle;text-align:center;line-height:1.5;font-size:11pt"><b>FICHA DE INSCRIÇÃO</b><br><b>CONVIVER</b></td>' +
       '<td style="font-family:\'Times New Roman\',Times,serif;font-size:12pt;color:#000;height:98px;border:1px solid #000;padding:0;vertical-align:middle;text-align:center">FOTO</td>' +
       '</tr></tbody></table>';
@@ -7902,11 +7908,11 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       [[2, 'Tem alguma deficiência'], [3, CK + ' não ' + CK + ' sim; se sim, qual?&nbsp;']],
       [[2, 'Você se considera'], [3, CK + ' preta ' + CK + ' branca ' + CK + ' parda ' + CK + ' indígena']]
     ]);
-    const escolares = tab([115, 251, 181, 125], [
+    const escolares = tab([108, 258, 181, 125], [
       [H(4, 'DADOS ESCOLARES')],
       [[1, 'Escola'], E(3)],
       [L(2, 'Série:'), L(2, 'Turno:')],
-      [L(3, 'Logradouro:'), L(1, 'Nº')],
+      [L(3, 'Logradouro:'), L(1, 'Nº:')],
       [L(4, 'Bairro:')],
       [L(4, 'Email:')],
       [L(4, 'Contato telefônico:')]
@@ -7954,7 +7960,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       [[1, 'Provedores', {rs:2, c:1}], E(4)], [E(4)],
       [[1, 'Renda Total', {c:1}], E(2), [1, 'Renda Per Capita', {c:1}], L(1, 'R$')],
       [[1, 'Situação de Moradia', {c:1}], [4, CK + ' própria ' + CK + ' alugada ' + CK + ' cedida']],
-      [[1, 'Cômodos', {c:1}], L(1, 'N°'), [3, CK + ' alvenaria ' + CK + ' madeira ' + CK + ' barro ' + CK + ' outros:&nbsp;']],
+      [[1, 'Cômodos', {c:1}], L(1, 'Nº:'), [3, CK + ' alvenaria ' + CK + ' madeira ' + CK + ' barro ' + CK + ' outros:&nbsp;']],
       [[1, 'Acesso', {c:1}], [4, CK + ' água canalizada ' + CK + ' energia elétrica ' + CK + ' rede de esgoto ' + CK + ' rua pavimentada']]
     ]);
 
@@ -7963,9 +7969,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       '<div class="pb" contenteditable="false"></div>' +
       rf2 + gap + endereco + gap + socio +
       ('<p style="' + F + 'margin:0;line-height:18px;height:18px"><br></p>').repeat(3) +
-      '<p style="' + F + 'line-height:1.5;margin:0 0 0 400px;text-align:left">Boa Vista, RR, {{DATA}}</p>' +
+      '<p style="' + F + 'line-height:1.5;margin:0;text-align:right">Boa Vista, RR, {{DATA}}</p>' +
       ('<p style="' + F + 'margin:0;line-height:18px;height:18px"><br></p>').repeat(3) +
-      '<table style="border-collapse:collapse;table-layout:fixed;width:602px;margin:0"><colgroup><col style="width:286px"><col style="width:101px"><col style="width:215px"></colgroup><tbody><tr>' +
+      '<table style="border-collapse:collapse;table-layout:fixed;width:672px;margin:0"><colgroup><col style="width:290px"><col style="width:92px"><col style="width:290px"></colgroup><tbody><tr>' +
         '<td style="' + F + 'height:30px;border:0;border-top:1px solid #000;padding:6px 0 0;vertical-align:top;text-align:center">Assinatura do Responsável</td>' +
         '<td style="' + F + 'border:0;padding:0">&nbsp;</td>' +
         '<td style="' + F + 'height:30px;border:0;border-top:1px solid #000;padding:6px 0 0;vertical-align:top;text-align:center">Assinatura do Servidor Público</td>' +
