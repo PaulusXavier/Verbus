@@ -1,5 +1,5 @@
 // Verbus — service worker: sempre tenta a rede primeiro (versão nova), usa o cache só offline.
-const CACHE = 'verbus-v59', DIC = 'verbus-dic'; // DIC: dicionário de português e sinônimos (CDN), mantidos para uso offline
+const CACHE = 'verbus-v61', DIC = 'verbus-dic'; // DIC: dicionário de português e sinônimos (CDN), mantidos para uso offline
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon-32.png'];
 
 self.addEventListener('install', e=>{
@@ -21,6 +21,11 @@ self.addEventListener('fetch', e=>{
     return;
   }
   if(u.origin !== location.origin) return;
+  // dicionário de português (≈5 MB): vem do cache e só vai à rede na primeira vez
+  if(/\/spell\/pt\.(aff|dic)$/.test(u.pathname)){
+    e.respondWith(caches.open(CACHE).then(c=>c.match(r).then(m=>m || fetch(r).then(res=>{ if(res.ok) c.put(r, res.clone()); return res; }))));
+    return;
+  }
   e.respondWith(
     fetch(r, {cache:'no-cache'}).then(res=>{
       if(res.ok){ const cp = res.clone(); caches.open(CACHE).then(c=>c.put(r, cp)); }
