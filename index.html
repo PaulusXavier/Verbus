@@ -252,6 +252,17 @@ header .lbl{align-self:center;opacity:.85}
 #page.abnt p.leg,#page.abnt p.fonte{font-size:10pt;line-height:1;text-indent:0;text-align:center}
 #page.abnt p.rs,#page.abnt p.ref,#page.abnt .sum p{text-indent:0}
 #page.abnt p.rs{line-height:1;margin-bottom:12pt}
+/* Referências: Índice, listas e Índice Remissivo */
+#page .sum p.tl{display:flex;align-items:baseline;margin:0;text-indent:0}
+#page .sum p.tl .tt{flex:0 1 auto;padding-right:4px}
+#page .sum p.tl .dl{flex:1 1 auto;min-width:12px;border-bottom:1px dotted currentColor;transform:translateY(-.25em)}
+#page .sum p.tl .pn{flex:0 0 auto;padding-left:4px}
+#page .sum p.ie{margin:0;text-indent:0}
+#page .sum p.il{margin:10pt 0 2pt;text-indent:0}
+#page p.leg{text-align:center;font-size:.85em;text-indent:0}
+body.showxe #page span.xe{background:#fff3b0;outline:1px dotted #c9a400}
+#tp-referencias .rb.bigb.lyb.two{min-width:58px}
+#tp-referencias .rb.bigb.lyb.two:hover:not(:disabled){background:var(--rhov,#e5eef8);border-color:var(--rhovb,#c5d9ee)}
 #page.abnt p.ref{text-align:left;line-height:1;margin-bottom:12pt}
 #page.abnt .cover{display:flex;flex-direction:column;justify-content:space-between;min-height:24.5cm;page:capa}
 #page.abnt .cover p{text-indent:0;text-align:center}
@@ -1310,25 +1321,18 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     </div><div class="gl">Tabela</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-referencias" data-tab="referencias" aria-labelledby="tab-referencias" hidden>
-    <div class="group" role="group" aria-label="Sumário e Legendas"><div class="gb">
-      <select id="abntIns" title="Inserir elemento ABNT">
-      <option value="" selected disabled hidden>Inserir…</option>
-      <option value="capa">Capa</option><option value="rosto">Folha de rosto</option>
-      <option value="resumo">Resumo</option><option value="sumario">Sumário</option>
-      <option value="Figura">Legenda de figura</option><option value="Tabela">Legenda de tabela</option><option value="Quadro">Legenda de quadro</option>
-    </select>
-    </div><div class="gl">Sumário e Legendas</div></div>
-    <div class="group" role="group" aria-label="Títulos"><div class="gb">
-      <select id="block" title="Estilo do parágrafo">
-      <option value="p">Normal</option>
-      <option value="h1">Título 1</option>
-      <option value="h1sn">Título sem número</option>
-      <option value="h2">Título 2</option>
-      <option value="h3">Título 3</option>
-      <option value="blockquote">Citação longa (ABNT)</option>
-    </select>
-      <button id="btnNum" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button>
-    </div><div class="gl">Títulos</div></div>
+    <div class="group" role="group" aria-label="Índice"><div class="gb cols">
+      <button id="btnToc" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Índice: insere o sumário automático (a partir dos Títulos 1, 2 e 3) com a página de cada título, numera os títulos e insere capa, folha de rosto e resumo (ABNT)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M11 12h10M11 16h10M11 20h6" stroke="#666"/></svg><span>Índice <i class="car"></i></span></button>
+      <div class="stack lystack lywide">
+        <button id="btnTocAdd" type="button" class="rb sm lysm" aria-haspopup="menu" aria-expanded="false" title="Adicionar Texto: define o nível do parágrafo no Índice (Nível 1, 2 ou 3) ou tira o parágrafo do Índice"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3.5h6M3 7h10M3 10.5h8" stroke="#666"/><path d="M12 2v5M9.5 4.5h5" stroke="#2b79c9"/></svg><span>Adicionar Texto</span><i class="car"></i></button>
+        <button id="btnTocUpd" type="button" class="rb sm lysm" disabled title="Atualizar Índice: refaz o sumário com os títulos e as páginas atuais"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 7h5M5.5 10h3" stroke="#666"/><circle cx="11.5" cy="11.5" r="3" fill="#fff" stroke="#d13438"/></svg><span>Atualizar Índice</span></button>
+      </div>
+      <div class="lyhid" hidden>
+        <select id="abntIns" title="Inserir elemento ABNT"><option value="" selected disabled hidden>Inserir…</option><option value="capa">Capa</option><option value="rosto">Folha de rosto</option><option value="resumo">Resumo</option><option value="sumario">Sumário</option></select>
+        <select id="block" title="Estilo do parágrafo"><option value="p">Normal</option><option value="h1">Título 1</option><option value="h1sn">Título sem número</option><option value="h2">Título 2</option><option value="h3">Título 3</option><option value="blockquote">Citação longa (ABNT)</option></select>
+        <button id="btnNum" type="button" title="Numerar títulos (1, 1.1, 1.1.1)">Numerar títulos</button>
+      </div>
+    </div><div class="gl">Índice</div></div>
     <div class="group" role="group" aria-label="Notas de Rodapé"><div class="gb cols">
       <button id="btnFn" type="button" class="rb bigb lyb two" title="Inserir nota de rodapé (Ctrl+Alt+F): fica no pé da página"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><text x="3" y="25" font-size="15" font-family="Segoe UI,Arial,sans-serif" fill="#666" stroke="none">AB</text><text x="21" y="12" font-size="10" font-family="Segoe UI,Arial,sans-serif" fill="#d13438" stroke="none">1</text></svg><span>Inserir Nota<br>de Rodapé</span></button>
       <div class="stack lystack lywide">
@@ -1337,6 +1341,9 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         <button id="btnNoteShow" type="button" class="rb sm lysm" title="Alterna entre o texto e a sua nota: do número vai para a nota, e da nota volta para o número"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff" stroke="#999"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#999"/></svg><span>Mostrar Notas</span></button>
       </div>
     </div><div class="gl">Notas de Rodapé</div><button type="button" id="notesDlgOpen" class="gdl" title="Notas de Rodapé e Notas de Fim…" aria-label="Notas de Rodapé e Notas de Fim"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1h4M1 1v4M9 9L3.6 3.6M9 9H6M9 9V6" stroke="currentColor" stroke-width="1" fill="none"/></svg></button></div>
+    <div class="group" role="group" aria-label="Pesquisar"><div class="gb cols">
+      <button id="btnLookup" type="button" class="rb bigb lyb two" title="Procurar: pesquisa na web o texto selecionado (ou o que você digitar), em outra aba"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="16" cy="14" r="10"/><path d="M16 12v8M16 8v1.5" stroke="#2b79c9" stroke-width="2"/><path d="M8 24l-5 5" stroke-width="2"/></svg><span>Procurar</span></button>
+    </div><div class="gl">Pesquisar</div></div>
     <div class="group" role="group" aria-label="Citações e Bibliografia"><div class="gb cols">
       <button id="btnCite" type="button" class="rb bigb lyb two" aria-haspopup="menu" aria-expanded="false" title="Inserir citação (NBR 10520) de uma fonte cadastrada, ou adicionar uma nova fonte"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M12 11c-2 .5-3 2-3 4h3v3H9" stroke="#d13438"/><path d="M19 17l3 3 6-7" stroke="#2b79c9" stroke-width="2"/></svg><span>Inserir<br>Citação <i class="car"></i></span></button>
       <div class="stack lystack lywide">
@@ -1346,6 +1353,21 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       </div>
       <div class="lyhid" hidden><button id="btnRefUpd" type="button" title="Atualiza a lista de REFERÊNCIAS e as citações do texto de acordo com as fontes cadastradas (também acontece sozinho ao adicionar, editar ou excluir uma fonte)">Atualizar</button></div>
     </div><div class="gl">Citações e Bibliografia</div></div>
+    <div class="group" role="group" aria-label="Legendas"><div class="gb cols">
+      <button id="btnCap" type="button" class="rb bigb lyb two" title="Inserir Legenda: Figura, Tabela, Quadro, Gráfico ou Equação, com numeração automática"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5.5 4.5h21v15h-21z" fill="#fff"/><path d="M8 17l5-6 4 4 3-3 4 5" stroke="#2b79c9"/><path d="M8 24.5h16M8 28h10" stroke="#666"/></svg><span>Inserir<br>Legenda</span></button>
+      <div class="stack lystack lywide">
+        <button id="btnTof" type="button" class="rb sm lysm" aria-haspopup="menu" aria-expanded="false" title="Inserir Índice de Ilustrações: lista as legendas de um tipo (Figura, Tabela…) com a página de cada uma"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#666"/><path d="M6 12.5h4" stroke="#2b79c9"/></svg><span>Inserir Índice de Ilustrações</span><i class="car"></i></button>
+        <button id="btnLstUpd" type="button" class="rb sm lysm" disabled title="Atualizar Tabela: refaz os índices de ilustrações com as legendas e as páginas atuais"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 7h5M5.5 10h3" stroke="#666"/><circle cx="11.5" cy="11.5" r="3" fill="#fff" stroke="#d13438"/></svg><span>Atualizar Índice</span></button>
+        <button id="btnXrefR" type="button" class="rb sm lysm" title="Referência Cruzada: insere o texto ou a página de uma legenda, de um título, de um indicador ou de uma nota"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 7h5M5.5 10h5" stroke="#666"/><path d="M1.5 5.5h3" stroke="#d13438"/></svg><span>Referência Cruzada</span></button>
+      </div>
+    </div><div class="gl">Legendas</div></div>
+    <div class="group" role="group" aria-label="Índice Remissivo"><div class="gb cols">
+      <button id="btnMark" type="button" class="rb bigb lyb two" title="Marcar Entrada: marca o texto selecionado para o índice remissivo (com subentrada, se quiser)"><svg class="ic" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 3.5h13l4 4v20h-17z" fill="#fff"/><path d="M5 5v8M1.5 9h7" stroke="#1e8a3c" stroke-width="2"/><path d="M12 20h9" stroke="#d13438" stroke-width="2"/></svg><span>Marcar<br>Entrada</span></button>
+      <div class="stack lystack lywide">
+        <button id="btnIdx" type="button" class="rb sm lysm" title="Inserir Índice Remissivo: lista em ordem alfabética as entradas marcadas, com as páginas"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="#666"/><path d="M6 12.5h4" stroke="#2b79c9"/></svg><span>Inserir Índice Remissivo</span></button>
+        <button id="btnIdxUpd" type="button" class="rb sm lysm" disabled title="Atualizar Índice Remissivo: refaz a lista com as entradas e as páginas atuais"><svg class="ic" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 1.5h7l2.5 2.5v10.5h-9.5z" fill="#fff"/><path d="M5.5 7h5M5.5 10h3" stroke="#666"/><circle cx="11.5" cy="11.5" r="3" fill="#fff" stroke="#d13438"/></svg><span>Atualizar Índice</span></button>
+      </div>
+    </div><div class="gl">Índice Remissivo</div></div>
   </div>
   <div class="tabpanel" role="tabpanel" id="tp-correspondencias" data-tab="correspondencias" aria-labelledby="tab-correspondencias" hidden>
     <div class="group" role="group" aria-label="Correspondência oficial"><div class="gb">
@@ -1885,6 +1907,22 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="radio" name="notesKind" value="en"> Nota de fim <span style="color:var(--muted);font-size:13px">(fim do documento, numeração i, ii, iii)</span></label>
   <div class="dlgrow"><button id="notesIns">Inserir</button><button id="notesNav">Mostrar notas</button><button id="notesClose">Fechar</button></div>
 </dialog>
+<dialog id="capDlg">
+  <h3>Inserir Legenda</h3>
+  <label style="display:flex;gap:8px;align-items:center;margin:6px 0">Rótulo: <select id="capLab"><option>Figura</option><option>Tabela</option><option>Quadro</option><option>Gráfico</option><option>Equação</option></select></label>
+  <label style="display:flex;gap:8px;align-items:center;margin:6px 0">Título: <input type="text" id="capTxt" placeholder="Título da ilustração" style="flex:1"></label>
+  <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" id="capBlank" checked> Deixar um espaço para a imagem ou tabela</label>
+  <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" id="capSrc" checked> Incluir a linha “Fonte:” abaixo (ABNT)</label>
+  <p id="capPrev" style="color:var(--muted);font-size:13px;margin:8px 0 0"></p>
+  <div class="dlgrow"><button id="capOk">OK</button><button id="capCancel">Cancelar</button></div>
+</dialog>
+<dialog id="mkDlg">
+  <h3>Marcar Entrada de Índice</h3>
+  <label style="display:flex;gap:8px;align-items:center;margin:6px 0">Entrada: <input type="text" id="mkE" style="flex:1"></label>
+  <label style="display:flex;gap:8px;align-items:center;margin:6px 0">Subentrada: <input type="text" id="mkS" style="flex:1" placeholder="(opcional)"></label>
+  <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" id="mkShow"> Realçar no texto as entradas marcadas (só na tela)</label>
+  <div class="dlgrow"><button id="mkOk">Marcar</button><button id="mkRm" hidden>Remover marca</button><button id="mkCancel">Cancelar</button></div>
+</dialog>
 <dialog id="nlDlg">
   <h3>Alterar Nível da Lista</h3>
   <label style="display:flex;gap:8px;align-items:center">Nível: <select id="nlLvl"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></label>
@@ -1991,7 +2029,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     <label><input type="checkbox" id="revAuto" checked> Corrigir erros comuns ao digitar (como o Word)</label>
     <label>Idioma <select id="revLang"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en-US">English (US)</option><option value="es">Español</option><option value="fr">Français</option><option value="it">Italiano</option></select></label>
   </div>
-  <p id="revHint" style="margin:0 0 8px;color:var(--muted);font-size:13px">A marcação em vermelho usa o corretor do seu navegador (funciona offline). Ao clicar em “Verificar documento”, o Verbus também confere cada palavra com o dicionário de português (baixado na primeira vez e guardado para uso offline) e procura problemas que o corretor não pega.</p>
+  <p id="revHint" style="margin:0 0 8px;color:var(--muted);font-size:13px">A marcação em vermelho usa o corretor do seu navegador (funciona offline). Ao clicar em “Verificar documento”, o Verbus também confere cada palavra com o dicionário de português que vem junto com o app (funciona offline) e procura problemas que o corretor não pega.</p>
   <div class="dlgrow" style="justify-content:flex-start;margin:0 0 6px"><button id="revScan">Verificar documento</button><button id="revFixAll">Corrigir todos</button><span id="revStat" style="color:var(--muted)"></span></div>
   <ul id="revList"></ul>
   <div class="dlgrow"><button id="revClose">Fechar</button></div>
@@ -5354,6 +5392,10 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         tit: {n:'Título', what:[['text', 'Texto do título'], ['page', 'Número da página']], list:()=>[...page.querySelectorAll('h1,h2,h3')].filter(h=>!h.closest('.fnotes,.endnotes') && h.textContent.replace(/​/g, '').trim()).map(h=>({t:h.textContent.trim(), el:h}))},
         fn: {n:'Nota de rodapé', what:[['num', 'Número da nota'], ['page', 'Número da página']], list:()=>[...page.querySelectorAll('sup.fn')].filter(x=>!x.closest('.fnotes')).map((s, i)=>({t:'Nota ' + (s.textContent.trim() || (i + 1)), el:s, num:s.textContent.trim() || String(i + 1)}))}
       };
+      ['Figura', 'Tabela', 'Quadro', 'Gráfico', 'Equação'].forEach(t=>{
+        const l = [...page.querySelectorAll('p.leg')].filter(p=>(p.dataset.t || 'Figura') === t);
+        if(l.length) KIND['c' + t] = {n:t, what:[['lab', 'Rótulo e número'], ['full', 'Legenda inteira'], ['page', 'Número da página']], list:()=>l.map(p=>{ const x = p.textContent.trim(), m = /^(\S+\s+\d+)/.exec(x); return {t:x, el:p, lab:m ? m[1] : x}; })};
+      });
       const d = dlg('Referência Cruzada',
         '<div class="fdGrid"><label>Tipo de referência<select id="xrKind">' + Object.keys(KIND).map(k=>'<option value="' + k + '">' + KIND[k].n + '</option>').join('') + '</select></label>' +
         '<label>Inserir referência para<select id="xrWhat"></select></label></div>' +
@@ -5363,7 +5405,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
         'Inserir', (dd, q)=>{
           const K = KIND[q('#xrKind').value], it = K.list()[+q('#xrList').value]; if(!it) return 'Escolha um item da lista.';
           const w = q('#xrWhat').value; let txt;
-          if(w === 'page') txt = String(pageOfEl(it.el)); else if(w === 'num') txt = it.num; else txt = it.t;
+          if(w === 'page') txt = String(pageOfEl(it.el)); else if(w === 'num') txt = it.num; else if(w === 'lab') txt = it.lab; else txt = it.t;
           if(q('#xrLink').checked) ins('<a href="#' + idFor(it.el) + '">' + H(txt) + '</a>'); else ins(H(txt));
         });
       const q = s=>d.querySelector(s);
@@ -5920,36 +5962,13 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     if(orig[0] !== orig[0].toLowerCase()) return rep[0].toUpperCase() + rep.slice(1);
     return rep;
   }
-  // ---------- Dicionário de português (Hunspell/VERO via nspell) ----------
-  // Baixado na primeira vez; o service worker guarda os arquivos (uso offline) e os atualiza em segundo plano.
-  const DIC_BASE = {'pt-BR':'https://cdn.jsdelivr.net/npm/dictionary-pt-br/', 'pt-PT':'https://cdn.jsdelivr.net/npm/dictionary-pt/'};
-  const DIC_EXTRA = 'condicionalidade condicionalidades socioassistencial socioassistenciais socioeducativo socioeducativa socioeducativos socioeducativas intersetorial intersetoriais intersetorialidade pix emoji emojis podcast podcasts selfie selfies online offline smartphone smartphones wifi';
+  // ---------- Dicionário de português (Hunspell em WebAssembly + dicionário pt-BR do LibreOffice/VERO) ----------
+  // Tudo fica dentro do app (pasta spell/): funciona offline desde a primeira vez e não depende de CDN. O Hunspell roda num Web Worker:
+  // a tela continua livre e as palavras são conferidas em lotes (o resultado volta por mensagem).
+  const DIC_EXTRA = 'condicionalidade condicionalidades socioassistencial socioassistenciais socioeducativo socioeducativa socioeducativos socioeducativas intersetorial intersetoriais intersetorialidade pix emoji emojis podcast podcasts selfie selfies online offline smartphone smartphones wifi whatsapp instagram wi-fi app apps gov genograma genogramas ecomapa ecomapas déficit déficits psicoeducação matriciamento socioemocional socioemocionais neurodivergente neurodivergentes neurodivergência cisgênero heteroagressividade intrafamiliar intrafamiliares transgeracional transgeracionais contrarreferência contrarreferências referenciamento vulnerabilização revitimização parentalidade coparentalidade homoparental homoparentais cadúnico';
   const spMem = {}, spOk = new Map(), spIgnore = new Set();
-  const spLang = ()=>{ let l = 'pt-BR'; try{ l = localStorage.getItem('verba:lang') || l; }catch(e){} return DIC_BASE[l] ? l : null; };   // outros idiomas: só o corretor do navegador
+  const spLang = ()=>{ let l = 'pt-BR'; try{ l = localStorage.getItem('verba:lang') || l; }catch(e){} return l === 'pt-BR' ? l : null; };   // outros idiomas: só o corretor do navegador
   const spUser = ()=>{ try{ return JSON.parse(localStorage.getItem('verbus:dicUser') || '[]'); }catch(e){ return []; } };
-  // O dicionário (≈5 MB) é montado pelo nspell, que trava a tela por vários segundos. Por isso ele roda num Web Worker: a tela continua livre
-  // e as palavras são conferidas em lotes (resultado volta por mensagem). Se o Worker não funcionar, cai no modo antigo (thread principal).
-  const NSPELL_URL = 'https://cdn.jsdelivr.net/npm/nspell@2.1.5/+esm';
-  const SP_WORKER = `
-    let sp = null, lazy = [], pumping = false;
-    const okW = x=>sp.correct(x) || (x.includes('-') && x.split('-').every(y=>sp.correct(y)));
-    const sugW = x=>sp.suggest(x).slice(0, 5);
-    function pump(){
-      if(pumping) return; pumping = true;
-      const step = ()=>{ const x = lazy.shift(); if(x === undefined){ pumping = false; return; } try{ self.postMessage({t:'sug', w:x, sug:sugW(x)}); }catch(e){} setTimeout(step, 0); };
-      setTimeout(step, 0);
-    }
-    self.onmessage = async ev=>{
-      const m = ev.data;
-      try{
-        if(m.t === 'init'){ const mod = await import(m.url); sp = mod.default(m.aff, m.dic); m.extra.forEach(x=>sp.add(x)); self.postMessage({t:'ready'}); }
-        else if(m.t === 'check'){
-          const out = [];
-          m.words.forEach(x=>{ const ok = okW(x); out.push([x, ok, ok || !m.sug ? null : sugW(x)]); if(!ok && !m.sug) lazy.push(x); });
-          self.postMessage({t:'res', out}); pump();
-        }else if(m.t === 'add') sp.add(m.w);
-      }catch(e){ self.postMessage({t:'fail', e:String(e && e.message || e)}); }
-    };`;
   function spProxy(w){
     const res = new Map(), want = new Map(), sent = new Set(); let tm = 0, waiters = [];
     const settle = ()=>{ if(!sent.size && !want.size){ const f = waiters; waiters = []; f.forEach(g=>g()); } };
@@ -5983,29 +6002,22 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     };
     return px;
   }
-  function spWorker(aff, dic){
+  function spWorker(){
     return new Promise((ok, no)=>{
-      let w; try{ w = new Worker(URL.createObjectURL(new Blob([SP_WORKER], {type:'text/javascript'}))); }catch(e){ return no(e); }
-      const fim = setTimeout(()=>{ try{ w.terminate(); }catch(_){} no(new Error('worker demorou')); }, 120000);
+      let w; try{ w = new Worker('spell/spell-worker.js', {type:'module'}); }catch(e){ return no(e); }
+      const fim = setTimeout(()=>{ try{ w.terminate(); }catch(_){} no(new Error('o dicionário demorou')); }, 60000);
       w.onerror = e=>{ clearTimeout(fim); try{ w.terminate(); }catch(_){} no(new Error('worker')); };
       w.onmessage = ev=>{
         if(ev.data.t === 'ready'){ clearTimeout(fim); ok(spProxy(w)); }
         else if(ev.data.t === 'fail'){ clearTimeout(fim); try{ w.terminate(); }catch(_){} no(new Error(ev.data.e)); }
       };
-      w.postMessage({t:'init', url:NSPELL_URL, aff, dic, extra:DIC_EXTRA.split(' ').concat(spUser())});
+      w.postMessage({t:'init', extra:DIC_EXTRA.split(' ').concat(spUser())});
     });
   }
   function spLoad(){
     const lang = spLang(); if(!lang) return Promise.reject(new Error('sem dicionário'));
-    if(!spMem[lang]) spMem[lang] = (async()=>{
-      const get = f=>fetch(DIC_BASE[lang] + f).then(r=>{ if(!r.ok) throw new Error(f); return r.text(); });
-      const [aff, dic] = await Promise.all([get('index.aff'), get('index.dic')]);
-      if(window.Worker){ try{ return await spWorker(aff, dic); }catch(e){ console.warn('Dicionário em segundo plano indisponível; usando a thread principal.', e); } }
-      const mod = await import(NSPELL_URL);
-      const sp = mod.default(aff, dic);
-      DIC_EXTRA.split(' ').concat(spUser()).forEach(w=>sp.add(w));
-      return sp;
-    })().catch(e=>{ delete spMem[lang]; throw e; });
+    if(!window.Worker) return Promise.reject(new Error('sem Worker'));
+    if(!spMem[lang]) spMem[lang] = spWorker().catch(e=>{ console.warn('Dicionário indisponível; fica o corretor do navegador.', e); delete spMem[lang]; throw e; });
     return spMem[lang];
   }
   function spAdd(w){
@@ -6107,7 +6119,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       if(sp.async){ rvOrto(sp); await sp.idle(); rvOrto(sp); await sp.idle(); }   // pede as palavras ao Worker e espera as respostas (com sugestões)
       rvItems = base.concat(rvOrto(sp).filter(o=>!base.some(a=>a.node === o.node && a.start === o.start))).sort(rvCmp);
       rvRender();
-    }catch(e){ rvRender(); $('revStat').textContent += ' (Não consegui baixar o dicionário agora — conecte-se à internet uma vez.)'; }
+    }catch(e){ rvRender(); $('revStat').textContent += ' (Não consegui carregar o dicionário de português. Atualize a página e tente de novo.)'; }
   }
   $('btnRev').addEventListener('mousedown', e=>e.preventDefault());
   $('btnRev').addEventListener('click', ()=>{ rvRescan(); $('revDlg').showModal(); });
@@ -6283,7 +6295,7 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
   }).observe(page, {childList:true, subtree:true, characterData:true});
   document.addEventListener('selectionchange', ()=>{ if(liveOn) liveSoon(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'F7'){ e.preventDefault(); $('btnRev').click(); } });
-  // O dicionário (nspell) é montado na thread principal: começa quando o navegador está ocioso e você não está digitando
+  // O dicionário carrega quando o navegador está ocioso e você não está digitando
   let lvLastKey = 0;
   page.addEventListener('keydown', ()=>{ lvLastKey = Date.now(); }, {passive:true});
   function liveBoot(){
@@ -8014,7 +8026,8 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     'h1,h2,h3{font-size:12pt;text-align:left;text-indent:0;margin:18pt 0}h1{font-weight:bold}h2{font-weight:normal}h3{font-weight:bold}h1.sn{text-align:center}' +
     'blockquote{margin:12pt 0 12pt 4cm;font-size:10pt;line-height:1;border:0;padding:0}blockquote p,td p,li p,.cover p,.sum p,p.rs,p.ref,p.leg,p.fonte{text-indent:0}' +
     'p.leg,p.fonte{font-size:10pt;line-height:1;text-align:center}p.rs{line-height:1;margin-bottom:12pt}p.ref{text-align:left;line-height:1;margin-bottom:12pt}' +
-    '.cover{text-align:center}.cover p{text-align:center}.nat{margin-left:8cm;font-size:10pt;line-height:1}.pb{page-break-after:always}table{font-size:10pt;line-height:1}';
+    '.cover{text-align:center}.cover p{text-align:center}.nat{margin-left:8cm;font-size:10pt;line-height:1}.pb{page-break-after:always}table{font-size:10pt;line-height:1}' +
+    '.sum p.tl{display:flex;align-items:baseline;margin:0}.sum p.tl .dl{flex:1 1 auto;min-width:12px;border-bottom:1px dotted #000;transform:translateY(-.25em)}.sum p.tl .tt{padding-right:4px}.sum p.tl .pn{padding-left:4px}.sum p.ie,.sum p.il{margin:0;text-indent:0}.sum p.il{margin-top:10pt}';
   const bAbnt = $('btnAbnt');
   function setAbnt(on, user){
     page.classList.toggle('abnt', on); $('sheet').classList.toggle('abnt', on); bAbnt.classList.toggle('on', on);
@@ -8061,25 +8074,51 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
     rosto:'<div class="cover"><div><p>NOME DO AUTOR</p></div><div><p><b>TÍTULO DO TRABALHO</b></p><p>subtítulo (se houver)</p></div><div class="nat"><p>Trabalho de Conclusão de Curso apresentado ao curso de ..., da Instituição ..., como requisito parcial para a obtenção do grau de ....</p><p><br></p><p>Orientador(a): Prof(a). Nome</p></div><div><p>CIDADE</p><p>ANO</p></div></div>' + PB,
     resumo:'<h1 class="sn">RESUMO</h1><p class="rs">Escreva aqui o resumo, em parágrafo único, com 150 a 500 palavras.</p><p class="rs"><b>Palavras-chave:</b> palavra 1; palavra 2; palavra 3.</p>' + PB
   };
-  function sumario(){
+  // Insere blocos logo depois do parágrafo do cursor (ou no lugar dele, se estiver vazio), sem partir o parágrafo ao meio
+  function putBlock(html){
+    const b4 = tSnap(); restore();
+    const sl = getSelection(); let n = sl.rangeCount ? sl.getRangeAt(0).startContainer : null;
+    while(n && n.parentNode !== page) n = n.parentNode;
+    const tp = document.createElement('template'); tp.innerHTML = html; const nodes = [...tp.content.childNodes];
+    if(n && n.nodeType === 1 && page.contains(n)){
+      if(n.tagName === 'P' && !n.textContent.trim() && !n.querySelector('img,table,svg')) n.replaceWith(...nodes); else n.after(...nodes);
+    }else page.append(...nodes);
+    tCommit(b4); changed();
+  }
+  const swapEl = (el, html)=>{ const b4 = tSnap(); el.outerHTML = html; tCommit(b4); changed(); };
+  // Página (na tela) em que um elemento está: mesma conta do "Página x de y" da barra de status
+  function pageOfEl(el){
+    try{
+      const n = pageCount(); if(n <= 1) return 1;
+      const sheet = $('sheet'), rc = el.getBoundingClientRect();
+      if(pgState){
+        const sr = sheet.getBoundingClientRect(), sc = sheet.offsetWidth ? sr.width / sheet.offsetWidth : 1, y = (rc.top - sr.top) / sc - pgState.base;
+        if(pgState.shifted) return Math.max(1, Math.min(n, Math.floor((y + pgState.et) / pgState.P) + 1));
+        let cur = 1; pgState.starts.forEach((v, i)=>{ if(y + 1 >= v) cur = i + 1; }); return cur;
+      }
+      const z = parseFloat(sheet.style.zoom) || 1, ph = pgOf().h * CMPX * z;
+      return Math.max(1, Math.min(n, Math.floor((rc.top - page.getBoundingClientRect().top) / ph) + 1));
+    }catch(e){ return 1; }
+  }
+  const TOCQ = '.sum:not(.lst):not(.idx)';
+  const tocRow = (txt, pg, ind, bold)=>'<p class="tl" style="margin-left:' + ind + 'cm"><span class="tt">' + (bold ? '<b>' + esc(txt) + '</b>' : esc(txt)) + '</span><span class="dl"></span><span class="pn">' + pg + '</span></p>';
+  function tocHtml(){
     const hs = [...page.querySelectorAll('h1,h2,h3')].filter(h=>!h.closest('.sum') && !/^(sum[aá]rio|resumo|abstract)$/i.test(h.textContent.trim()));
     const rows = hs.map(h=>{
       const lv = +h.tagName[1]; let t = h.textContent.trim(); if(lv < 3) t = t.toUpperCase();
-      return '<p style="margin-left:' + (lv - 1) * 0.6 + 'cm">' + (lv === 1 ? '<b>' + esc(t) + '</b>' : esc(t)) + '</p>';
+      return tocRow(t, pageOfEl(h), (lv - 1) * 0.6, lv === 1);
     }).join('');
-    const html = '<div class="sum"><h1 class="sn">SUMÁRIO</h1>' + rows + '</div>', old = page.querySelector('.sum');
-    if(old){ old.outerHTML = html; changed(); } else { restore(); exec('insertHTML', html + PB); }
+    return '<div class="sum"><h1 class="sn">SUMÁRIO</h1>' + (rows || '<p class="tl"><span class="tt">Use os estilos Título 1, 2 e 3 para montar o sumário.</span></p>') + '</div>';
   }
-  function legenda(tipo){
-    const n = page.querySelectorAll('p.leg[data-t="' + tipo + '"]').length + 1;
-    restore();
-    exec('insertHTML', '<p class="leg" data-t="' + tipo + '">' + tipo + ' ' + n + ' – Título</p><p style="text-indent:0;text-align:center"><br></p><p class="fonte">Fonte: autoria própria (' + new Date().getFullYear() + ').</p>');
+  function sumario(){
+    const html = tocHtml(), old = page.querySelector(TOCQ);
+    if(old) swapEl(old, html); else putBlock(html + PB);
+    if(window.__refsLater) window.__refsLater();     // as páginas mudam depois que o sumário entra no texto
   }
   $('abntIns').addEventListener('change', e=>{
     const v = e.target.value; e.target.value = '';
     if(TPL[v]){ restore(); exec('insertHTML', TPL[v]); }
     else if(v === 'sumario') sumario();
-    else legenda(v);
   });
 
   // Referências e citações
@@ -8270,6 +8309,196 @@ body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
       {t:'Referências', h:'Insere a lista com o título REFERÊNCIAS', f:()=>insertBib('REFERÊNCIAS')},
       {t:'Bibliografia', h:'Insere a lista com o título BIBLIOGRAFIA', f:()=>insertBib('BIBLIOGRAFIA')}, '-',
       {t:'Atualizar lista', f:()=>$('btnRefUpd').click()}]);
+  })();
+
+  // ---------- Referências (estilo Word): Índice, Pesquisar, Legendas, Referência Cruzada e Índice Remissivo ----------
+  (function(){
+    const PLUR = {'Figura':'FIGURAS', 'Tabela':'TABELAS', 'Quadro':'QUADROS', 'Gráfico':'GRÁFICOS', 'Equação':'EQUAÇÕES'}, LABELS = Object.keys(PLUR);
+    const capRe = /^(\S+)\s+(\d+)\s*[–-]\s*([\s\S]*)$/;
+    const uid = ()=>Math.random().toString(36).slice(2, 9);
+    const caps = t=>[...page.querySelectorAll('p.leg')].filter(p=>!t || (p.dataset.t || 'Figura') === t);
+    const capT = p=>p.dataset.t || 'Figura';
+    const num = (p, n)=>{ const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), t = w.nextNode(); if(t) t.nodeValue = t.nodeValue.replace(/^(\s*\S+\s+)\d+/, '$1' + n); };
+    const later = fn=>{ setTimeout(fn, 350); setTimeout(fn, 1000); };
+    const same = (a, h)=>{ const t = document.createElement('div'); t.innerHTML = h; return !!t.firstChild && a.isEqualNode(t.firstChild); };
+    const hasSel = ()=>{ const s = getSelection(); return s.rangeCount && !s.isCollapsed && page.contains(s.anchorNode) && page.contains(s.focusNode); };
+
+    // menu simples ligado a um botão
+    function menu(btn, build){
+      let pop = null;
+      function close(){ if(pop){ pop.remove(); pop = null; } btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); document.removeEventListener('keydown', esc, true); }
+      function outside(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(); }
+      function esc(e){ if(e.key === 'Escape'){ e.preventDefault(); close(); } }
+      btn.addEventListener('mousedown', e=>e.preventDefault());
+      btn.addEventListener('click', ()=>{
+        if(pop){ close(); return; }
+        pop = document.createElement('div'); pop.id = 'tblPop'; pop.setAttribute('role', 'menu');
+        build().forEach(it=>{
+          if(it === '-'){ pop.appendChild(document.createElement('hr')); return; }
+          if(it.hd){ const h = document.createElement('div'); h.className = 'mh'; h.textContent = it.hd; pop.appendChild(h); return; }
+          const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it.t; if(it.h) b.title = it.h;
+          b.addEventListener('click', ()=>{ close(); it.f(); }); pop.appendChild(b);
+        });
+        pop.addEventListener('mousedown', e=>e.preventDefault());
+        document.body.appendChild(pop);
+        const r = btn.getBoundingClientRect();
+        pop.style.left = Math.max(4, Math.min(r.left, innerWidth - pop.offsetWidth - 4)) + 'px'; pop.style.top = Math.max(4, Math.min(r.bottom + 2, innerHeight - pop.offsetHeight - 4)) + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+        document.addEventListener('mousedown', outside, true); document.addEventListener('keydown', esc, true);
+      });
+    }
+    const fire = (id, v)=>{ const sl = $(id); sl.value = v; sl.dispatchEvent(new Event('change', {bubbles:true})); };
+
+    // ---- Índice (sumário) ----
+    menu($('btnToc'), ()=>[
+      {t:'Sumário Automático', h:'Insere o sumário com os Títulos 1, 2 e 3 e a página de cada um (ou atualiza o que já existe)', f:()=>sumario()},
+      ...(page.querySelector(TOCQ) ? [{t:'Remover Sumário', f:()=>{ const o = page.querySelector(TOCQ); if(o){ const b4 = tSnap(); o.remove(); tCommit(b4); changed(); } }}] : []),
+      '-', {t:'Numerar Títulos', h:'Numera os títulos: 1, 1.1, 1.1.1', f:()=>$('btnNum').click()},
+      '-', {hd:'Elementos ABNT'},
+      {t:'Capa', f:()=>fire('abntIns', 'capa')}, {t:'Folha de rosto', f:()=>fire('abntIns', 'rosto')}, {t:'Resumo', f:()=>fire('abntIns', 'resumo')}]);
+    const lvl = v=>()=>{ restore(); blockChange(v); };
+    menu($('btnTocAdd'), ()=>[
+      {t:'Não Mostrar no Índice', h:'Volta o parágrafo para texto normal', f:lvl('p')},
+      {t:'Nível 1', f:lvl('h1')}, {t:'Nível 2', f:lvl('h2')}, {t:'Nível 3', f:lvl('h3')},
+      '-', {t:'Título sem número', h:'Título 1 centralizado, sem numeração (ex.: RESUMO, REFERÊNCIAS)', f:lvl('h1sn')},
+      {t:'Citação longa (ABNT)', f:lvl('blockquote')}]);
+    $('btnTocUpd').addEventListener('click', ()=>{ if(page.querySelector(TOCQ)) sumario(); });
+
+    // ---- Pesquisar ----
+    $('btnLookup').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnLookup').addEventListener('click', ()=>{
+      let q = hasSel() ? getSelection().toString().trim() : '';
+      if(!q) q = (prompt('O que você quer procurar na web?', '') || '').trim();
+      if(q) window.open('https://www.google.com/search?q=' + encodeURIComponent(q.slice(0, 200)), '_blank', 'noopener');
+    });
+
+    // ---- Legendas ----
+    function renumber(){
+      const cnt = {}; let ch = false;
+      caps().forEach(p=>{
+        const t = capT(p); cnt[t] = (cnt[t] || 0) + 1;
+        const m = capRe.exec(p.textContent.trim()); if(m && +m[2] !== cnt[t]){ num(p, cnt[t]); ch = true; }
+        if(!p.dataset.cid){ p.dataset.cid = uid(); ch = true; }
+      });
+      return ch;
+    }
+    const capLabel = p=>{ const m = capRe.exec(p.textContent.trim()); return m ? m[1] + ' ' + m[2] : p.textContent.trim(); };
+    const capTitle = p=>{ const m = capRe.exec(p.textContent.trim()); return m ? m[3].trim() : p.textContent.trim(); };
+    const nextN = t=>caps(t).length + 1;
+    function capPrev(){ $('capPrev').textContent = 'Será inserida: ' + $('capLab').value + ' ' + nextN($('capLab').value) + ' – ' + ($('capTxt').value.trim() || 'Título'); }
+    $('btnCap').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnCap').addEventListener('click', ()=>{
+      $('capTxt').value = ''; capPrev(); $('capDlg').showModal(); $('capTxt').focus();
+    });
+    $('capLab').addEventListener('change', capPrev); $('capTxt').addEventListener('input', capPrev);
+    $('capCancel').addEventListener('click', ()=>$('capDlg').close());
+    $('capDlg').addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.id === 'capTxt'){ e.preventDefault(); $('capOk').click(); } });
+    $('capOk').addEventListener('click', ()=>{
+      const t = $('capLab').value, tx = $('capTxt').value.trim() || 'Título';
+      $('capDlg').close();
+      putBlock('<p class="leg" data-t="' + t + '" data-cid="' + uid() + '">' + t + ' ' + nextN(t) + ' – ' + esc(tx) + '</p>' +
+        ($('capBlank').checked ? '<p style="text-indent:0;text-align:center"><br></p>' : '') +
+        ($('capSrc').checked ? '<p class="fonte">Fonte: autoria própria (' + new Date().getFullYear() + ').</p>' : ''));
+      renumber(); later(refreshAll);
+    });
+
+    // listas de ilustrações
+    const lstHtml = t=>{
+      const rows = caps(t).map(p=>tocRow(capLabel(p) + ' – ' + capTitle(p), pageOfEl(p), 0, false)).join('');
+      return '<div class="sum lst" data-t="' + t + '"><h1 class="sn">LISTA DE ' + PLUR[t] + '</h1>' + rows + '</div>';
+    };
+    menu($('btnTof'), ()=>{
+      const it = LABELS.filter(t=>caps(t).length).map(t=>({t:'Lista de ' + PLUR[t].toLowerCase() + ' (' + caps(t).length + ')', h:'Insere (ou atualiza) a lista com as legendas “' + t + '”', f:()=>putList(t)}));
+      return it.length ? it : [{t:'Nenhuma legenda no documento', h:'Use Inserir Legenda primeiro', f:()=>{}}];
+    });
+    function putList(t){
+      renumber();
+      const old = [...page.querySelectorAll('.sum.lst')].find(x=>x.dataset.t === t), h = lstHtml(t);
+      if(old) swapEl(old, h); else putBlock(h + PB);
+      later(refreshAll);
+    }
+    $('btnLstUpd').addEventListener('click', ()=>{ renumber(); refreshAll(); });
+
+    // ---- Referência Cruzada: abre a janela da guia Inserir (que também lista as legendas) ----
+    $('btnXrefR').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnXrefR').addEventListener('click', ()=>{ renumber(); $('btnXref').click(); });
+
+    // ---- Índice Remissivo ----
+    const norm = x=>x.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+    function idxHtml(){
+      const M = new Map();
+      page.querySelectorAll('span.xe').forEach(x=>{
+        const e = (x.dataset.e || '').trim(); if(!e) return;
+        const s = (x.dataset.s || '').trim(), pg = pageOfEl(x);
+        if(!M.has(e)) M.set(e, {p:new Set(), s:new Map()});
+        const o = M.get(e);
+        if(s){ if(!o.s.has(s)) o.s.set(s, new Set()); o.s.get(s).add(pg); } else o.p.add(pg);
+      });
+      const pg = set=>[...set].sort((a, b)=>a - b).join(', '), col = (a, b)=>a.localeCompare(b, 'pt-BR');
+      let out = '', letter = '';
+      [...M.keys()].sort(col).forEach(e=>{
+        const L = norm(e).charAt(0) || '#'; if(L !== letter){ letter = L; out += '<p class="il"><b>' + esc(L) + '</b></p>'; }
+        const o = M.get(e); out += '<p class="ie">' + esc(e) + (o.p.size ? ', ' + pg(o.p) : '') + '</p>';
+        [...o.s.keys()].sort(col).forEach(s=>{ out += '<p class="ie" style="margin-left:.6cm">' + esc(s) + ', ' + pg(o.s.get(s)) + '</p>'; });
+      });
+      return '<div class="sum idx"><h1 class="sn">ÍNDICE</h1>' + out + '</div>';
+    }
+    $('btnIdx').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnIdx').addEventListener('click', ()=>{
+      if(!page.querySelector('span.xe')){ alert('Nenhuma entrada marcada. Selecione um termo no texto e use Marcar Entrada.'); return; }
+      const old = page.querySelector('.sum.idx'), h = idxHtml();
+      if(old) swapEl(old, h); else putBlock(h);
+      later(refreshAll);
+    });
+    $('btnIdxUpd').addEventListener('click', ()=>refreshAll());
+    let mkR = null, mkEl = null;
+    $('btnMark').addEventListener('mousedown', e=>e.preventDefault());
+    $('btnMark').addEventListener('click', ()=>{
+      const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)){ alert('Selecione, no texto, a palavra ou a expressão que vai para o índice.'); return; }
+      const r = s.getRangeAt(0).cloneRange(), n = r.commonAncestorContainer, host = (n.nodeType === 1 ? n : n.parentElement).closest('span.xe');
+      if(r.collapsed && !host){ alert('Selecione, no texto, a palavra ou a expressão que vai para o índice.'); return; }
+      mkR = r; mkEl = host && page.contains(host) ? host : null;
+      $('mkE').value = mkEl ? mkEl.dataset.e || '' : r.toString().replace(/\s+/g, ' ').trim(); $('mkS').value = mkEl ? mkEl.dataset.s || '' : '';
+      $('mkRm').hidden = !mkEl; $('mkOk').textContent = mkEl ? 'Salvar' : 'Marcar'; $('mkShow').checked = document.body.classList.contains('showxe');
+      $('mkDlg').showModal(); $('mkE').focus(); $('mkE').select();
+    });
+    $('mkCancel').addEventListener('click', ()=>$('mkDlg').close());
+    $('mkShow').addEventListener('change', e=>document.body.classList.toggle('showxe', e.target.checked));
+    $('mkRm').addEventListener('click', ()=>{
+      if(mkEl && mkEl.parentNode){ const b4 = tSnap(); mkEl.replaceWith(...mkEl.childNodes); tCommit(b4); changed(); refreshAll(); }
+      $('mkDlg').close();
+    });
+    $('mkOk').addEventListener('click', ()=>{
+      const e = $('mkE').value.trim(), sb = $('mkS').value.trim(); if(!e){ $('mkE').focus(); return; }
+      if(mkEl){ mkEl.dataset.e = e; if(sb) mkEl.dataset.s = sb; else delete mkEl.dataset.s; }
+      else{
+        const sp = document.createElement('span'); sp.className = 'xe'; sp.dataset.e = e; if(sb) sp.dataset.s = sb;
+        const b4 = tSnap();
+        try{ mkR.surroundContents(sp); tCommit(b4); }
+        catch(err){ alert('Selecione um trecho dentro de um único parágrafo, sem abrir ou fechar formatações pela metade.'); return; }
+      }
+      $('mkDlg').close(); changed(); later(refreshAll);
+    });
+
+    // ---- atualização geral (páginas, numeração, referências) ----
+    function refreshAll(){
+      let ch = renumber();
+      const t = page.querySelector(TOCQ); if(t){ const h = tocHtml(); if(!same(t, h)){ t.outerHTML = h; ch = true; } }
+      page.querySelectorAll('.sum.lst').forEach(l=>{ const h = lstHtml(l.dataset.t || 'Figura'); if(!same(l, h)){ l.outerHTML = h; ch = true; } });
+      const ix = page.querySelector('.sum.idx'); if(ix){ const h = idxHtml(); if(!same(ix, h)){ ix.outerHTML = h; ch = true; } }
+      if(ch) changed();
+      sync();
+    }
+    window.__refsLater = ()=>later(refreshAll);
+    // botões "Atualizar" ficam acinzentados quando o documento não tem o índice correspondente
+    let tm = 0;
+    function sync(){
+      $('btnTocUpd').disabled = !page.querySelector(TOCQ);
+      $('btnLstUpd').disabled = !page.querySelector('.sum.lst');
+      $('btnIdxUpd').disabled = !page.querySelector('.sum.idx');
+    }
+    new MutationObserver(()=>{ clearTimeout(tm); tm = setTimeout(sync, 150); }).observe(page, {childList:true, subtree:true});
+    sync();
   })();
 
   // ---------- Réguas (horizontal e vertical, estilo clássico) ----------
