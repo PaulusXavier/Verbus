@@ -111,12 +111,13 @@ footer span:last-child{margin-left:auto}
 :root[data-theme="dark"]{--bg:#14171b;--bar:#20252b;--ink:#e6e9ed;--muted:#98a3b0;--line:#38414b;--accent:#7aa8f5;--accent-soft:#27364f;--pgedge:#0b0d10}
 :root[data-theme="light"]{--bg:#e6e6e6;--bar:#f7f8fa;--ink:#1f2933;--muted:#5f6b7a;--line:#c9d0d8;--accent:#1d5fd1;--accent-soft:#dce8fb;--pgedge:#c6c6c6}
 ::highlight(vfind){background:#ffe36e;color:#000}
+::highlight(vfindcur){background:#ff9632;color:#000}
 ::highlight(vsim){background:#9ec5fa;color:#000}
 ::highlight(vspell){text-decoration:underline wavy #d93025;text-decoration-skip-ink:none}
 ::highlight(vgram){text-decoration:underline double #2b79c9;text-decoration-skip-ink:none}
 @media print{::highlight(vspell),::highlight(vgram){text-decoration:none}}
 @media print{::highlight(vsim){background:transparent;color:inherit}}
-@media print{::highlight(vfind){background:transparent;color:inherit}}
+@media print{::highlight(vfind),::highlight(vfindcur){background:transparent;color:inherit}}
 @media print{html,body,main,#work,#sheet{background:#fff !important}.vdlg,#clipDlg,#symDlg,#fmenu,#cpal,#minibar,#gotoDlg{display:none !important}#page{caret-color:transparent}}
 #page .ctx + .ctx{margin-top:0 !important}
 #page [data-lh=min] *{line-height:normal}
