@@ -292,9 +292,27 @@
     if(s.rangeCount && page.contains(s.anchorNode)) savedRange = s.getRangeAt(0).cloneRange();
     refreshSoon();
   });
+  // prompt() tira o foco da folha e pode deixar a seleção no início do documento: guarda o intervalo de antes e devolve ao fechar,
+  // para que o que for inserido depois do diálogo (nota de rodapé, link, legenda…) caia onde estava o cursor
+  (function(){
+    const nativo = window.prompt.bind(window);
+    window.prompt = function(){
+      const s = getSelection(), vivo = s.rangeCount && page.contains(s.anchorNode) ? s.getRangeAt(0).cloneRange() : null;
+      const antes = vivo || (savedRange ? savedRange.cloneRange() : null);
+      try{ return nativo.apply(window, arguments); }
+      finally{
+        if(antes) savedRange = antes;
+        if(vivo && document.activeElement === page){ s.removeAllRanges(); s.addRange(vivo); }
+      }
+    };
+  })();
   function restore(){
+    // com a folha já em foco, a seleção atual é a verdadeira: savedRange só é atualizado de forma assíncrona (selectionchange)
+    // e logo depois de mover o cursor (Ctrl+End, setas) ainda guarda a posição antiga
+    const s = getSelection();
+    if(document.activeElement === page && s.rangeCount && page.contains(s.anchorNode)) return;
     page.focus();
-    if(savedRange){ const s = getSelection(); s.removeAllRanges(); s.addRange(savedRange); }
+    if(savedRange){ s.removeAllRanges(); s.addRange(savedRange); }
   }
 
   // (a leitura do arquivo e a colocação da imagem ficam no módulo "Imagens", mais abaixo)
