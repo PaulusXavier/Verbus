@@ -91,6 +91,13 @@ Editor de texto de uso pessoal que roda no navegador (HTML, CSS e JavaScript pur
 ## Como usar
 Abra o `index.html` no navegador.
 
+## Estrutura do projeto
+- `index.html`: só a marcação da página; carrega `style.css`, `style-word.css` e os arquivos de `js/` na ordem em que aparecem.
+- `js/`: o programa dividido por assunto (`armazenamento`, `pagina`, `arquivo`, `mala-direta`, `tabelas`, `inserir`, `corretor`, `modelos`, `abnt`, `menu-arquivo`, `layout`, `design` etc.). Formam um só programa e compartilham o escopo global, então **a ordem dos `<script>` importa**.
+- `js/chaves.js`: **única** lista das chaves do localStorage (`LS_KEYS`), do que o "Apagar ao fechar" remove (`LS_KEYS_DOCS`) e a migração dos nomes antigos (`verba:`, `verbus_`, `verbus.`). Preferência nova: acrescente a chave lá e use `LS_KEYS.nome`.
+- `js/modelos-imagens.js`: as imagens (PNG em base64) dos cabeçalhos e rodapés dos modelos prontos.
+- `sw.js`: ao criar ou renomear um arquivo, inclua-o em `ARQUIVOS` e aumente o número de `CACHE` (`verbus-vNN`).
+
 ## Publicar no GitHub Pages
 Settings > Pages > Branch: main / (root) > Save.
 
