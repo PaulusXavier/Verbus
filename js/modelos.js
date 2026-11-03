@@ -440,10 +440,8 @@
   }
   function cleanPasted(h){
     const doc = new DOMParser().parseFromString(h, 'text/html');
-    doc.querySelectorAll('script,style,meta,link,iframe,object,embed,title').forEach(n=>n.remove());
-    doc.body.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{
-      const k = a.name.toLowerCase();
-      if(k.startsWith('on') || k === 'class' || k === 'id' || k === 'style' || (k === 'href' && /^[\x00-\x20]*j[\t\n\r]*a[\t\n\r]*v[\t\n\r]*a[\t\n\r]*s[\t\n\r]*c[\t\n\r]*r[\t\n\r]*i[\t\n\r]*p[\t\n\r]*t[\t\n\r]*:/i.test(a.value))) n.removeAttribute(a.name);
-    }));
+    doc.querySelectorAll('style,title').forEach(n=>n.remove());
+    sanitizarHtml(doc.body);
+    doc.body.querySelectorAll('*').forEach(n=>['class', 'id', 'style'].forEach(k=>n.removeAttribute(k)));
     return doc.body.innerHTML;
   }
