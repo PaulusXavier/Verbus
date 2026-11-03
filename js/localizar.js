@@ -99,7 +99,8 @@
   // realça todas as ocorrências (CSS Custom Highlight API; sem suporte, só a ocorrência atual aparece selecionada)
   function hlAll(ms){
     try{
-      if(!window.CSS || !CSS.highlights) return;
+      if(!window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+      if(!ms.length) CSS.highlights.delete('vfindcur');
       if(!ms.length || !$('fhl').checked){ CSS.highlights.delete('vfind'); return; }
       CSS.highlights.set('vfind', new Highlight(...ms.map(m=>m.r.cloneRange())));
     }catch(e){}
@@ -110,7 +111,14 @@
     fIdx = (fIdx + dir + ms.length) % ms.length;
     $('fstat').textContent = (fIdx + 1) + ' de ' + ms.length;
     hlAll(ms);
-    const r = ms[fIdx].r, s = getSelection(); s.removeAllRanges(); s.addRange(r.cloneRange());
+    const r = ms[fIdx].r, s = getSelection();
+    // selecionar dentro da folha (contenteditable) rouba o foco da caixa de busca no Chrome e o resto do que se digita iria para o documento
+    const ae = document.activeElement, keep = ae && ae !== page && fb.contains(ae) ? ae : null;
+    s.removeAllRanges(); s.addRange(r.cloneRange());
+    if(keep){
+      keep.focus({preventScroll:true});
+      try{ if(window.CSS && CSS.highlights && typeof Highlight !== 'undefined') CSS.highlights.set('vfindcur', new Highlight(r.cloneRange())); }catch(e){}   // a seleção some quando a caixa mantém o foco: a ocorrência atual fica em destaque
+    }
     const el = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer;
     if(el) el.scrollIntoView({block:'center'});
   }
@@ -338,7 +346,7 @@
   $('gtNum').addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); gotoGo(); } });
   $('gtClose').addEventListener('click', ()=>$('gotoDlg').close());
   document.addEventListener('keydown', e=>{ if(e.ctrlKey && !e.shiftKey && !e.altKey && (e.key === 'g' || e.key === 'G')){ e.preventDefault(); openGoto(); } });
-  $('fclose').addEventListener('click', ()=>{ fb.hidden = true; try{ CSS.highlights.delete('vfind'); }catch(e){} page.focus(); });
+  $('fclose').addEventListener('click', ()=>{ fb.hidden = true; try{ CSS.highlights.delete('vfind'); CSS.highlights.delete('vfindcur'); }catch(e){} page.focus(); });
   $('fword').addEventListener('change', ()=>{ fIdx = -1; step(1); });
   $('fhl').addEventListener('change', ()=>{ fIdx = -1; step(1); });
   $('fnext').addEventListener('click', ()=>step(1));
@@ -355,7 +363,7 @@
   $('freplAll').addEventListener('click', ()=>{
     const ms = matches();
     for(let i = ms.length - 1; i >= 0; i--) replaceOne(ms[i]);
-    $('fstat').textContent = ms.length + ' substituído(s)'; changed(); fIdx = -1; try{ CSS.highlights.delete('vfind'); }catch(e){}
+    $('fstat').textContent = ms.length + ' substituído(s)'; changed(); fIdx = -1; try{ CSS.highlights.delete('vfind'); CSS.highlights.delete('vfindcur'); }catch(e){}
   });
   $('fwild').addEventListener('change', ()=>{ fIdx = -1; step(1); });
   // códigos especiais
