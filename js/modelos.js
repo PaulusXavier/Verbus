@@ -310,7 +310,7 @@
       [[2, 'Cadastro Único atualizado'], [3, CK + ' sim ' + CK + ' não']],
       [[2, 'Benefícios sociais'], [3, CK + ' Bolsa Família ' + CK + ' BPC ' + CK + ' outros:&nbsp;']],
       [[2, 'Participa de Projetos Sociais'], [3, CK + ' sim ' + CK + ' não']],
-      [[5, 'É acompanhada pelo ' + CK + ' PAIF ' + CK + ' PAEFI ' + CK + ' CREAS ' + CK + ' Conselho Tutelar']],
+      [[5, 'É acompanhado(a) pelo ' + CK + ' PAIF ' + CK + ' PAEFI ' + CK + ' CREAS ' + CK + ' Conselho Tutelar']],
       [[1, 'Composição Familiar', {rs:6, c:1}], E(4)], [E(4)], [E(4)], [E(4)], [E(4)], [E(4)],
       [[1, 'Provedores', {rs:2, c:1}], E(4)], [E(4)],
       [[1, 'Renda Total', {c:1}], E(2), [1, 'Renda Per Capita', {c:1}], L(1, 'R$')],
