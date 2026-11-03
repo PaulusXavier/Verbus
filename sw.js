@@ -1,5 +1,5 @@
 // Verbus — service worker: sempre tenta a rede primeiro (versão nova), usa o cache só offline.
-const CACHE = 'verbus-v70', DIC = 'verbus-dic'; // DIC: dicionário de português e sinônimos (CDN), mantidos para uso offline
+const CACHE = 'verbus-v71', DIC = 'verbus-dic'; // DIC: dicionário de português e sinônimos (CDN), mantidos para uso offline
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon-32.png', './style.css', './style-word.css',
   './js/chaves.js', './js/armazenamento.js', './js/pagina.js', './js/edicao-base.js', './js/arquivo.js', './js/mala-direta.js', './js/tabelas.js', './js/notas-inserir.js', './js/inserir.js', './js/corretor.js', './js/localizar.js', './js/salvar.js', './js/modelos-imagens.js', './js/modelos.js', './js/formatacao.js', './js/abnt.js', './js/referencias.js', './js/reguas.js', './js/cabecalho.js', './js/menu-arquivo.js', './js/estilos-imagens.js', './js/layout.js', './js/interface.js', './js/design.js'];
 
