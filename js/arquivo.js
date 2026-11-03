@@ -35,6 +35,19 @@
     window.addEventListener('beforeprint', ()=>{ const n = window.__pdfNome || autoName() || title.value.trim(); if(n){ old = document.title; document.title = n; } });
     window.addEventListener('afterprint', ()=>{ window.__pdfNome = null; if(old != null){ document.title = old; old = null; } });
   })();
+  // Limpa HTML vindo de fora (arquivo aberto, .docx convertido, texto colado): tira scripts, manipuladores on*, srcdoc e endereços
+  // javascript:/vbscript:/data:text/html em qualquer atributo de endereço (href, src, xlink:href, action, formaction…)
+  const URL_ATTR = /^(href|src|xlink:href|action|formaction|data|poster|background|srcset)$/i;
+  const URL_PERIGO = /^(javascript|vbscript|data:text\/html)/i;
+  function sanitizarHtml(root){
+    root.querySelectorAll('script,iframe,object,embed,base,meta,link,applet').forEach(n=>n.remove());
+    root.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{
+      const k = a.name.toLowerCase();
+      if(k.startsWith('on') || k === 'srcdoc' || (URL_ATTR.test(k) && URL_PERIGO.test(a.value.replace(/[\x00-\x20\u00a0\u200b]+/g, '')))) n.removeAttribute(a.name);
+    }));
+    return root;
+  }
+  window.sanitizarHtml = sanitizarHtml;
   function hfLines(k, cls){
     const hh = hfData(), lines = [[]];
     hfRuns(hh[k]).forEach(t=>{
@@ -102,7 +115,7 @@
         try{
           if(!window.mammoth) await loadScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js');
           const res = await window.mammoth.convertToHtml({arrayBuffer: await f.arrayBuffer()});
-          page.innerHTML = res.value; title.value = f.name.replace(/\.[^.]+$/, ''); changed(); ligar();
+          page.innerHTML = sanitizarHtml(new DOMParser().parseFromString(res.value, 'text/html').body).innerHTML; title.value = f.name.replace(/\.[^.]+$/, ''); changed(); ligar();
         }catch(err){ alert('Não foi possível abrir o .docx. Verifique a conexão com a internet.'); }
       })();
       return;
@@ -112,10 +125,8 @@
       const isHtml = /\.(html?|doc)$/i.test(f.name);
       if(isHtml){
         const doc = new DOMParser().parseFromString(r.result, 'text/html');
-        doc.querySelectorAll('script,style,iframe,object,embed').forEach(n=>n.remove());
-        doc.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{
-          if(/^on/i.test(a.name) || /^[\x00-\x20]*j[\t\n\r]*a[\t\n\r]*v[\t\n\r]*a[\t\n\r]*s[\t\n\r]*c[\t\n\r]*r[\t\n\r]*i[\t\n\r]*p[\t\n\r]*t[\t\n\r]*:/i.test(a.value)) n.removeAttribute(a.name);
-        }));
+        doc.querySelectorAll('style').forEach(n=>n.remove());
+        sanitizarHtml(doc.body);
         page.innerHTML = doc.body.innerHTML;
       }else{
         page.textContent = '';
