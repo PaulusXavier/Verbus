@@ -660,3 +660,8 @@ dialog.mcd .mct button:hover{color:var(--ink)}
 dialog.mcd ul.chklist{margin:6px 0;padding-left:4px;list-style:none}
 dialog.mcd ul.chklist li{margin:4px 0}
 dialog.mcd ul.okl{color:var(--muted)}
+/* PDF anexado (js/anexo-pdf.js) */
+#page .pdfx{user-select:none;cursor:pointer}
+#page .pdfx img{box-shadow:0 0 0 1px #c9d0d8}
+#page .pdfx.sel img{outline:3px solid var(--accent,#1d5fd1);outline-offset:1px}
+@media print{#page .pdfx img{box-shadow:none;outline:0 !important} #page .pdfx{break-inside:avoid}}
