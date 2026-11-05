@@ -71,7 +71,7 @@
         two('<b>Encaminhamento:</b>' + SP, '<b>CRAS/CRISTIANA VICENTE NUNES</b>', 40, {t:1}) +
         full(L('Assunto:') + SP, 56) +
         full(L('Nome do adolescente/criança:') + SP, 36) +
-        two(L('Data de nascimento:') + SP, '<b>Idade:</b>' + SP, 32) +
+        two(L('Data de nascimento:') + SP, L('Idade:') + SP, 32) +
         two(L('CPF:') + SP, L('NIS:') + SP, 32) +
         full(L('Responsável Familiar:') + SP, 32) +
         two(L('CPF:') + SP, L('Contato:') + SP, 32) +
@@ -83,7 +83,8 @@
         full('<p style="margin:14px 0 0 300px;width:282px;padding-top:3px;border-top:1px solid #000;text-align:center;font-weight:bold;line-height:1.5">Técnico de Referência</p>', 70, {b:1}) +
       '</tbody></table>' +
       '<div class="pb" contenteditable="false"></div>' +
-      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.5;margin:0">ANEXO</p>';
+      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.5;margin:0">ANEXO</p>' +
+      '<p style="' + F + 'line-height:1.5;margin:8px 0 0;text-align:justify;text-indent:1.25cm"><br></p>';
     return {
       title:'Encaminhamento', kind:'encaminhamento', html, abnt:false,
       sty:{f:'Times New Roman', hc:'', sp:'padrao'},
@@ -173,7 +174,7 @@
       '<table style="border-collapse:collapse;table-layout:fixed;width:' + W + 'px;margin:0"><colgroup><col style="width:22px"><col style="width:280px"><col style="width:80px"><col style="width:280px"><col style="width:21px"></colgroup><tbody><tr>' +
         td(22, '', {}) + td(280, tplBold('Responsável pelo Recebimento'), {a:'center', bt:1, h:26}).replace('vertical-align:bottom', 'vertical-align:top') + td(80, '', {}) + td(280, tplBold('Responsável pela Entrega'), {a:'center', bt:1, h:26}).replace('vertical-align:bottom', 'vertical-align:top') + td(21, '', {}) +
       '</tr></tbody></table>';
-    const corte = '<p style="' + F + 'line-height:1.5;margin:34px 0 14px;border-top:1px dashed #000;font-size:12pt;height:0;overflow:visible"><span style="position:relative;top:-12px;left:-34px">✂</span></p>';
+    const corte = '<p style="' + F + 'line-height:1.5;margin:34px 0 14px;border-top:1px dashed #000;font-size:12pt;height:0;overflow:visible"><span style="position:relative;top:-12px;left:0;background:#fff;padding-right:4px">✂</span></p>';
     const html = via + corte + via;
     return {
       title:'Declaração de Entrega de Cesta', kind:'declaracao', html, abnt:false,
@@ -210,13 +211,14 @@
       hd('05. PARECER TÉCNICO:') + box(62, '<p style="margin:0;line-height:1.5;text-align:left"><b>Concluo que:</b>&nbsp;</p>' + par) +
       hd('06. PROVIDÊNCIAS:') + box(49, '<ul style="margin:0;padding-left:40px;line-height:1.5;text-align:left"><li>Visita domiciliar;</li><li>Elaboração de estudo de caso.</li></ul>') +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;margin:31px 0 0;text-align:left;break-after:avoid">Informações adicionais:&nbsp;</p>' +
-      ('<p style="' + F + 'line-height:1.5;margin:0;text-align:justify"><br></p>').repeat(3) +
+      ('<p style="' + F + 'line-height:1.5;margin:0;text-align:justify;text-indent:1.25cm"><br></p>').repeat(3) +
       '<p style="' + F + 'line-height:1.5;margin:31px 0 0;text-align:right;break-after:avoid">Boa Vista – RR, {{DATA}}</p>' +
       ('<p style="' + F + 'line-height:1.5;margin:0;break-after:avoid"><br></p>').repeat(3) +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 323px;padding-top:3px;border-top:1px solid #000;text-align:right;break-after:avoid">Técnico de Referência</p>' +
       '<p style="' + F + 'font-weight:bold;line-height:1.5;width:326px;margin:0 0 0 323px;text-align:right">Psicólogo</p>' +
       '<div class="pb" contenteditable="false"></div>' +
-      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.5;margin:0">ANEXO</p>';
+      '<p style="' + F + 'font-weight:bold;text-align:center;line-height:1.5;margin:0">ANEXO</p>' +
+      '<p style="' + F + 'line-height:1.5;margin:8px 0 0;text-align:justify;text-indent:1.25cm"><br></p>';
     return {
       title:'Estudo de Caso', kind:'estudo', html, abnt:false,
       sty:{f:'Times New Roman', hc:'', sp:'padrao'},
