@@ -26,36 +26,51 @@
     const e = effMar(), pg = pgOf(), W = Math.max(CMPX, pg.w * CMPX - e.l - e.r), H = Math.max(CMPX, pg.h * CMPX - e.t - e.b) - 70;   // sobra espaço para um título (ex.: ANEXO) acima da 1ª página
     const out = [];
     for(let i = 1; i <= n; i++){
-      const p = await doc.getPage(i), v1 = p.getViewport({scale:1}), k = Math.min(2.5, 1600 / v1.width), v = p.getViewport({scale:k});
+      const p = await doc.getPage(i), v1 = p.getViewport({scale:1}), k = Math.min(2.5, 1600 / v1.width, 4000 / v1.height), v = p.getViewport({scale:k});   // limita largura e altura do canvas (páginas muito grandes ou compridas)
       const cv = document.createElement('canvas'); cv.width = Math.round(v.width); cv.height = Math.round(v.height);
       const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
       await p.render({canvasContext:cx, viewport:v}).promise;
       const r = v1.height / v1.width; let nw = Math.min(W, v1.width * 96 / 72), nh = nw * r; if(nh > H){ nh = H; nw = nh / r; }
       out.push('<div class="pdfx"><img alt="' + esc(file.name) + ' — página ' + i + '" src="' + cv.toDataURL('image/jpeg', 0.85) + '" style="width:' + Math.round(nw) + 'px;height:auto"></div>');
-      p.cleanup();
+      cv.width = cv.height = 0; p.cleanup();
     }
     doc.destroy();
     return out.join('<div class="pb" contenteditable="false"></div>');
   }
+  // PDF (divs e quebras de página) não pode ficar dentro de célula de tabela, lista ou caixa: o ponto de inserção vai para um parágrafo novo depois do bloco
+  function saiDeBloco(){
+    const s = getSelection(); if(!s.rangeCount || !page.contains(s.anchorNode)) return;
+    const n = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentNode, host = n.closest('td,th,li,.tbx,#fnotes,.fnotes,.endnotes');
+    if(!host || !page.contains(host)) return;
+    let top = host; while(top.parentNode && top.parentNode !== page) top = top.parentNode;
+    if(top.parentNode !== page) return;
+    const p = document.createElement('p'); p.appendChild(document.createElement('br')); top.after(p);
+    const r = document.createRange(); r.setStart(p, 0); r.collapse(true); s.removeAllRanges(); s.addRange(r);
+    document.dispatchEvent(new Event('selectionchange'));
+  }
+  let ocupado = false;
   window.__anexar = async function(files){
+    if(ocupado){ alert('Ainda estou anexando o arquivo anterior. Aguarde terminar.'); return; }
+    if(!page.isContentEditable) return;   // modo de leitura / documento travado
     files = [...files]; const bad = files.filter(f=>!isPdf(f) && !isImg(f));
     if(bad.length) alert('Só é possível anexar PDF e imagens (JPG, PNG…). Ignorado: ' + bad.map(f=>f.name).join(', '));
-    document.body.style.cursor = 'progress';
+    document.body.style.cursor = 'progress'; ocupado = true;
     try{
       for(const f of files){
         if(isPdf(f)){
           let h = ''; try{ h = await pdfHtml(f); }catch(err){ alert('Não foi possível ler o PDF "' + f.name + '". Ele pode estar protegido por senha ou danificado.'); continue; }
           if(!h) continue;
-          restore(); exec('insertHTML', h + '<p><br></p>'); changed();
+          restore(); saiDeBloco(); exec('insertHTML', h + '<p><br></p>'); changed();
         }else if(isImg(f)) await window.__insImgAsync(f);
       }
-    }finally{ document.body.style.cursor = ''; }
+    }finally{ document.body.style.cursor = ''; ocupado = false; }
   };
   // arrastar arquivos do computador para a folha (sem isto o navegador abre o arquivo e sai do documento)
   const has = e=>e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
   page.addEventListener('dragover', e=>{ if(has(e)){ e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
   page.addEventListener('drop', e=>{
     if(!has(e)) return; e.preventDefault();
+    if(!page.isContentEditable) return;
     const fs = [...e.dataTransfer.files].filter(f=>isPdf(f) || isImg(f)); if(!fs.length) return;
     try{
       const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
