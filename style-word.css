@@ -343,3 +343,8 @@ body.tbl-drag{user-select:none;-webkit-user-select:none}
 #page select.ccs,#page input.ccd{font:inherit;color:inherit;background:rgba(29,95,209,.09);border:0;border-radius:3px;padding:0 2px;max-width:100%}
 body.formmode #page{outline:2px solid rgba(29,95,209,.35);outline-offset:-2px}
 @media print{#page .ccf,#page select.ccs,#page input.ccd{background:none}#page select.ccs{appearance:none;-webkit-appearance:none}#page input.ccd::-webkit-calendar-picker-indicator{display:none}#page .ccf[data-ph]{color:inherit}}
+
+/* Impressão: o cursor (caret) não sai no papel/PDF (a regra de style.css perdia para "#page{caret-color:#000}" acima) */
+@media print{#page{caret-color:transparent !important}}
+/* Impressão: quadro de uma linha que atravessa a página (ex.: Relato do Encaminhamento) fecha embaixo e reabre em cima, com as bordas laterais nas duas páginas, como nos outros modelos */
+@media print{#page table:has(> tbody > tr[data-flow]){border-collapse:separate !important;border-spacing:0}#page tr[data-flow] > td{-webkit-box-decoration-break:clone;box-decoration-break:clone}}
