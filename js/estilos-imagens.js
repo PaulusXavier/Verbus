@@ -496,8 +496,8 @@
       if(editingHF()){ addHF(pr.src, pr.w, pr.h, window.__hfActive ? window.__hfActive() : 'h'); return; }
       await insertBody(pr.src, pr.w, pr.h);
     }
-    window.__insImgFile = f=>{ insFile(f).catch(()=>alert('Não foi possível inserir a imagem.')); };
-    window.__insImgAsync = f=>insFile(f).catch(()=>alert('Não foi possível inserir a imagem.'));
+    window.__insImgFile = f=>{ insFile(f, 'auto').catch(()=>alert('Não foi possível inserir a imagem.')); };
+    window.__insImgAsync = f=>insFile(f, 'auto').catch(()=>alert('Não foi possível inserir a imagem.'));
     fileImg.addEventListener('change', e=>{
       const fs = [...e.target.files]; e.target.value = ''; if(!fs.length) return;
       if(mode === 'auto' && window.__anexar){ window.__anexar(fs); return; }   // no corpo do documento: vários arquivos, imagens e PDF
