@@ -458,7 +458,7 @@
 
     // ---- inserir no corpo: cabe na área do texto (largura e altura)
     async function insertBody(src, w, h){
-      const W = contentW(), H = contentH();
+      const W = contentW(), H = contentH() - 40;   // folga de ~1 linha: com a altura inteira, o parágrafo depois da imagem ia para uma página em branco
       let nw = Math.min(w, W), nh = h * nw / w; if(nh > H){ nh = H; nw = w * nh / h; }
       restore();
       exec('insertHTML', '<img data-new="1" src="' + src + '" style="width:' + Math.round(nw) + 'px;height:auto">');
@@ -497,7 +497,14 @@
       await insertBody(pr.src, pr.w, pr.h);
     }
     window.__insImgFile = f=>{ insFile(f).catch(()=>alert('Não foi possível inserir a imagem.')); };
-    fileImg.addEventListener('change', e=>{ const f = e.target.files[0]; e.target.value = ''; if(f) insFile(f).catch(()=>alert('Não foi possível inserir a imagem.')); });
+    window.__insImgAsync = f=>insFile(f).catch(()=>alert('Não foi possível inserir a imagem.'));
+    fileImg.addEventListener('change', e=>{
+      const fs = [...e.target.files]; e.target.value = ''; if(!fs.length) return;
+      if(mode === 'auto' && window.__anexar){ window.__anexar(fs); return; }   // no corpo do documento: vários arquivos, imagens e PDF
+      const f = fs[0];
+      if(/pdf/i.test(f.type) || /\.pdf$/i.test(f.name)){ mode = 'auto'; alert('PDF só pode ser anexado no corpo do documento (Inserir > Imagens > Este Dispositivo).'); return; }
+      insFile(f).catch(()=>alert('Não foi possível inserir a imagem.'));
+    });
     const pick = m=>{ mode = m; fileImg.click(); };
     $('btnImg').addEventListener('click', ()=>{ mode = 'auto'; });
     $('btnImgHF').addEventListener('click', ()=>pick('h'));
