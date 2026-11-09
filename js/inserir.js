@@ -277,7 +277,7 @@
     bind('btnImg', b=>{
       const sel = $('selImg'); try{ sel.dispatchEvent(new Event('focus')); }catch(e){}
       const its = sel._items || [];
-      const list = [{t:'Este Dispositivo…', f:()=>$('fileImg').click()}, {t:'Imagem no Cabeçalho…', f:()=>$('btnImgHF').click()}, {t:'Imagem no Rodapé…', f:()=>$('btnImgFT').click()}, '-', {h:'Selecionar imagem do documento'}];
+      const list = [{t:'Este Dispositivo… (imagem ou PDF)', f:()=>$('fileImg').click()}, {t:'Imagem no Cabeçalho…', f:()=>$('btnImgHF').click()}, {t:'Imagem no Rodapé…', f:()=>$('btnImgFT').click()}, '-', {h:'Selecionar imagem do documento'}];
       if(its.length) its.forEach(x=>list.push({t:x.t, f:()=>x.run()})); else list.push({t:'(nenhuma imagem no documento)', dis:true, f:()=>{}});
       menu(b, list);
     });
