@@ -26,12 +26,12 @@
     const e = effMar(), pg = pgOf(), W = Math.max(CMPX, pg.w * CMPX - e.l - e.r), H = Math.max(CMPX, pg.h * CMPX - e.t - e.b) - 70;   // sobra espaço para um título (ex.: ANEXO) acima da 1ª página
     const out = [];
     for(let i = 1; i <= n; i++){
-      const p = await doc.getPage(i), v1 = p.getViewport({scale:1}), k = Math.min(2.5, 1600 / v1.width, 4000 / v1.height), v = p.getViewport({scale:k});   // limita largura e altura do canvas (páginas muito grandes ou compridas)
+      const p = await doc.getPage(i), v1 = p.getViewport({scale:1}), k = Math.min(2.2, 1500 / v1.width, 4000 / v1.height), v = p.getViewport({scale:k});   // limita largura e altura do canvas (páginas muito grandes ou compridas)
       const cv = document.createElement('canvas'); cv.width = Math.round(v.width); cv.height = Math.round(v.height);
       const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
       await p.render({canvasContext:cx, viewport:v}).promise;
       const r = v1.height / v1.width; let nw = Math.min(W, v1.width * 96 / 72), nh = nw * r; if(nh > H){ nh = H; nw = nh / r; }
-      out.push('<div class="pdfx"><img alt="' + esc(file.name) + ' — página ' + i + '" src="' + cv.toDataURL('image/jpeg', 0.85) + '" style="width:' + Math.round(nw) + 'px;height:auto"></div>');
+      out.push('<div class="pdfx"><img alt="' + esc(file.name) + ' — página ' + i + '" src="' + cv.toDataURL('image/jpeg', 0.8) + '" style="width:' + Math.round(nw) + 'px;height:auto"></div>');
       cv.width = cv.height = 0; p.cleanup();
     }
     doc.destroy();
@@ -48,6 +48,26 @@
     const r = document.createRange(); r.setStart(p, 0); r.collapse(true); s.removeAllRanges(); s.addRange(r);
     document.dispatchEvent(new Event('selectionchange'));
   }
+  // Onde o PDF começa: sempre em folha nova e com o título ANEXO (a não ser que o ponto de inserção já esteja logo abaixo de um ANEXO ou de outro PDF).
+  // Antes isto não era feito: em modelos sem página de anexo (Desligamento, Relatório…) o PDF entrava no meio da folha, depois da assinatura.
+  const vazio = n=>!(n.textContent || '').replace(/[\s\u200b\u00a0]/g, '') && !(n.querySelector && n.querySelector('img,table,canvas,iframe'));
+  const PB = '<div class="pb" contenteditable="false"></div>';
+  const TIT = '<p style="font-weight:bold;text-align:center;line-height:1.5;margin:0;text-indent:0;break-after:avoid">ANEXO</p>';
+  function contexto(){
+    const s = getSelection(); let top = null;
+    if(s.rangeCount && page.contains(s.anchorNode)){ top = s.anchorNode; while(top && top.parentNode !== page) top = top.parentNode; if(top && top.nodeType !== 1) top = null; }
+    const near = dir=>{ let n = top ? (dir < 0 ? top.previousElementSibling : top.nextElementSibling) : (dir < 0 ? page.lastElementChild : null); while(n && n.nodeType === 1 && !n.matches('.pb,.sbk') && vazio(n)) n = dir < 0 ? n.previousElementSibling : n.nextElementSibling; return n; };
+    const own = top && top.nodeType === 1 && !vazio(top);   // a linha onde está o cursor tem texto: o PDF entra depois dela, em folha nova
+    const prev = own ? top : near(-1), next = near(1);
+    return {prev, next, own};
+  }
+  function prefixo(c, primeiro){
+    const p = c.prev; if(!p) return primeiro ? TIT : PB;
+    if(primeiro && p.matches && p.matches('p,div') && /^\s*ANEXO\s*$/i.test(p.textContent) ) return '';
+    if(p.matches && p.matches('.pdfx')) return PB;
+    if(p.matches && p.matches('.pb,.sbk')) return primeiro ? TIT : '';
+    return PB + (primeiro ? TIT : '');
+  }
   let ocupado = false;
   window.__anexar = async function(files){
     if(ocupado){ alert('Ainda estou anexando o arquivo anterior. Aguarde terminar.'); return; }
@@ -56,15 +76,38 @@
     if(bad.length) alert('Só é possível anexar PDF e imagens (JPG, PNG…). Ignorado: ' + bad.map(f=>f.name).join(', '));
     document.body.style.cursor = 'progress'; ocupado = true;
     try{
+      let primeiro = true;
       for(const f of files){
         if(isPdf(f)){
           let h = ''; try{ h = await pdfHtml(f); }catch(err){ alert('Não foi possível ler o PDF "' + f.name + '". Ele pode estar protegido por senha ou danificado.'); continue; }
           if(!h) continue;
-          restore(); saiDeBloco(); exec('insertHTML', h + '<p><br></p>'); changed();
+          restore(); saiDeBloco();
+          const c = contexto(), pre = prefixo(c, primeiro), depois = c.next && !c.next.matches('.pb,.sbk') ? PB : '';
+          // o próprio parágrafo do cursor tem texto: o PDF vai depois dele
+          if(c.own){ const s = getSelection(), r = document.createRange(); let t = c.prev; while(t.parentNode !== page) t = t.parentNode; const np = document.createElement('p'); np.appendChild(document.createElement('br')); t.after(np); r.setStart(np, 0); r.collapse(true); s.removeAllRanges(); s.addRange(r); }
+          exec('insertHTML', pre + h + depois + '<p><br></p>'); changed(); primeiro = false;
         }else if(isImg(f)) await window.__insImgAsync(f);
       }
     }finally{ document.body.style.cursor = ''; ocupado = false; }
   };
+  // clicar numa página do PDF a seleciona (contorno azul); Delete/Backspace apaga só aquela página (e a quebra de folha ao lado dela)
+  let selPdf = null;
+  const limpa = ()=>{ if(selPdf){ selPdf.classList.remove('sel'); selPdf = null; } };
+  page.addEventListener('click', e=>{
+    const d = e.target.closest && e.target.closest('.pdfx'); limpa();
+    if(d && page.isContentEditable){ selPdf = d; d.classList.add('sel'); }
+  });
+  document.addEventListener('keydown', e=>{
+    if(!selPdf) return;
+    if((e.key === 'Delete' || e.key === 'Backspace') && page.contains(selPdf) && !e.ctrlKey && !e.metaKey){
+      e.preventDefault(); e.stopImmediatePropagation();
+      const d = selPdf; limpa();
+      const nx = d.nextElementSibling, pv = d.previousElementSibling;
+      if(nx && nx.matches('.pb')) nx.remove(); else if(pv && pv.matches('.pb')) pv.remove();
+      d.remove(); changed(); return;
+    }
+    if(!/^(Control|Shift|Alt|Meta)$/.test(e.key)) limpa();
+  }, true);
   // arrastar arquivos do computador para a folha (sem isto o navegador abre o arquivo e sai do documento)
   const has = e=>e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
   page.addEventListener('dragover', e=>{ if(has(e)){ e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
