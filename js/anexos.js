@@ -14,16 +14,17 @@
       document.head.appendChild(s);
     }));
   }
-  const esc = s=>String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  const esc = s=>String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   async function pdfHtml(file){
     const lib = await loadPdfjs(), buf = await file.arrayBuffer();
     const doc = await lib.getDocument({data:buf}).promise;
+    try{
     let n = doc.numPages;
     if(n > MAXPAG){
-      if(!confirm('O PDF "' + file.name + '" tem ' + n + ' páginas. Anexar só as ' + MAXPAG + ' primeiras? (cada página vira uma imagem dentro do documento)')) { doc.destroy(); return ''; }
+      if(!confirm('O PDF "' + file.name + '" tem ' + n + ' páginas. Anexar só as ' + MAXPAG + ' primeiras? (cada página vira uma imagem dentro do documento)')) return '';
       n = MAXPAG;
     }
-    const e = effMar(), pg = pgOf(), W = Math.max(CMPX, pg.w * CMPX - e.l - e.r), H = Math.max(CMPX, pg.h * CMPX - e.t - e.b) - 70;   // sobra espaço para um título (ex.: ANEXO) acima da 1ª página
+    const e = effMar(), pg = pgOf(), W = Math.max(CMPX, pg.w * CMPX - e.l - e.r), H = Math.max(CMPX, pg.h * CMPX - e.t - e.b - 70);   // sobra espaço para um título (ex.: ANEXO) acima da 1ª página
     const out = [];
     for(let i = 1; i <= n; i++){
       const p = await doc.getPage(i), v1 = p.getViewport({scale:1}), k = Math.min(2.2, 1500 / v1.width, 4000 / v1.height), v = p.getViewport({scale:k});   // limita largura e altura do canvas (páginas muito grandes ou compridas)
@@ -34,8 +35,8 @@
       out.push('<div class="pdfx"><img alt="' + esc(file.name) + ' — página ' + i + '" src="' + cv.toDataURL('image/jpeg', 0.8) + '" style="width:' + Math.round(nw) + 'px;height:auto"></div>');
       cv.width = cv.height = 0; p.cleanup();
     }
-    doc.destroy();
     return out.join('<div class="pb" contenteditable="false"></div>');
+    }finally{ doc.destroy(); }   // libera o PDF também quando uma página falha ou o usuário cancela
   }
   // PDF (divs e quebras de página) não pode ficar dentro de célula de tabela, lista ou caixa: o ponto de inserção vai para um parágrafo novo depois do bloco
   function saiDeBloco(){
@@ -90,6 +91,14 @@
       }
     }finally{ document.body.style.cursor = ''; ocupado = false; }
   };
+  // botão Inserir > Anexar PDF: antes não tinha nenhuma ação. Usa um seletor de arquivo próprio (não depende do modo cabeçalho/rodapé do seletor de imagens)
+  (function(){
+    const btn = document.getElementById('btnPdfAx'); if(!btn) return;
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/pdf,.pdf,image/*'; inp.multiple = true; inp.hidden = true; document.body.appendChild(inp);
+    btn.addEventListener('mousedown', e=>e.preventDefault());   // não tira o cursor da folha
+    btn.addEventListener('click', ()=>{ if(page.isContentEditable) inp.click(); });
+    inp.addEventListener('change', ()=>{ const fs = [...inp.files]; inp.value = ''; if(fs.length) window.__anexar(fs); });
+  })();
   // clicar numa página do PDF a seleciona (contorno azul); Delete/Backspace apaga só aquela página (e a quebra de folha ao lado dela)
   let selPdf = null;
   const limpa = ()=>{ if(selPdf){ selPdf.classList.remove('sel'); selPdf = null; } };
@@ -97,14 +106,19 @@
     const d = e.target.closest && e.target.closest('.pdfx'); limpa();
     if(d && page.isContentEditable){ selPdf = d; d.classList.add('sel'); }
   });
+  document.addEventListener('mousedown', e=>{ if(selPdf && !(e.target.closest && e.target.closest('.pdfx'))) limpa(); }, true);   // clicar fora da página marcada tira a marcação
   document.addEventListener('keydown', e=>{
     if(!selPdf) return;
-    if((e.key === 'Delete' || e.key === 'Backspace') && page.contains(selPdf) && !e.ctrlKey && !e.metaKey){
+    if(!page.contains(selPdf)){ limpa(); return; }
+    // Antes: com uma página do PDF marcada, Backspace/Delete digitado em OUTRO campo (título, Localizar, caixas de diálogo) apagava a página
+    const noCampo = e.target && e.target.closest && e.target.closest('input,textarea,select');
+    if((e.key === 'Delete' || e.key === 'Backspace') && !noCampo && !e.ctrlKey && !e.metaKey){
       e.preventDefault(); e.stopImmediatePropagation();
       const d = selPdf; limpa();
+      const b4 = typeof tSnap === 'function' ? tSnap() : null;   // permite Ctrl+Z (o desfazer nativo não enxerga remoções feitas direto no DOM)
       const nx = d.nextElementSibling, pv = d.previousElementSibling;
       if(nx && nx.matches('.pb')) nx.remove(); else if(pv && pv.matches('.pb')) pv.remove();
-      d.remove(); changed(); return;
+      d.remove(); if(b4 != null && typeof tCommit === 'function') tCommit(b4); changed(); return;
     }
     if(!/^(Control|Shift|Alt|Meta)$/.test(e.key)) limpa();
   }, true);
@@ -116,7 +130,9 @@
     if(!page.isContentEditable) return;
     const fs = [...e.dataTransfer.files].filter(f=>isPdf(f) || isImg(f)); if(!fs.length) return;
     try{
-      const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
+      let r = null;
+      if(document.caretRangeFromPoint) r = document.caretRangeFromPoint(e.clientX, e.clientY);
+      else if(document.caretPositionFromPoint){ const cp = document.caretPositionFromPoint(e.clientX, e.clientY); if(cp){ r = document.createRange(); r.setStart(cp.offsetNode, cp.offset); r.collapse(true); } }   // Firefox
       if(r && page.contains(r.startContainer)){ const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
     }catch(err){}
     window.__anexar(fs);
