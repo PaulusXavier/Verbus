@@ -103,6 +103,48 @@
   window.__abrirArquivo = pickOpen;
   document.getElementById('btnOpen').addEventListener('click', pickOpen);
   document.getElementById('fileOpen').addEventListener('change', e=>{ const f = e.target.files[0]; if(f) abrirArquivo(f, null); e.target.value = ''; });
+  // Corpo de um HTML/.doc/.docx gerado pelo Verbus: tira o invólucro Section1 e o cabeçalho/rodapé do Word (mso-element), que não fazem parte do texto
+  function corpoImportado(doc){
+    doc.querySelectorAll('style').forEach(n=>n.remove());
+    const b = doc.body;
+    b.querySelectorAll('[style*="mso-element"]').forEach(n=>n.remove());
+    b.querySelectorAll(':scope > div').forEach(d=>{ if(/^(Section1|WordSection\d+)$/.test(d.className)) d.replaceWith(...d.childNodes); });
+    sanitizarHtml(b);
+    return b.innerHTML;
+  }
+  // O .docx gravado pelo Verbus (html-docx-js) guarda o texto num anexo HTML (word/afchunk.mht), que o mammoth não lê: extrai o HTML e as imagens dele
+  function qpDecode(s, cs){
+    s = s.replace(/=\r?\n/g, '');
+    const by = [];
+    for(let i = 0; i < s.length; i++){
+      const c = s[i];
+      if(c === '=' && /^[0-9A-Fa-f]{2}$/.test(s.substr(i + 1, 2))){ by.push(parseInt(s.substr(i + 1, 2), 16)); i += 2; }
+      else{ const o = s.charCodeAt(i); if(o < 128) by.push(o); else new TextEncoder().encode(s[i]).forEach(x=>by.push(x)); }
+    }
+    try{ return new TextDecoder(cs || 'utf-8').decode(new Uint8Array(by)); }catch(e){ return new TextDecoder('utf-8').decode(new Uint8Array(by)); }
+  }
+  async function docxAltChunk(ab){
+    if(!window.JSZip || !window.JSZip.loadAsync) await loadScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js');
+    const zip = await window.JSZip.loadAsync(ab);
+    const dx = zip.file('word/document.xml'), ch = zip.file('word/afchunk.mht');
+    if(!dx || !ch || !/<w:altChunk\b/.test(await dx.async('string'))) return null;
+    const mht = await ch.async('string');
+    const bm = /boundary="?([^"\r\n;]+)"?/i.exec(mht); if(!bm) return null;
+    let html = null; const imgs = [];
+    mht.split('--' + bm[1]).forEach(part=>{
+      const cut = /\r?\n\r?\n/.exec(part); if(!cut) return;
+      const head = part.slice(0, cut.index).replace(/\r?\n[ \t]+/g, ' '), body = part.slice(cut.index + cut[0].length);
+      const hd = n=>{ const m = new RegExp('^' + n + ':\\s*(.*)$', 'im').exec(head); return m ? m[1].trim() : ''; };
+      const ct = hd('Content-Type'), enc = hd('Content-Transfer-Encoding').toLowerCase(), loc = hd('Content-Location');
+      if(/^text\/html/i.test(ct)){
+        const cs = (/charset="?([\w-]+)"?/i.exec(ct) || [])[1];
+        html = enc === 'quoted-printable' ? qpDecode(body, cs) : enc === 'base64' ? new TextDecoder(cs || 'utf-8').decode(Uint8Array.from(atob(body.replace(/\s+/g, '')), c=>c.charCodeAt(0))) : body;
+      }else if(/^image\//i.test(ct) && enc === 'base64' && loc) imgs.push([loc, 'data:' + ct.split(';')[0].trim() + ';base64,' + body.replace(/\s+/g, '')]);
+    });
+    if(html == null) return null;
+    imgs.forEach(([loc, uri])=>{ html = html.split(loc).join(uri); });
+    return corpoImportado(new DOMParser().parseFromString(html, 'text/html'));
+  }
   function abrirArquivo(f, handle){
     if(page.innerText.trim()) newDoc();
     const idDoc = store.current;
@@ -113,9 +155,15 @@
     if(/\.docx$/i.test(f.name)){
       (async()=>{
         try{
-          if(!window.mammoth) await loadScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js');
-          const res = await window.mammoth.convertToHtml({arrayBuffer: await f.arrayBuffer()});
-          page.innerHTML = sanitizarHtml(new DOMParser().parseFromString(res.value, 'text/html').body).innerHTML; title.value = f.name.replace(/\.[^.]+$/, ''); changed(); ligar();
+          const ab = await f.arrayBuffer();
+          let corpo = null;
+          try{ corpo = await docxAltChunk(ab); }catch(e){ corpo = null; }   // .docx gravado pelo próprio Verbus
+          if(corpo == null){
+            if(!window.mammoth) await loadScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js');
+            const res = await window.mammoth.convertToHtml({arrayBuffer: ab});
+            corpo = sanitizarHtml(new DOMParser().parseFromString(res.value, 'text/html').body).innerHTML;
+          }
+          page.innerHTML = corpo; title.value = f.name.replace(/\.[^.]+$/, ''); changed(); ligar();
         }catch(err){ alert('Não foi possível abrir o .docx. Verifique a conexão com a internet.'); }
       })();
       return;
@@ -124,10 +172,7 @@
     r.onload = ()=>{
       const isHtml = /\.(html?|doc)$/i.test(f.name);
       if(isHtml){
-        const doc = new DOMParser().parseFromString(r.result, 'text/html');
-        doc.querySelectorAll('style').forEach(n=>n.remove());
-        sanitizarHtml(doc.body);
-        page.innerHTML = doc.body.innerHTML;
+        page.innerHTML = corpoImportado(new DOMParser().parseFromString(r.result, 'text/html'));
       }else{
         page.textContent = '';
         r.result.split(/\r?\n/).forEach(l=>{ const p = document.createElement('p'); p.textContent = l || '\u200b'; page.appendChild(p); });
