@@ -2,7 +2,7 @@
    (js/salvar.js). Os arquivos de js/ formam um só programa e compartilham o escopo global; a ordem de <script> em index.html importa. */
 // ================= Mais funções =================
   function loadScript(src){
-    return new Promise((ok, no)=>{ const t = document.createElement('script'); t.src = src; t.onload = ok; t.onerror = no; document.head.appendChild(t); });
+    return new Promise((ok, no)=>{ const t = document.createElement('script'); t.crossOrigin = 'anonymous'; t.src = src; t.onload = ok; t.onerror = no; document.head.appendChild(t); });
   }
 
   // Tamanho da fonte em pontos
